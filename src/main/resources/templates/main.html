@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Main Page</title>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header" />
+
+<div class="cat_page">
+    <p><a class="gt_community" href="/Nyangmunity/community">커뮤니티 바로가기</a></p>
+</div>
+<img th:src="@{/images/logo.png}">
+
+<div th:replace="fragments/footer :: footer" />
+
+</body>
+</html>
