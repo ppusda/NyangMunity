@@ -1,0 +1,23 @@
+.header {
+  width: 100%;
+  position: static;
+  top: 0%;
+  background-color: #333;
+  border-radius: 0px 0px 30px 30px;
+}
+
+#img_logo {
+  position: relative;
+  left: 50%;
+  transform:translate(-50%, 0%);
+  margin: 0.2%;
+  width: 13%;
+  height: 13%;
+}
+
+.menu {
+  position: relative;
+  left: 75%;
+  transform:translate(-50%, 0%);
+  font-size: 1vw;
+}
