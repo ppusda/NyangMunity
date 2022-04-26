@@ -6,26 +6,24 @@ html{
 body{
   height:100%;
   width: 100%;
-  background-image: url("/images/background.jpg");
+  background: url("/images/background.jpg") rgba(51, 51, 51, 0.9);
+  background-blend-mode: multiply;
   background-size: contain;
 }
 
-.cat_page {
+.cat_page, .login_div{
   position: relative;
   left: 50%;
   transform:translate(-50%, 0%);
-  height: 85%;
-  width: 80%;
 }
 
-#main_img {
-  width: 100%;
-  height: 100%;
+#main_img{
+  margin-top: 5vw;
   position: relative;
   left: 50%;
   transform:translate(-50%, 0%);
   object-fit: contain;
-  background: rgba(51, 51, 51, 0.9);
+
 }
 
 .gt_community {
@@ -45,4 +43,5 @@ body{
   right: 0;
   transform:translate(-50%, -50%);
   color: white;
+  font-size: 0.8vw;
 }
