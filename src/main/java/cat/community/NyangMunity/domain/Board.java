@@ -1,28 +1,33 @@
 package cat.community.NyangMunity.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
-import static javax.persistence.FetchType.LAZY;
-
-@Entity
-@Getter @Setter
+@Entity @Table(name = "BOARD")
 public class Board {
 
-    @Id
-    @GeneratedValue
-    private String numId;
+    @Id @Column(name = "BOARD_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "TITLE")
     private String title;
-    private String contents;
-    private String date;
 
-    @ManyToOne(fetch = LAZY)
+    @Column(name = "CONTENT")
+    private String content;
+
+    @Column(name = "CREATE_DATE")
+    private String createDate;
+
+    @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private User user;
 
+    @Column(name = "NICKNAME")
     private String nickname;
 
 }
