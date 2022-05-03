@@ -11,7 +11,7 @@ body{
   background-size: contain;
 }
 
-.cat_page, .login_div{
+.cat_page{
   position: relative;
   left: 50%;
   transform:translate(-50%, 0%);
@@ -23,7 +23,6 @@ body{
   left: 50%;
   transform:translate(-50%, 0%);
   object-fit: contain;
-
 }
 
 .gt_community {
@@ -35,13 +34,4 @@ body{
   left: 50%;
   top: 90%;
   transform:translate(-50%, -50%);
-}
-
-#cat_intro {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  transform:translate(-50%, -50%);
-  color: white;
-  font-size: 0.8vw;
 }

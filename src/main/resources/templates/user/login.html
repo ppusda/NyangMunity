@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/css/login.css">
+    <link rel="stylesheet" type="text/css" href="/css/footer.css">
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Main Page</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"/>
+
+    <div class="login_div">
+        <form th:method="post" th:action="@{/user/login}" th:id="loginForm">
+            <table>
+                <tr>
+                    <td><a>ID : </a></td> <td><input id="email" name="email" type="text"></td>
+                </tr>
+                <tr>
+                    <td><a>PW : </a></td> <td><input id="password" name="password" type="password"></td>
+                </tr>
+                <tr>
+                    <td> <input type="submit" value="커뮤니티 로그인"> </td> <td> <a th:onclick="|location.href='@{/user/join}'|"> 회원가입 </a></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <a th:href="@{https://kauth.kakao.com/oauth/authorize?client_id=78effdc7d3e403e800af579ee0059fef&redirect_uri=http://localhost:8080/loginKakao&response_type=code}">
+                            <img src="/images/kakao_login.png"/>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
+
+<div th:replace="fragments/footer :: footer"/>
+</body>
+</html>

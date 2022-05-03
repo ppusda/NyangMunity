@@ -1,0 +1,11 @@
+.login_div{
+    position: relative;
+    margin: 20vw;
+    text-align: center;
+    background: rgba(51, 51, 51);
+    padding: 10vw;
+}
+
+#basicLogin{
+    background-image: url("/images/login.jpg");
+}
