@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css">
     <link rel="stylesheet" type="text/css" href="/css/main.css">
@@ -11,6 +12,7 @@
 </head>
 <body>
 <div th:replace="fragments/header :: header"/>
+    <input value="true" th:value="${loginState}" type="text" name="loginState" id="loginState" hidden="true"/>
 
     <div class="login_div">
         <form th:method="post" th:action="@{/user/login}" th:id="loginForm">
@@ -22,7 +24,7 @@
                     <td><a>PW : </a></td> <td><input id="password" name="password" type="password"></td>
                 </tr>
                 <tr>
-                    <td> <input type="submit" value="커뮤니티 로그인"> </td> <td> <a th:onclick="|location.href='@{/user/join}'|"> 회원가입 </a></td>
+                    <td> <input id="loginBtn" type="button" onclick="chkValue()" value="커뮤니티 로그인"> </td> <td> <a th:onclick="|location.href='@{/user/join}'|"> 회원가입 </a></td>
                 </tr>
                 <tr>
                     <td colspan="2">
@@ -39,4 +41,29 @@
 
 <div th:replace="fragments/footer :: footer"/>
 </body>
+<script type="text/javascript">
+    const loginForm = document.querySelector("#loginForm");
+
+    function chkValue(){
+        const email = document.querySelector("#email").value;
+        const password = document.querySelector("#password").value;
+
+        if(email === ''){
+            alert("ID를 입력해주세요!");
+        }else if(password === ''){
+            alert("PW를 입력해주세요!");
+        }else{
+            loginForm.submit();
+        }
+    }
+
+    $(document).ready(function () {
+        if($("#loginState").val() === "fail"){
+            alert("계정 정보가 잘못되었습니다.");
+            return history.go(-1);
+        }
+    });
+
+
+</script>
 </html>
