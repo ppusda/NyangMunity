@@ -11,17 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity @Table(name = "USER")
+@Getter @Setter
 public class User {
 
     @Id @Column(name = "USER_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "EMAIL", nullable = false)
+    private String email;
+
     @Column(name = "PASSWORD", nullable = false)
     private String password;
-
-    @Column(name = "GENDER")
-    private String gender;
 
     @Column(name = "NICKNAME", nullable = false)
     private String nickname;
@@ -29,7 +30,7 @@ public class User {
     @Column(name = "CREATE_DATE", nullable = false)
     private LocalDateTime createDate;
 
-    @Column(name = "BIRTHDAY", nullable = false)
+    @Column(name = "BIRTHDAY")
     private LocalDateTime birthday;
 
 }
