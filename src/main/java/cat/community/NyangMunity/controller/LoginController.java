@@ -9,9 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @Slf4j
@@ -19,6 +21,7 @@ import java.io.IOException;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class LoginController {
+
     private final UserRepository userRepository;
 
     @GetMapping("/login")
@@ -27,7 +30,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    private String loginComplete(HttpServletResponse response, UserForm userForm, Model model) throws IOException {
+    private String loginComplete(@RequestBody @Valid UserForm userForm, Model model) throws IOException {
         User loginUser;
         try{
             loginUser = userRepository.findByEmailPassword(userForm.getEmail(), userForm.getPassword());
@@ -44,7 +47,6 @@ public class LoginController {
 
     @RequestMapping("/kakaoLogin")
     public String loginKakao(){
-
         return "/main";
     }
 }

@@ -25,7 +25,6 @@ public class JoinController {
 
     @GetMapping("/join")
     private String userJoin(Model model){
-
         model.addAttribute("userForm", new UserForm());
         return "/user/join";
     }

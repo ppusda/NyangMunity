@@ -13,15 +13,20 @@
 <div th:replace="fragments/header :: header"/>
 
 <div class="community_div">
-    <form th:method="post">
-        <tbody>
-            <tr>
-                <td th:text="${loginUser.id}"></td>
-                <td th:text="${loginUser.email}"></td>
-                <td th:text="${loginUser.password}"></td>
-            </tr>
-        </tbody>
-    </form>
+    <table>
+        <tr>
+            <th>번호</th><th>제목</th><th>글쓴이</th><th>고양이</th><th>작성일</th>
+        </tr>
+        <tr th:each="board : ${boards}">
+            <td><a href="board.html" th:href="@{/basic/boards/{itemId}(itemId=${item.id})}"
+                   th:text="${board.id}">글ID</a></td>
+            <td><a href="board.html" th:href="@{|/basic/boards/${item.id}|}"
+                   th:text="${board.itemName}">제목</a></td>
+            <td th:text="${board.price}">글쓴이</td>
+            <td th:text="${board.quantity}">고양이</td>
+            <td th:text="${board.quantity}">작성일</td>
+        </tr>
+    </table>
 </div>
 
 <div th:replace="fragments/footer :: footer"/>
