@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -22,27 +23,17 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final UserRepository userRepository;
-
     @GetMapping("/login")
     public String loginPage(){
         return "/user/login";
     }
 
     @PostMapping("/login")
-    private String loginComplete(@RequestBody @Valid UserForm userForm, Model model) throws IOException {
-        User loginUser;
-        try{
-            loginUser = userRepository.findByEmailPassword(userForm.getEmail(), userForm.getPassword());
-            model.addAttribute("loginState", "true");
-        }catch (Exception e){
-            model.addAttribute("loginState", "fail");
-            return "/user/login";
-        }
-
-        model.addAttribute("loginUser", loginUser);
-
-        return "/community/community";
+    private UserForm loginComplete(@RequestBody @Valid UserForm userForm, Model model) throws IOException {
+        log.info("email : " + userForm.getEmail());
+        log.info("password : " + userForm.getPassword());
+        return userForm;
+        //return "/community/community";
     }
 
     @RequestMapping("/kakaoLogin")

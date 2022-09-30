@@ -21,26 +21,13 @@ import java.time.LocalDateTime;
 @RequestMapping("/user")
 public class JoinController {
 
-    private final UserRepository userRepository;
-
     @GetMapping("/join")
     private String userJoin(Model model){
-        model.addAttribute("userForm", new UserForm());
         return "/user/join";
     }
 
     @PostMapping("/join")
     private String userJoinConfirm(@Valid JoinForm joinForm, HttpServletResponse response) throws IOException {
-
-        User user = new User();
-
-        user.setEmail(joinForm.getEmail());
-        user.setPassword(joinForm.getPassword());
-        user.setNickname(joinForm.getNickname());
-        user.setCreateDate(LocalDateTime.now());
-
-        userRepository.save(user);
-
         return "/user/joinConfirm";
     }
 
