@@ -3,7 +3,6 @@ package cat.community.NyangMunity.repository;
 import cat.community.NyangMunity.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -14,7 +13,7 @@ import java.util.List;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class UserRepository {
+public class LoginRepository {
 
     private final EntityManager em;
 

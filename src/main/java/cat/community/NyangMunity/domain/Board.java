@@ -1,14 +1,17 @@
 package cat.community.NyangMunity.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity @Table(name = "BOARD")
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Board {
+
+    public Board(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
     @Id @Column(name = "BOARD_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
