@@ -15,7 +15,11 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     public void write(BoardForm boardForm){
-        Board board = new Board(boardForm.getTitle(), boardForm.getContent());
+        Board board = Board.builder()
+                .title(boardForm.getTitle())
+                .content(boardForm.getContent())
+                .build();
+
         boardRepository.save(board);
     }
 

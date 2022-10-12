@@ -17,9 +17,14 @@ public class BoardController {
 
     private final BoardService boardService;
 
+//    @PostMapping("/write")
+//    public @ResponseBody BoardForm BoardWrite(@RequestBody @Valid BoardForm boardForm) {
+//        boardService.write(boardForm);
+//        return boardForm;
+//    }
+
     @PostMapping("/write")
-    public @ResponseBody BoardForm BoardWrite(@RequestBody @Valid BoardForm boardForm) {
+    public void BoardWrite(@RequestBody @Valid BoardForm boardForm) {
         boardService.write(boardForm);
-        return boardForm;
     }
 }

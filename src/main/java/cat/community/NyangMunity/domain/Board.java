@@ -8,6 +8,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Board {
 
+    @Builder
     public Board(String title, String content) {
         this.title = title;
         this.content = content;

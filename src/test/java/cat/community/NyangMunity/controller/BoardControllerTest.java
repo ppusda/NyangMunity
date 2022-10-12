@@ -1,6 +1,8 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.repository.BoardRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BoardControllerTest {
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -51,12 +56,40 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("미로미로 빔")
-    void test3() throws Exception {
+    @DisplayName("post 요청 시 json을 출력한다.")
+    void test() throws Exception{
+
+        BoardForm boardForm = BoardForm.builder()
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        String json = objectMapper.writeValueAsString(boardForm);
+
+        System.out.println(json);
+
+        mockMvc.perform(post("/write")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                ).andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("post 요청 시 DB에 값을 저장한다.")
+    void postRequestInputDB() throws Exception {
+
+        BoardForm boardForm = BoardForm.builder()
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        String json = objectMapper.writeValueAsString(boardForm);
+
         // when
         mockMvc.perform(post("/write")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"miro babo\", \"content\": \"go to baboo channel\"}")
+                        .content(json)
                 ).andExpect(status().isOk())
                 .andDo(print());
 
