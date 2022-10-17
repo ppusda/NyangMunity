@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+@Getter
 @Entity @Table(name = "BOARD")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Board {

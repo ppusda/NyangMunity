@@ -1,30 +1,36 @@
 package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.controller.form.BoardForm;
+import cat.community.NyangMunity.domain.Board;
+import cat.community.NyangMunity.response.BoardResponse;
 import cat.community.NyangMunity.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
 
-//    @PostMapping("/write")
-//    public @ResponseBody BoardForm BoardWrite(@RequestBody @Valid BoardForm boardForm) {
-//        boardService.write(boardForm);
-//        return boardForm;
-//    }
-
     @PostMapping("/write")
     public void BoardWrite(@RequestBody @Valid BoardForm boardForm) {
         boardService.write(boardForm);
     }
+
+    @GetMapping("/write/{boardId}")
+    public BoardResponse BoardRead(@PathVariable(name = "boardId") Long id) {
+        BoardResponse boardResponse = boardService.read(id);
+        return boardResponse;
+    }
+
+//    @GetMapping("/write/{boardId}/rss")
+//    public Board getRss(@PathVariable(name = "boardId") Long id) {
+//        Board board = boardService.getId();
+//        return board;
+//    }
 }

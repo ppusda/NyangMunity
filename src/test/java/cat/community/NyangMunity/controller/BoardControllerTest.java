@@ -1,6 +1,7 @@
 package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.controller.form.BoardForm;
+import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -13,9 +14,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import javax.transaction.Transactional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,7 +74,7 @@ class BoardControllerTest {
         mockMvc.perform(post("/write")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
-                ).andExpect(status().isBadRequest())
+                ).andExpect(status().isOk())
                 .andDo(print());
     }
 
@@ -95,6 +98,27 @@ class BoardControllerTest {
 
         // then
         Assertions.assertEquals(1L, boardRepository.count());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회")
+    void test4() throws Exception {
+        // given
+        Board board = Board.builder()
+                .title("1234567891012345")
+                .content("bar")
+                .build();
+
+        boardRepository.save(board);
+
+        // expected
+        mockMvc.perform(get("/write/{boardId}", board.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("1234567891"))
+                .andExpect(jsonPath("$.content").value("bar"))
+                .andDo(print());
+
     }
 
 }
