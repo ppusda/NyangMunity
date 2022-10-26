@@ -3,6 +3,7 @@ package cat.community.NyangMunity.controller;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
+import cat.community.NyangMunity.response.BoardResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +21,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import javax.transaction.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -105,29 +108,8 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("글 1개 조회")
-    void test4() throws Exception {
-        // given
-        Board board = Board.builder()
-                .title("1234567891012345")
-                .content("bar")
-                .build();
-
-        boardRepository.save(board);
-
-        // expected
-        mockMvc.perform(get("/read/{boardId}", board.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("1234567891"))
-                .andExpect(jsonPath("$.content").value("bar"))
-                .andDo(print());
-
-    }
-
-    @Test
     @DisplayName("글 여러개 조회")
-    void test5() throws Exception {
+    void test4() throws Exception {
         // given
         Board bd1 = Board.builder()
                 .title("title_1")
@@ -155,5 +137,28 @@ class BoardControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("글 1페이지 조회")
+    void test5() throws Exception {
+        // given
+        List<Board> requestBoards = IntStream.range(1, 31)
+                .mapToObj(i -> Board.builder()
+                        .title("빵국이 제목 " + i)
+                        .content("빵국이 입니다 " + i)
+                        .build())
+                .collect(Collectors.toList());
+
+        boardRepository.saveAll(requestBoards); // 한번에 저장
+
+        // expected
+        mockMvc.perform(get("/read/boards?page=1&sort=id,desc")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(5)))
+                //.andExpect(jsonPath("$.id()").value(30))
+                .andExpect(jsonPath("$.title()").value("빵국이 제목 30"))
+                .andExpect(jsonPath("$.content()").value("빵국이 입니다 30"))
+                .andDo(print());
+    }
 }
 

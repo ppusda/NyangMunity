@@ -11,11 +11,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 
 import javax.transaction.Transactional;
 
+import java.awt.*;
+import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -94,8 +101,10 @@ class BoardServiceTest {
                 .build();
         boardRepository.save(bd2);
 
+        Pageable pageable = PageRequest.of(0, 5);
+
         // when
-        List<BoardResponse> boardList = boardService.getBoard();
+        List<BoardResponse> boardList = boardService.getList(pageable);
 
         // then
         assertEquals(2L, boardList.size());
@@ -116,12 +125,37 @@ class BoardServiceTest {
                         .build()
         )); // 한번에 저장
 
+        Pageable pageable = PageRequest.of(0, 5);
+
         // when
-        List<BoardResponse> boardList = boardService.getBoard();
+        List<BoardResponse> boardList = boardService.getList(pageable);
 
         // then
         assertEquals(2L, boardList.size());
     }
 
+    @Test
+    @DisplayName("글 1페이지 조회")
+    void test5() throws Exception {
+        // given
+        List<Board> requestBoards = IntStream.range(1, 31)
+                .mapToObj(i -> Board.builder()
+                        .title("빵국이 제목 " + i)
+                        .content("빵국이 입니다 " + i)
+                        .build())
+                .collect(Collectors.toList());
+
+        boardRepository.saveAll(requestBoards); // 한번에 저장
+
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id"));
+
+        // when
+        List<BoardResponse> boardList = boardService.getList(pageable);
+
+        // then
+        assertEquals(5L, boardList.size());
+        assertEquals("빵국이 제목 30", boardList.get(0).getTitle());
+        assertEquals("빵국이 제목 26", boardList.get(4).getTitle());
+    }
 
 }

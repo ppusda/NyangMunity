@@ -6,6 +6,8 @@ import cat.community.NyangMunity.response.BoardResponse;
 import cat.community.NyangMunity.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +32,11 @@ public class BoardController {
     }
 
     @GetMapping("/read/boards")
-    public List<BoardResponse> readBoards(){
-        return boardService.getBoard();
-    }
+    public List<BoardResponse> readBoards(Pageable pageable){
+        return boardService.getList(pageable);
+    } //pageableDefault는 기본 size값이 10이다.
+
+
 
 //    @GetMapping("/write/{boardId}/rss")
 //    public Board getRss(@PathVariable(name = "boardId") Long id) {

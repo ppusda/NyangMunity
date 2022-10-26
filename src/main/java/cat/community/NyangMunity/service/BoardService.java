@@ -6,6 +6,9 @@ import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.response.BoardResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,9 +42,12 @@ public class BoardService {
                 .build();
     }
 
-    public List<BoardResponse> getBoard() {
-        return boardRepository.findAll().stream()
+    public List<BoardResponse> getList(Pageable pageable) {
+        return boardRepository.findAll(pageable).stream()
                 .map(BoardResponse::new)
                 .collect(Collectors.toList());
     }
+    // pagable 객체 이용
+    // 위처럼 설정 시 5개를 자동으로 얻어와준다
+
 }
