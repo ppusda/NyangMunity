@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +23,15 @@ public class BoardController {
         boardService.write(boardForm);
     }
 
-    @GetMapping("/write/{boardId}")
-    public BoardResponse BoardRead(@PathVariable(name = "boardId") Long id) {
+    @GetMapping("/read/{boardId}")
+    public BoardResponse readBorad(@PathVariable(name = "boardId") Long id) {
         BoardResponse boardResponse = boardService.read(id);
         return boardResponse;
+    }
+
+    @GetMapping("/read/boards")
+    public List<BoardResponse> readBoards(){
+        return boardService.getBoard();
     }
 
 //    @GetMapping("/write/{boardId}/rss")

@@ -4,6 +4,7 @@ import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import javax.transaction.Transactional;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -112,13 +116,43 @@ class BoardControllerTest {
         boardRepository.save(board);
 
         // expected
-        mockMvc.perform(get("/write/{boardId}", board.getId())
+        mockMvc.perform(get("/read/{boardId}", board.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("1234567891"))
                 .andExpect(jsonPath("$.content").value("bar"))
                 .andDo(print());
 
+    }
+
+    @Test
+    @DisplayName("글 여러개 조회")
+    void test5() throws Exception {
+        // given
+        Board bd1 = Board.builder()
+                .title("title_1")
+                .content("content_1")
+                .build();
+        boardRepository.save(bd1);
+
+        Board bd2 = Board.builder()
+                .title("title_2")
+                .content("content_2")
+                .build();
+        boardRepository.save(bd2);
+
+        // expected
+        mockMvc.perform(get("/read/boards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(2)))
+                .andExpect(jsonPath("$.[0].id").value(bd1.getId()))
+                .andExpect(jsonPath("$.[0].title").value("title_1"))
+                .andExpect(jsonPath("$.[0].content").value("content_1"))
+                .andExpect(jsonPath("$.[1].id").value(bd2.getId()))
+                .andExpect(jsonPath("$.[1].title").value("title_2"))
+                .andExpect(jsonPath("$.[1].content").value("content_2"))
+                .andDo(print());
     }
 
 }

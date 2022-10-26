@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.response;
 
+import cat.community.NyangMunity.domain.Board;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,6 +10,12 @@ public class BoardResponse {
     private final Long id;
     private final String title;
     private final String content;
+
+    public BoardResponse(Board board) {
+        this.id = board.getId();
+        this.title = board.getTitle();
+        this.content = board.getContent();
+    }
 
     @Builder
     public BoardResponse(Long id, String title, String content) {
