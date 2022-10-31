@@ -3,6 +3,7 @@ package cat.community.NyangMunity.service;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
+import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -84,35 +85,9 @@ class BoardServiceTest {
         assertEquals("bar", response.getContent());
     }
 
-
     @Test
     @DisplayName("글 여러개 조회")
-    void test3() {
-        // given
-        Board bd1 = Board.builder()
-                .title("foo1")
-                .content("bar1")
-                .build();
-        boardRepository.save(bd1);
-
-        Board bd2 = Board.builder()
-                .title("foo2")
-                .content("bar2")
-                .build();
-        boardRepository.save(bd2);
-
-        Pageable pageable = PageRequest.of(0, 5);
-
-        // when
-        List<BoardResponse> boardList = boardService.getList(pageable);
-
-        // then
-        assertEquals(2L, boardList.size());
-    }
-
-    @Test
-    @DisplayName("글 여러개 조회")
-    void test4() throws Exception {
+    void test3() throws Exception {
         // given
         boardRepository.saveAll(List.of(
                 Board.builder()
@@ -125,10 +100,12 @@ class BoardServiceTest {
                         .build()
         )); // 한번에 저장
 
-        Pageable pageable = PageRequest.of(0, 5);
+        BoardSearch boardSearch = BoardSearch.builder()
+                .page(1)
+                .build();
 
         // when
-        List<BoardResponse> boardList = boardService.getList(pageable);
+        List<BoardResponse> boardList = boardService.getList(boardSearch);
 
         // then
         assertEquals(2L, boardList.size());
@@ -136,9 +113,9 @@ class BoardServiceTest {
 
     @Test
     @DisplayName("글 1페이지 조회")
-    void test5() throws Exception {
+    void test4() throws Exception {
         // given
-        List<Board> requestBoards = IntStream.range(1, 31)
+        List<Board> requestBoards = IntStream.range(0, 20)
                 .mapToObj(i -> Board.builder()
                         .title("빵국이 제목 " + i)
                         .content("빵국이 입니다 " + i)
@@ -147,15 +124,17 @@ class BoardServiceTest {
 
         boardRepository.saveAll(requestBoards); // 한번에 저장
 
-        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id"));
+        BoardSearch boardSearch = BoardSearch.builder()
+                .page(1)
+                .size(10)
+                .build();
 
         // when
-        List<BoardResponse> boardList = boardService.getList(pageable);
+        List<BoardResponse> boardList = boardService.getList(boardSearch);
 
         // then
-        assertEquals(5L, boardList.size());
-        assertEquals("빵국이 제목 30", boardList.get(0).getTitle());
-        assertEquals("빵국이 제목 26", boardList.get(4).getTitle());
+        assertEquals(10L, boardList.size());
+        assertEquals("빵국이 제목 19", boardList.get(0).getTitle());
     }
 
 }

@@ -3,6 +3,7 @@ package cat.community.NyangMunity.service;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
+import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +43,8 @@ public class BoardService {
                 .build();
     }
 
-    public List<BoardResponse> getList(Pageable pageable) {
-        return boardRepository.findAll(pageable).stream()
+    public List<BoardResponse> getList(BoardSearch boardSearch) {
+        return boardRepository.getList(boardSearch).stream()
                 .map(BoardResponse::new)
                 .collect(Collectors.toList());
     }

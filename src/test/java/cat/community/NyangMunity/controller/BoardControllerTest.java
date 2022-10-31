@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.transaction.Transactional;
 
@@ -141,7 +142,7 @@ class BoardControllerTest {
     @DisplayName("글 1페이지 조회")
     void test5() throws Exception {
         // given
-        List<Board> requestBoards = IntStream.range(1, 31)
+        List<Board> requestBoards = IntStream.range(0, 20)
                 .mapToObj(i -> Board.builder()
                         .title("빵국이 제목 " + i)
                         .content("빵국이 입니다 " + i)
@@ -151,14 +152,41 @@ class BoardControllerTest {
         boardRepository.saveAll(requestBoards); // 한번에 저장
 
         // expected
-        mockMvc.perform(get("/read/boards?page=1&sort=id,desc")
+        mockMvc.perform(get("/read/boards?page=1&size=10") ///read/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Matchers.is(5)))
-                //.andExpect(jsonPath("$.id()").value(30))
-                .andExpect(jsonPath("$.title()").value("빵국이 제목 30"))
-                .andExpect(jsonPath("$.content()").value("빵국이 입니다 30"))
+                .andExpect(jsonPath("$.length()", Matchers.is(10)))
+                .andExpect(jsonPath("$[0].title").value("빵국이 제목 19"))
+                .andExpect(jsonPath("$[0].content").value("빵국이 입니다 19"))
                 .andDo(print());
     }
+
+    //                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("빵국이 제목 0"))
+    //                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("빵국이 제목 0"))
+    //                .andDo(print())
+
+    @Test
+    @DisplayName("페이지를 0으로 요청하면 첫 페이지를 가져온다.")
+    void test6() throws Exception {
+        // given
+        List<Board> requestBoards = IntStream.range(0, 20)
+                .mapToObj(i -> Board.builder()
+                        .title("빵국이 제목 " + i)
+                        .content("빵국이 입니다 " + i)
+                        .build())
+                .collect(Collectors.toList());
+
+        boardRepository.saveAll(requestBoards); // 한번에 저장
+
+        // expected
+        mockMvc.perform(get("/read/boards?page=0&size=10") ///read/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(10)))
+                .andExpect(jsonPath("$[0].title").value("빵국이 제목 19"))
+                .andExpect(jsonPath("$[0].content").value("빵국이 입니다 19"))
+                .andDo(print());
+    }
+
 }
 

@@ -2,6 +2,7 @@ package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
+import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
 import cat.community.NyangMunity.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,8 @@ public class BoardController {
     }
 
     @GetMapping("/read/boards")
-    public List<BoardResponse> readBoards(Pageable pageable){
-        return boardService.getList(pageable);
+    public List<BoardResponse> readBoards(@ModelAttribute BoardSearch boardSearch){
+        return boardService.getList(boardSearch);
     } //pageableDefault는 기본 size값이 10이다.
 
 
