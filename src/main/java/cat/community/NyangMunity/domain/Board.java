@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.domain;
 
+import cat.community.NyangMunity.request.BoardEdit;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,5 +35,16 @@ public class Board {
 
     @Column(name = "NICKNAME")
     private String nickname;
+
+    public BoardEditor.BoardEditorBuilder toEditor() {
+        return BoardEditor.builder()
+                .title(title)
+                .content(content);
+    }
+
+    public void edit(BoardEditor boardEditor){
+        title = boardEditor.getTitle();
+        content = boardEditor.getContent();
+    }
 
 }

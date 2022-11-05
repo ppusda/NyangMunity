@@ -3,24 +3,18 @@ package cat.community.NyangMunity.service;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
+import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 
 import javax.transaction.Transactional;
 
-import java.awt.*;
-import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
 @SpringBootTest
@@ -135,6 +128,56 @@ class BoardServiceTest {
         // then
         assertEquals(10L, boardList.size());
         assertEquals("빵국이 제목 19", boardList.get(0).getTitle());
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void test5() throws Exception {
+        // given
+        Board board = Board.builder()
+                        .title("빵국이제목")
+                        .content("빵국입니다")
+                        .build();
+
+        boardRepository.save(board); // 한번에 저장
+
+        BoardEdit boardEdit = BoardEdit.builder()
+                                .title("제목: 빵국이")
+                                .build();
+
+        // when
+        boardService.edit(board.getId(), boardEdit);
+
+        // then
+        Board changedBoard = boardRepository.findById(board.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다."));
+        Assertions.assertEquals("제목: 빵국이", changedBoard.getTitle());
+    }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void test6() throws Exception {
+        // given
+        Board board = Board.builder()
+                .title("빵국이 제목")
+                .content("빵국입니다")
+                .build();
+
+        boardRepository.save(board); // 한번에 저장
+
+        BoardEdit boardEdit = BoardEdit.builder()
+                .title("빵국이 제목")
+                .content("빵국이 내용")
+                .build();
+
+        // when
+        boardService.edit(board.getId(), boardEdit);
+
+        // then
+        Board changedBoard = boardRepository.findById(board.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다."));
+        Assertions.assertEquals("빵국이 제목", changedBoard.getTitle());
+        Assertions.assertEquals("빵국이 내용", changedBoard.getContent());
     }
 
 }

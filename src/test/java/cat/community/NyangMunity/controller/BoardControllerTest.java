@@ -3,6 +3,7 @@ package cat.community.NyangMunity.controller;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.repository.BoardRepository;
+import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.response.BoardResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -26,8 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,7 +56,7 @@ class BoardControllerTest {
     @Test
     @DisplayName("글쓰기 테스트")
     void writeTest() throws Exception{
-        mockMvc.perform(post("/write")
+        mockMvc.perform(post("/boards/write")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\": null, \"content\": \"go to baboo channel\"}")
                 ).andExpect(status().isBadRequest())
@@ -79,7 +79,7 @@ class BoardControllerTest {
 
         System.out.println(json);
 
-        mockMvc.perform(post("/write")
+        mockMvc.perform(post("/boards/write")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 ).andExpect(status().isOk())
@@ -98,7 +98,7 @@ class BoardControllerTest {
         String json = objectMapper.writeValueAsString(boardForm);
 
         // when
-        mockMvc.perform(post("/write")
+        mockMvc.perform(post("/boards/write")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 ).andExpect(status().isOk())
@@ -106,6 +106,27 @@ class BoardControllerTest {
 
         // then
         Assertions.assertEquals(1L, boardRepository.count());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회")
+    void test3_1() throws Exception {
+        // given
+        Board bd1 = Board.builder()
+                .title("title_1")
+                .content("content_1")
+                .build();
+        boardRepository.save(bd1);
+
+        // expected
+        mockMvc.perform(get("/boards/{boardId}", bd1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(4)))
+                .andExpect(jsonPath("$.id").value(bd1.getId()))
+                .andExpect(jsonPath("$.title").value("title_1"))
+                .andExpect(jsonPath("$.content").value("content_1"))
+                .andDo(print());
     }
 
     @Test
@@ -125,7 +146,7 @@ class BoardControllerTest {
         boardRepository.save(bd2);
 
         // expected
-        mockMvc.perform(get("/read/boards")
+        mockMvc.perform(get("/boards")
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", Matchers.is(2)))
@@ -152,7 +173,7 @@ class BoardControllerTest {
         boardRepository.saveAll(requestBoards); // 한번에 저장
 
         // expected
-        mockMvc.perform(get("/read/boards?page=1&size=10") ///read/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
+        mockMvc.perform(get("/boards?page=1&size=10") ///read/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", Matchers.is(10)))
@@ -179,12 +200,36 @@ class BoardControllerTest {
         boardRepository.saveAll(requestBoards); // 한번에 저장
 
         // expected
-        mockMvc.perform(get("/read/boards?page=0&size=10") ///read/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
+        mockMvc.perform(get("/boards?page=0&size=10") ///read/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", Matchers.is(10)))
                 .andExpect(jsonPath("$[0].title").value("빵국이 제목 19"))
                 .andExpect(jsonPath("$[0].content").value("빵국이 입니다 19"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 수정")
+    void test7() throws Exception {
+        // given
+        Board board = Board.builder()
+                .title("빵국이")
+                .content("빵국입니다")
+                .build();
+
+        boardRepository.save(board); // 한번에 저장
+
+        BoardEdit boardEdit = BoardEdit.builder()
+                .title("빵국이 제목")
+                .content("빵국입니다")
+                .build();
+
+        // expected
+        mockMvc.perform(patch("/boards/{boardId}", board.getId()) // PATCH /boards/{boardId}
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(boardEdit))
+                ).andExpect(status().isOk())
                 .andDo(print());
     }
 
