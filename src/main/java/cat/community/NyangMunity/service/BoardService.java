@@ -64,16 +64,7 @@ public class BoardService {
                 .build();
 
         board.edit(boardEditor);
-
-//        if(boardEdit.getTitle() != null){
-//            boardEditorBuilder.title(boardEdit.getTitle())
-//        }
-//
-//        if(boardEdit.getContent() != null){
-//            boardEditorBuilder.content(boardEdit.getContent())
-//        }
-//
-//        board.edit(boardEditorBuilder.build());
+        // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
 
     }
 }

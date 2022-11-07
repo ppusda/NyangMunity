@@ -166,7 +166,7 @@ class BoardServiceTest {
         boardRepository.save(board); // 한번에 저장
 
         BoardEdit boardEdit = BoardEdit.builder()
-                .title("빵국이 제목")
+                .title(null) // null 값 처리 시에는 Builder 클래스를 새로 생성하여 만들면 된다.
                 .content("빵국이 내용")
                 .build();
 
