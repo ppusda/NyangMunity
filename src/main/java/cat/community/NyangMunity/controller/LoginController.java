@@ -5,16 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class LoginController {
@@ -25,11 +22,9 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    private UserForm loginComplete(@RequestBody @Valid UserForm userForm, Model model) throws IOException {
+    private void loginComplete(@RequestBody @Valid UserForm userForm, Model model) throws IOException {
         log.info("email : " + userForm.getEmail());
         log.info("password : " + userForm.getPassword());
-        return userForm;
-        //return "/community/community";
     }
 
     @RequestMapping("/kakaoLogin")

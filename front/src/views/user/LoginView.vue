@@ -1,17 +1,32 @@
+<script setup lang="ts">
+import {ref} from "vue";
+import axios from "axios";
+
+const email = ref("")
+const password = ref("")
+
+const login = function () {
+  axios.post("http://localhost:8080/user/login", {
+    email: email.value,
+    password: password.value
+  });
+}
+</script>
+
 <template>
   <input value="true" type="text" name="loginState" id="loginState" hidden="true"/>
 
   <div class="login_page">
-    <form id="login_form">
+    <form id="login_form" method="post">
       <table>
         <tr>
-          <td>ID :</td> <td><input id="email" name="email" type="text"></td>
+          <td>ID :</td> <td><el-input id="email" v-model="email" type="text"></el-input></td>
         </tr>
         <tr>
-          <td>PW :</td> <td><input id="password" name="password" type="password"></td>
+          <td>PW :</td> <td><el-input id="password" v-model="password" type="password"></el-input></td>
         </tr>
         <tr>
-          <td colspan="2"> <a id="loginBtn" onclick="chkValue()">커뮤니티 로그인</a> </td>
+          <td colspan="2"> <a id="loginBtn" @click="login">커뮤니티 로그인</a> </td>
         </tr>
         <tr>
           <td colspan="2">
@@ -31,12 +46,6 @@
   </div>
 
 </template>
-
-<script>
-export default {
-  name: "LoginView.vue"
-}
-</script>
 
 <style scoped>
 
