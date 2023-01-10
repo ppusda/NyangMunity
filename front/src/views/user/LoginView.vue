@@ -11,6 +11,7 @@ const login = function () {
     password: password.value
   });
 }
+
 </script>
 
 <template>
@@ -39,7 +40,7 @@ const login = function () {
           <td colspan="2" style="font-size: 2px">--------------- 처음이신가요? ---------------</td>
         </tr>
         <tr>
-          <td colspan="2"> <a> 회원가입 </a></td>
+          <td colspan="2"> <RouterLink to="/user/join">회원가입</RouterLink></td>
         </tr>
       </table>
     </form>
