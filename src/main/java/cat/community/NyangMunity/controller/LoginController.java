@@ -1,6 +1,8 @@
 package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.controller.form.UserForm;
+import cat.community.NyangMunity.domain.User;
+import cat.community.NyangMunity.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class LoginController {
 
+    private final LoginService loginService;
+
     @GetMapping("/login")
     public String loginPage(){
         return "/user/login";
@@ -23,8 +27,12 @@ public class LoginController {
 
     @PostMapping("/login")
     private void loginComplete(@RequestBody @Valid UserForm userForm, Model model) throws IOException {
-        log.info("email : " + userForm.getEmail());
-        log.info("password : " + userForm.getPassword());
+        if(loginService.userLogin(userForm.getEmail(), userForm.getPassword())){
+            log.info("email : " + userForm.getEmail());
+            log.info("password : " + userForm.getPassword());
+        }else {
+            log.info("유저 정보가 없습니다.");
+        }
     }
 
     @RequestMapping("/kakaoLogin")

@@ -23,4 +23,23 @@ export default {
 </template>
 
 <style>
+  #app {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: hsl(236, 99%, 70%);
+    transition: 0.4s;
+    cursor: pointer;
+  }
 </style>

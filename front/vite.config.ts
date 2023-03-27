@@ -14,7 +14,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/posts": "http://localhost:8080",
+      "/nm/":{
+        target: "http://localhost:8080",
+        rewrite: (path) => path.replace(/^\/nm/, ''),
+      }
     }
   }
 });

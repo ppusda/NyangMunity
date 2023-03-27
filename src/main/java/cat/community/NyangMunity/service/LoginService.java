@@ -18,5 +18,14 @@ public class LoginService {
         return loginRepository.findAll();
     }
 
+    public boolean userLogin(String email, String password) {
+        User user = loginRepository.findByEmailPassword(email, password);
+        if (user != null){
+            return true;
+        }else {
+            return false;
+        }
+
+    }
 }
 

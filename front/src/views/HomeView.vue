@@ -1,11 +1,28 @@
-<script setup lang="ts">
+<script lang="ts">
+import axios from "axios";
+import { defineComponent } from 'vue';
+
+export default defineComponent ({
+  name: 'home',
+  methods: {
+    community: function () {
+      axios.get("/nm/community");
+    }
+  }
+})
+
 </script>
 
 <template>
-      <div class="cat_page">
-        <!--<img id="main_img" src="src/images/computer_cat.gif"/>-->
+      <div class="overlay d-flex justify-content-center align-content-center w-100 h-100 cat_page">
         <img id="main_img" src="src/images/computer_cat.gif"/>
-        <b><a class="gt_community" href="/community">커뮤니티 바로가기</a></b>
-        <a id="cat_intro"> 오늘의 고양이: loki! </a>
       </div>
 </template>
+
+<style scoped>
+
+  #main_img{
+    max-width: 100%;
+    height: 100%;
+  }
+</style>

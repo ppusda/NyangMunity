@@ -4,15 +4,22 @@ import {ref} from "vue";
 const count = ref(0) // 반응형 변수로 추가
 
 import axios from "axios";
+import {useRouter} from "vue-router";
+import homeView from "@/views/HomeView.vue";
 
 const title = ref("")
 const content = ref("")
 
+const router = useRouter()
+
 const write = function () {
-  axios.post("http://localhost:8080/boards/write", {
+  axios.post("/nm/boards/write", {
     title: title.value,
     content: content.value
-  });
+  })
+  .then(() => {
+    router.replace({name: "home"})
+  })
 }
 </script>
 

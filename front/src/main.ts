@@ -7,7 +7,9 @@ import router from "./router";
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
-import "bootstrap/dist/css/bootstrap-utilities.css"
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 import "./assets/main.css";
 import "./assets/login.css";
@@ -17,6 +19,6 @@ const app = createApp(App);
 
 app.use(createPinia());
 app.use(router);
-app.use(ElementPlus)
+app.use(ElementPlus);
 
 app.mount("#app");

@@ -1,7 +1,9 @@
 <template>
-  <div class="footer">
-    <b id="info"> &copy;냥뮤니티 개발자 - ppusda</b>
-  </div>
+  <footer class="sticky-bottom footer">
+    <div>
+      <b id="info"> &copy;냥뮤니티 개발자 - ppusda</b>
+    </div>
+  </footer>
 </template>
 
 <script>
@@ -12,8 +14,6 @@ export default {
 
 <style>
 .footer {
-  position: sticky;
-  width: 100%;
   background-color: #333;
   text-align: right;
   bottom: 0;
