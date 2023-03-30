@@ -24,6 +24,12 @@ const edit = () => {
   });
 }
 
+const remove = () => {
+  axios.delete(`/nm/boards/${props.postId}`).then(() => {
+    router.replace({name: "boards"})
+  });
+}
+
 </script>
 
 <template>
@@ -36,7 +42,8 @@ const edit = () => {
   </div>
 
   <div class="mt-2">
-    <button type="primary" @click="edit()">수정 완료</button>
+    <el-button type="primary" @click="edit()">글 수정</el-button>
+    <el-button type="danger" @click="remove()">글 삭제</el-button>
   </div>
 </template>
 

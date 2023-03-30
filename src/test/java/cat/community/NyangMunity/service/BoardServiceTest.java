@@ -180,4 +180,21 @@ class BoardServiceTest {
         Assertions.assertEquals("빵국이 내용", changedBoard.getContent());
     }
 
+    @Test
+    @DisplayName("게시글 삭제")
+    void test7() throws Exception {
+        // given
+        Board board = Board.builder()
+                .title("빵국이 제목")
+                .content("빵국입니다")
+                .build();
+
+        boardRepository.save(board);
+
+        // when
+        boardService.delete(board.getId());
+
+        // then
+        Assertions.assertEquals(0, boardRepository.count());
+    }
 }

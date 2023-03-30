@@ -65,6 +65,13 @@ public class BoardService {
 
         board.edit(boardEditor);
         // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
+    }
 
+    @Transactional
+    public void delete(Long id) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+
+        boardRepository.delete(board);
     }
 }

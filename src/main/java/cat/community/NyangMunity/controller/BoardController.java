@@ -44,6 +44,11 @@ public class BoardController {
         boardService.edit(boardId, request);
     }
 
+    @DeleteMapping("/boards/{boardId}")
+    public void delete(@PathVariable Long boardId) {
+        boardService.delete(boardId);
+    }
+
 //    @GetMapping("/write/{boardId}/rss")
 //    public Board getRss(@PathVariable(name = "boardId") Long id) {
 //        Board board = boardService.getId();
