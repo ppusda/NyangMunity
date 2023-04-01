@@ -17,7 +17,7 @@
             </li>
             <li class="nav-item">
               <a class="nav-link">
-                <RouterLink to="/community">커뮤니티</RouterLink>
+                <RouterLink to="/boards/">커뮤니티</RouterLink>
               </a>
             </li>
             <li class="nav-item">

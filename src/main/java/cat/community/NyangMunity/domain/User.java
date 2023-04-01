@@ -33,4 +33,7 @@ public class User {
     @Column(name = "BIRTHDAY")
     private LocalDateTime birthday;
 
+    @OneToMany(mappedBy = "user")
+    private List<Board> boards = new ArrayList<>();
+
 }
