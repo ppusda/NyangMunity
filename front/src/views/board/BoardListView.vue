@@ -19,6 +19,7 @@ const moveToRead = () => {
 </script>
 
 <template>
+  <el-button type="primary"><router-link to="/boards/write">새로 글 쓰기</router-link></el-button>
   <ul>
     <li v-for="post in posts" :key="post.id">
       <div>

@@ -21,20 +21,20 @@ const login = function () {
     <form id="login_form" method="post">
       <table>
         <tr>
-          <td>ID :</td> <td><el-input id="email" v-model="email" type="text"></el-input></td>
+          <td class="w-25 me-2">ID :</td> <td class="w-auto"><el-input id="email" v-model="email" type="text"></el-input></td>
         </tr>
         <tr>
-          <td>PW :</td> <td><el-input id="password" v-model="password" type="password"></el-input></td>
+          <td class="w-25 me-2">PW :</td> <td class="w-auto"><el-input id="password" v-model="password" type="password"></el-input></td>
         </tr>
         <tr>
-          <td colspan="2">
-            <a id="loginBtn" @click="login">커뮤니티 로그인</a>
+          <td colspan="2" class="w-auto pe">
+            <a class="clButton btn btn-primary mt-2" @click="login">커뮤니티 로그인</a>
           </td>
         </tr>
         <tr>
-          <td colspan="2">
-            <a href="https://kauth.kakao.com/oauth/authorize?client_id=78effdc7d3e403e800af579ee0059fef&redirect_uri=http://localhost:8080/loginKakao&response_type=code">
-              <img class="w-100" id="kakaoLoginIamge" src="/src/images/kakao_login_medium_wide.png"/>
+          <td colspan="2" class="w-auto">
+            <a class="clButton btn btn-warning pt-1 text-white" href="https://kauth.kakao.com/oauth/authorize?client_id=78effdc7d3e403e800af579ee0059fef&redirect_uri=http://localhost:8080/loginKakao&response_type=code">
+              카카오 로그인
             </a>
           </td>
         </tr>
@@ -52,6 +52,9 @@ const login = function () {
 
 <style scoped>
   .login_page{
+    width: 100%;
+    height: 100%;
+    text-align: center;
     font-size: 0.9vw;
   }
 
@@ -64,18 +67,9 @@ const login = function () {
     border-radius: 15px;
   }
 
-  #kakaoLoginIamge{
-    height: 2vw;
-    margin: 0.5vw;
-  }
-
-  #loginBtn{
-    margin-top: 0.5vw;
-    display: flex;
-    flex-direction: column;
-    padding: 0.3vw;
-    background: rgb(24, 24, 24, 0.5);
-    border-radius: 8px;
+  .clButton {
+    font-size: 0.9vw;
+    width: -webkit-fill-available;
   }
 
 </style>

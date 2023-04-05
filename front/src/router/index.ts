@@ -16,7 +16,7 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: "/write",
+      path: "/boards/write",
       name: "write",
       component: WriteView
     },

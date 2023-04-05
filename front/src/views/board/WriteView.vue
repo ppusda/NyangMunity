@@ -33,7 +33,7 @@ const write = function () {
   </div>
 
   <div class="mt-2">
-    <button type="primary" @click="write">글 작성완료</button>
+    <el-button type="primary" @click="write">글 작성완료</el-button>
   </div>
 </template>
 
