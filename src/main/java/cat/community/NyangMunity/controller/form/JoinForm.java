@@ -2,8 +2,10 @@ package cat.community.NyangMunity.controller.form;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.tomcat.jni.Local;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Getter @Setter
 public class JoinForm {
@@ -16,5 +18,5 @@ public class JoinForm {
     @NotBlank
     private String nickname;
 
-    private String birthday;
+    private LocalDateTime birthday;
 }

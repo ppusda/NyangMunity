@@ -52,9 +52,6 @@ const login = function () {
 
 <style scoped>
   .login_page{
-    width: 100%;
-    height: 100%;
-    text-align: center;
     font-size: 0.9vw;
   }
 

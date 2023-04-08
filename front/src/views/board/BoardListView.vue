@@ -30,8 +30,22 @@ const moveToRead = () => {
       </div>
     </li>
   </ul>
+
+  <div class="container w-100 h-100 text-white text-center">
+    <div class="content_area h-100" method="post">
+
+    </div>
+  </div>
+
 </template>
 
 <style scoped>
-
+  .content_area {
+    display: inline-block;
+    position: relative;
+    top: 15%;
+    background: #333;
+    padding: 5vw;
+    border-radius: 15px;
+  }
 </style>

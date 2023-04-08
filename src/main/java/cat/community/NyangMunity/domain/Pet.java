@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity @Table(name = "PET")
@@ -25,6 +26,6 @@ public class Pet {
     private String gender;
 
     @Column(name = "BIRTHDAY")
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
 }

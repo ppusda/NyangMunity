@@ -2,17 +2,26 @@
 
 import axios from "axios";
 import {ref} from "vue";
+import router from "@/router";
 
 const email = ref("")
 const password = ref("")
 const passwordChk = ref("")
+const birthday = ref("")
+const nickname = ref("")
 
-const join = function () {
-  if(password != passwordChk){
+const joinConfirm = function () {
+  if(password.value != passwordChk.value){
     alert("비밀번호가 다릅니다.")
   }else{
-    axios.post("/nm/user/login", {
-    });
+    axios.post("/nm/user/join", {
+      email: email.value,
+      password: password.value,
+      birthday: birthday.value,
+      nickname: nickname.value,
+    }).then(() => {
+      router.replace({name: "home"})
+    })
   }
 }
 
@@ -26,20 +35,20 @@ const join = function () {
           <td class="w-50"><a class="text-white">이메일 : </a></td> <td class="w-auto"><input id="email" v-model="email" name="email" type="text"></td>
         </tr>
         <tr>
-          <td class="w-50"><a class="text-white">비밀번호 : </a></td> <td class="w-auto"><input id="password" name="password" type="password"></td>
+          <td class="w-50"><a class="text-white">비밀번호 : </a></td> <td class="w-auto"><input v-model="password" id="password" type="password"></td>
         </tr>
         <tr>
-          <td class="w-50"><a class="text-white">비밀번호 확인 : </a></td> <td class="w-auto"><input id="passwordCheck" name="passwordCheck" type="password"></td>
+          <td class="w-50"><a class="text-white">비밀번호 확인 : </a></td> <td class="w-auto"><input v-model="passwordChk" id="passwordChk" name="passwordChk" type="password"></td>
         </tr>
         <tr>
-          <td class="w-50"><a class="text-white">생일 : </a></td> <td class="w-auto"><input id="birthday" name="birthday" type="date"/></td>
+          <td class="w-50"><a class="text-white">생일 : </a></td> <td class="w-auto"><input v-model="birthday" id="birthday" name="birthday" type="date"/></td>
         </tr>
         <tr>
-          <td class="w-50"><a class="text-white">닉네임 : </a></td> <td class="w-auto"><input id="nickname" name="nickname" type="text"></td>
+          <td class="w-50"><a class="text-white">닉네임 : </a></td> <td class="w-auto"><input v-model="nickname" id="nickname" name="nickname" type="text"></td>
         </tr>
         <tr>
           <td colspan="2">
-            <a class="clButton btn btn-primary m-3" @click="join">회원가입</a>
+            <a class="clButton btn btn-primary m-3" @click="joinConfirm">회원가입</a>
             <a class="clButton btn btn-warning text-white" @click="$router.go(-1)">취소</a>
           </td>
         </tr>
@@ -49,4 +58,23 @@ const join = function () {
 </template>
 
 <style scoped>
+  .join_page{
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 0.9vw;
+  }
+
+  #join_form{
+    display: inline-block;
+    position: relative;
+    top: 15%;
+    background: #333;
+    padding: 5vw 15vw;
+    border-radius: 15px;
+  }
+
+  #birthday{
+    width: 97%;
+  }
 </style>
