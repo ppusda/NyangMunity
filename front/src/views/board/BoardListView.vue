@@ -19,33 +19,25 @@ const moveToRead = () => {
 </script>
 
 <template>
-  <el-button type="primary"><router-link to="/boards/write">새로 글 쓰기</router-link></el-button>
-  <ul>
-    <li v-for="post in posts" :key="post.id">
-      <div>
-        <router-link :to="{name: 'read', params: {postId: post.id}}">{{post.title}}</router-link>
-      </div>
-      <div>
-        {{post.content}}
-      </div>
-    </li>
-  </ul>
+
 
   <div class="container w-100 h-100 text-white text-center">
-    <div class="content_area h-100" method="post">
-
+    <div class="content_area" method="post">
+      <el-button type="primary"><router-link to="/boards/write">새로 글 쓰기</router-link></el-button>
+      <ul>
+        <li v-for="post in posts" :key="post.id">
+          <div>
+            <router-link :to="{name: 'read', params: {postId: post.id}}">{{post.title}}</router-link>
+          </div>
+          <div>
+            {{post.content}}
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 
 </template>
 
 <style scoped>
-  .content_area {
-    display: inline-block;
-    position: relative;
-    top: 15%;
-    background: #333;
-    padding: 5vw;
-    border-radius: 15px;
-  }
 </style>

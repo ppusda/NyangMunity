@@ -18,7 +18,7 @@ const login = function () {
   <input value="true" type="text" name="loginState" id="loginState" hidden="true"/>
 
   <div class="container login_page w-100 h-100 text-white text-center">
-    <form id="login_form" method="post">
+    <form class="content_area">
       <table>
         <tr>
           <td class="w-25 me-2">ID :</td> <td class="w-auto"><el-input id="email" v-model="email" type="text"></el-input></td>
@@ -53,15 +53,6 @@ const login = function () {
 <style scoped>
   .login_page{
     font-size: 0.9vw;
-  }
-
-  #login_form{
-    display: inline-block;
-    position: relative;
-    top: 15%;
-    background: #333;
-    padding: 5vw 15vw;
-    border-radius: 15px;
   }
 
   .clButton {

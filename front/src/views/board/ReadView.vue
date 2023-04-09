@@ -29,10 +29,14 @@ onMounted( () => {
 </script>
 
 <template>
-  <h2>{{post.title}}</h2>
-  <div>{{post.content}}</div>
+  <div class="container w-100 h-100 text-white text-center">
+    <div class="content_area" method="post">
+      <h2>{{post.title}}</h2>
+      <div>{{post.content}}</div>
 
-  <el-button type="warning" @click="moveToEdit()">수정</el-button>
+      <el-button type="warning" @click="moveToEdit()">수정</el-button>
+    </div>
+  </div>
 </template>
 
 <style scoped>

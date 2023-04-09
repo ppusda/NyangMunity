@@ -29,7 +29,7 @@ const joinConfirm = function () {
 
 <template>
   <div class="join_page">
-    <form id="join_form">
+    <form class="content_area">
       <table>
         <tr>
           <td class="w-50"><a class="text-white">이메일 : </a></td> <td class="w-auto"><input id="email" v-model="email" name="email" type="text"></td>
@@ -65,16 +65,7 @@ const joinConfirm = function () {
     font-size: 0.9vw;
   }
 
-  #join_form{
-    display: inline-block;
-    position: relative;
-    top: 15%;
-    background: #333;
-    padding: 5vw 15vw;
-    border-radius: 15px;
-  }
-
   #birthday{
-    width: 97%;
+    width: 100%;
   }
 </style>
