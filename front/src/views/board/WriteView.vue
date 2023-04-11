@@ -1,16 +1,14 @@
-<script setup lang="ts">
+<script setup lang="ts" defer>
 import {ref} from "vue";
-
-const count = ref(0) // 반응형 변수로 추가
 
 import axios from "axios";
 import {useRouter} from "vue-router";
 import homeView from "@/views/HomeView.vue";
 
-const title = ref("")
-const content = ref("")
+const title = ref("");
+const content = ref("");
 
-const router = useRouter()
+const router = useRouter();
 
 const write = function () {
   axios.post("/nm/boards/write", {
@@ -20,7 +18,24 @@ const write = function () {
   .then(() => {
     router.replace({name: "home"})
   })
+};
+
+window.onload = () => {
+  const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
+  const preview = document.querySelector('.image-box') as HTMLImageElement;
+
+  fileDOM?.addEventListener('change', () => {
+  if (!fileDOM.files) {
+    return;
+  }
+  const imageSrc = URL.createObjectURL(fileDOM.files[0]);
+  preview!.src = imageSrc
+});
 }
+
+// window.onload 사용해서 해결.. 결국엔 로드되지 않은 것을 불러오려 하여 발생한 이슈였음.
+// script 상의 위치가 바뀌어도 해결되지 않았던 이유는 vue여서 일까?
+
 </script>
 
 <template>
@@ -30,20 +45,45 @@ const write = function () {
       <div>
         <el-input v-model="title" placeholder="제목을 입력해주세요" />
       </div>
-
+      <div class="mt-2" id="test">
+        <img class="image-box" />
+      </div>
+      <div class="mt-2">
+        <label for="imgInput">
+          <div class="btn-upload">파일 업로드하기</div>
+        </label>
+        <input type="file" name="imgInput" class="imgInput" id="imgInput" multiple>
+      </div>
       <div class="mt-2">
         <el-input v-model="content" type="textarea" rows="3"></el-input>
       </div>
-
       <div class="mt-2">
         <el-button type="primary" @click="write">글 작성완료</el-button>
       </div>
     </div>
   </div>
-
-
 </template>
 
 <style>
+  .btn-upload {
+    width: 150px;
+    height: 30px;
+    background: #333;
+    border: 1px solid rgb(77,77,77);
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .btn-upload:hover {
+    background: rgb(77,77,77);
+    color: #fff;
+  }
+
+  #imgInput {
+    display: none;
+  }
 </style>
