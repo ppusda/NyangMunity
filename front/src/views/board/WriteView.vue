@@ -20,21 +20,41 @@ const write = function () {
   })
 };
 
+// window.onload = () => {
+//   const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
+//   const preview = document.querySelector('.image-box') as HTMLImageElement;
+//
+//   fileDOM?.addEventListener('change', () => {
+//   if (!fileDOM.files) {
+//     return;
+//   }
+//   const imageSrc = URL.createObjectURL(fileDOM.files[0]);
+//   preview!.src = imageSrc
+// });
+// }
+
+// // window.onload 사용해서 해결.. 결국엔 로드되지 않은 것을 불러오려 하여 발생한 이슈였음.
+// // script 상의 위치가 바뀌어도 해결되지 않았던 이유는 vue여서 일까?
+
 window.onload = () => {
   const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
-  const preview = document.querySelector('.image-box') as HTMLImageElement;
 
   fileDOM?.addEventListener('change', () => {
-  if (!fileDOM.files) {
-    return;
-  }
-  const imageSrc = URL.createObjectURL(fileDOM.files[0]);
-  preview!.src = imageSrc
-});
+    const preview = document.getElementById('previewDiv');
+    preview!.innerHTML = '';
+    if (!fileDOM.files) {
+      return;
+    }
+    for(let i = 0; i < 3; i++){
+      const urls = URL.createObjectURL(fileDOM.files[i]);
+      document.getElementById("previewDiv")!.innerHTML += '<img class="image-box" src="'+urls+'">';
+    }
+    if (fileDOM.files.length > 3) {
+      document.getElementById("previewDiv")!.innerHTML += '<h6>+'+(fileDOM.files.length-3)+' More...</h6>';
+    }
+  });
 }
 
-// window.onload 사용해서 해결.. 결국엔 로드되지 않은 것을 불러오려 하여 발생한 이슈였음.
-// script 상의 위치가 바뀌어도 해결되지 않았던 이유는 vue여서 일까?
 
 </script>
 
@@ -45,8 +65,7 @@ window.onload = () => {
       <div>
         <el-input v-model="title" placeholder="제목을 입력해주세요" />
       </div>
-      <div class="mt-2" id="test">
-        <img class="image-box" />
+      <div class="mt-2" id="previewDiv">
       </div>
       <div class="mt-2">
         <label for="imgInput">
@@ -85,5 +104,10 @@ window.onload = () => {
 
   #imgInput {
     display: none;
+  }
+
+  .image-box {
+    max-width: 8vw;
+    max-height: 8vw;
   }
 </style>
