@@ -4,6 +4,7 @@ import cat.community.NyangMunity.request.BoardEdit;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +14,12 @@ import java.util.List;
 public class Board {
 
     @Builder
-    public Board(String title, String content) {
+    public Board(String title, String content, LocalDateTime createDate) {
         this.title = title;
         this.content = content;
+        this.user = new User();
+        this.boardImages = new ArrayList<>();
+        this.createDate = createDate;
     }
 
     @Id @Column(name = "BOARD_ID")
@@ -29,7 +33,7 @@ public class Board {
     private String content;
 
     @Column(name = "CREATE_DATE")
-    private String createDate;
+    private LocalDateTime createDate;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")

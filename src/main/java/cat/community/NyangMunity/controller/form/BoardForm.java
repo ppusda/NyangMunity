@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +17,8 @@ public class BoardForm {
 
     @NotBlank(message = "content를 입력해주세요.")
     private String content;
+
+    private List images;
 
     @Builder
     public BoardForm(String title, String content) {

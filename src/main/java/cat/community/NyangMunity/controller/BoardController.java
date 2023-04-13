@@ -8,6 +8,7 @@ import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
 import cat.community.NyangMunity.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,14 +19,16 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
 
     @PostMapping("/boards/write")
-    public void BoardWrite(@RequestBody @Valid BoardForm boardForm) {
-        boardService.write(boardForm);
+    public void BoardWrite(@RequestBody @Valid String txt) { //BoardForm boardForm
+        log.info(String.valueOf(txt));
+        //boardService.write(boardForm);
     }
 
     @GetMapping("/boards/{boardId}")

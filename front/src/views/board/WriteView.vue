@@ -11,30 +11,17 @@ const content = ref("");
 const router = useRouter();
 
 const write = function () {
+  const fileArray = document.getElementsByClassName('image-box');
+
   axios.post("/nm/boards/write", {
     title: title.value,
-    content: content.value
+    content: content.value,
+    imageArray: fileArray.item(0)
   })
   .then(() => {
     router.replace({name: "home"})
   })
 };
-
-// window.onload = () => {
-//   const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
-//   const preview = document.querySelector('.image-box') as HTMLImageElement;
-//
-//   fileDOM?.addEventListener('change', () => {
-//   if (!fileDOM.files) {
-//     return;
-//   }
-//   const imageSrc = URL.createObjectURL(fileDOM.files[0]);
-//   preview!.src = imageSrc
-// });
-// }
-
-// // window.onload 사용해서 해결.. 결국엔 로드되지 않은 것을 불러오려 하여 발생한 이슈였음.
-// // script 상의 위치가 바뀌어도 해결되지 않았던 이유는 vue여서 일까?
 
 window.onload = () => {
   const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
@@ -55,6 +42,8 @@ window.onload = () => {
   });
 }
 
+// // window.onload 사용해서 해결.. 결국엔 로드되지 않은 것을 불러오려 하여 발생한 이슈였음.
+// // script 상의 위치가 바뀌어도 해결되지 않았던 이유는 vue여서 일까?
 
 </script>
 
