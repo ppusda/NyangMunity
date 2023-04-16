@@ -10,20 +10,28 @@ const content = ref("");
 
 const router = useRouter();
 
-const write = function () {
-  const fileArray = document.getElementsByClassName('image-box');
+const write = function (e: Event) {
+  e.preventDefault();
 
-  axios.post("/nm/boards/write", {
-    title: title.value,
-    content: content.value,
-    imageArray: fileArray.item(0)
+  const fileInput = document.getElementById('imgInput') as HTMLInputElement;
+
+  const formData = new FormData();
+  formData.append('title', title.value)
+  formData.append('content', content.value)
+  Array.from(fileInput.files ?? []).forEach((file) =>{
+    formData.append('imgInput', file)
   })
-  .then(() => {
-    router.replace({name: "home"})
+
+  axios.post("/nm/boards/write", formData, {
+  }).then(response => {
+    console.log(response)
+  }).catch(response => {
+    console.log(response)
   })
+
 };
 
-window.onload = () => {
+const imageUpload = () => {
   const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
 
   fileDOM?.addEventListener('change', () => {
@@ -50,7 +58,7 @@ window.onload = () => {
 <template>
 
   <div class="container w-100 h-100 text-white text-center">
-    <div class="content_area" method="post">
+    <form class="content_area">
       <div>
         <el-input v-model="title" placeholder="제목을 입력해주세요" />
       </div>
@@ -58,9 +66,9 @@ window.onload = () => {
       </div>
       <div class="mt-2">
         <label for="imgInput">
-          <div class="btn-upload">파일 업로드하기</div>
+          <div type="button" class="btn-upload" @click="imageUpload">파일 업로드하기</div>
         </label>
-        <input type="file" name="imgInput" class="imgInput" id="imgInput" multiple>
+        <input type="file" class="imgInput" name="imgInput" id="imgInput" multiple>
       </div>
       <div class="mt-2">
         <el-input v-model="content" type="textarea" rows="3"></el-input>
@@ -68,7 +76,7 @@ window.onload = () => {
       <div class="mt-2">
         <el-button type="primary" @click="write">글 작성완료</el-button>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
