@@ -14,8 +14,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.mail.Multipart;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -26,8 +34,16 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping("/boards/write")
-    public void BoardWrite(@RequestBody @Valid String txt) { //BoardForm boardForm
-        log.info(String.valueOf(txt));
+    public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
+        log.info(String.valueOf(boardForm.getTitle()));
+        log.info(String.valueOf(boardForm.getContent()));
+        for(MultipartFile file : boardForm.getImgInput()){
+            log.info(String.valueOf(file));
+
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get("D:\\NyangMunityImages\\" + file.getOriginalFilename());
+            Files.write(path, bytes);
+        }
         //boardService.write(boardForm);
     }
 

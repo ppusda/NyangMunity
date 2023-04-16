@@ -2,6 +2,7 @@ package cat.community.NyangMunity.controller.form;
 
 import cat.community.NyangMunity.domain.User;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -18,12 +19,13 @@ public class BoardForm {
     @NotBlank(message = "content를 입력해주세요.")
     private String content;
 
-    private List images;
+    private List<MultipartFile> imgInput;
 
     @Builder
-    public BoardForm(String title, String content) {
+    public BoardForm(String title, String content, List<MultipartFile> imgInput) {
         this.title = title;
         this.content = content;
+        this.imgInput = imgInput;
     }
 }
 
