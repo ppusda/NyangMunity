@@ -3,6 +3,7 @@ package cat.community.NyangMunity.service;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardEditor;
+import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,12 +25,15 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    public void write(BoardForm boardForm){
+    public void write(BoardForm boardForm, ArrayList<BoardImage> boardImages){
         Board board = Board.builder()
                 .title(boardForm.getTitle())
                 .content(boardForm.getContent())
+                .boardImages(boardImages)
                 .createDate(LocalDateTime.now())
                 .build();
+
+        board.setBoardImages(boardImages);
 
         boardRepository.save(board);
     }

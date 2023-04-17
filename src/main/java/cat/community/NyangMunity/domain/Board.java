@@ -14,11 +14,11 @@ import java.util.List;
 public class Board {
 
     @Builder
-    public Board(String title, String content, LocalDateTime createDate) {
+    public Board(String title, String content, User user, ArrayList<BoardImage> boardImages, LocalDateTime createDate) {
         this.title = title;
         this.content = content;
-        this.user = new User();
-        this.boardImages = new ArrayList<>();
+        this.user = user;
+        this.boardImages = boardImages;
         this.createDate = createDate;
     }
 
@@ -57,6 +57,15 @@ public class Board {
         this.user = user;
         if(!user.getBoards().contains(this)){
             user.getBoards().add(this);
+        }
+    }
+
+    public void setBoardImages(List<BoardImage> boardImages) { // 연관관계 편의 메서드
+        this.boardImages = boardImages;
+        for(BoardImage boardImage: this.getBoardImages()){
+            if(boardImages.contains(boardImage)){
+                boardImages.add(boardImage);
+            }
         }
     }
 }

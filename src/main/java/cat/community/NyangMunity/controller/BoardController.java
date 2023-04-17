@@ -3,6 +3,7 @@ package cat.community.NyangMunity.controller;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardEditor;
+import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,19 +34,31 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final String PATH = "D:\\NyangMunityImages\\";
 
     @PostMapping("/boards/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
         log.info(String.valueOf(boardForm.getTitle()));
         log.info(String.valueOf(boardForm.getContent()));
+
+        ArrayList<BoardImage> boardImages = new ArrayList<>();
+
         for(MultipartFile file : boardForm.getImgInput()){
-            log.info(String.valueOf(file));
+            BoardImage boardImage = BoardImage.builder()
+                    .name(file.getOriginalFilename())
+                    .path(PATH+ file.getOriginalFilename())
+                    .size(file.getSize())
+                    .build();
 
             byte[] bytes = file.getBytes();
-            Path path = Paths.get("D:\\NyangMunityImages\\" + file.getOriginalFilename());
+            Path path = Paths.get(PATH + file.getOriginalFilename());
             Files.write(path, bytes);
+            log.info("Path: " + PATH + file.getOriginalFilename() + "에 저장 완료했습니다.");
+
+            boardImages.add(boardImage);
+            log.info(String.valueOf(boardImages));
         }
-        //boardService.write(boardForm);
+        boardService.write(boardForm, boardImages);
     }
 
     @GetMapping("/boards/{boardId}")

@@ -1,16 +1,30 @@
 package cat.community.NyangMunity.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity @Table(name = "BoardImage")
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardImage {
+
+    @Builder
+    public BoardImage(String name, Long size, Board board, String path) {
+        this.name = name;
+        this.size = size;
+        this.board = board;
+        this.path = path;
+    }
 
     @Id @Column(name = "IMAGE_ID")
     private Long Id;
+
+    @Column(name = "NAME")
+    private String name;
+
+    @Column(name = "SIZE")
+    private Long size;
 
     @ManyToOne
     @JoinColumn(name = "BOARD_ID")
@@ -18,11 +32,11 @@ public class BoardImage {
 
     @Column(name = "PATH")
     private String path;
-
-    public void setBoard(Board board) { // 연관관계 편의 메서드
-        this.board = board;
-        if(!board.getBoardImages().contains(this)){
-            board.getBoardImages().add(this);
-        }
-    }
+//
+//    public void setBoard(Board board) { // 연관관계 편의 메서드
+//        this.board = board;
+//        if(!board.getBoardImages().contains(this)){
+//            board.getBoardImages().add(this);
+//        }
+//    }
 }
