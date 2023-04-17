@@ -18,6 +18,7 @@ public class BoardImage {
     }
 
     @Id @Column(name = "IMAGE_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     @Column(name = "NAME")
@@ -32,11 +33,5 @@ public class BoardImage {
 
     @Column(name = "PATH")
     private String path;
-//
-//    public void setBoard(Board board) { // 연관관계 편의 메서드
-//        this.board = board;
-//        if(!board.getBoardImages().contains(this)){
-//            board.getBoardImages().add(this);
-//        }
-//    }
+
 }

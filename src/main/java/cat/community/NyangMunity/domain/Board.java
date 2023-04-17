@@ -39,7 +39,7 @@ public class Board {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<BoardImage> boardImages = new ArrayList<>();
 
     public BoardEditor.BoardEditorBuilder toEditor() {
@@ -62,8 +62,8 @@ public class Board {
 
     public void setBoardImages(List<BoardImage> boardImages) { // 연관관계 편의 메서드
         this.boardImages = boardImages;
-        for(BoardImage boardImage: this.getBoardImages()){
-            if(boardImages.contains(boardImage)){
+        for(BoardImage boardImage: this.boardImages){
+            if(!boardImages.contains(boardImage)){
                 boardImages.add(boardImage);
             }
         }

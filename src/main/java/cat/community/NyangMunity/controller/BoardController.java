@@ -56,7 +56,6 @@ public class BoardController {
             log.info("Path: " + PATH + file.getOriginalFilename() + "에 저장 완료했습니다.");
 
             boardImages.add(boardImage);
-            log.info(String.valueOf(boardImages));
         }
         boardService.write(boardForm, boardImages);
     }
