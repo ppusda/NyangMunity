@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,11 @@ public class BoardService {
                 .createDate(LocalDateTime.now())
                 .build();
 
-        board.setBoardImages(boardImages);
+        Iterator<BoardImage> iterator = boardImages.iterator();
+        while (iterator.hasNext()){
+            BoardImage boardImage = iterator.next();
+            board.setBoardImages(boardImage);
+        }
 
         boardRepository.save(board);
     }

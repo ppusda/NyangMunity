@@ -68,6 +68,11 @@ public class BoardController {
 
     @GetMapping("/boards")
     public List<BoardResponse> readBoards(@ModelAttribute BoardSearch boardSearch){
+        for(BoardResponse boardResponse : boardService.getList(boardSearch)){
+            for (BoardImage boardImage: boardResponse.getBoardImages()) {
+                log.info("test" + boardImage);
+            }
+        }
         return boardService.getList(boardSearch);
     } //pageableDefault는 기본 size값이 10이다.
 

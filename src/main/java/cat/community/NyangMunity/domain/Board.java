@@ -60,12 +60,8 @@ public class Board {
         }
     }
 
-    public void setBoardImages(List<BoardImage> boardImages) { // 연관관계 편의 메서드
-        this.boardImages = boardImages;
-        for(BoardImage boardImage: this.boardImages){
-            if(!boardImages.contains(boardImage)){
-                boardImages.add(boardImage);
-            }
-        }
+    public void setBoardImages(BoardImage boardImage) { // 연관관계 편의 메서드
+        boardImages.add(boardImage);
+        boardImage.setBoard(this);
     }
 }

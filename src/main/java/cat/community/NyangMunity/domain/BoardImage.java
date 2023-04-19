@@ -34,4 +34,7 @@ public class BoardImage {
     @Column(name = "PATH")
     private String path;
 
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }

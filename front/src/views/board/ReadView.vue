@@ -15,6 +15,7 @@ const post = ref({
   id: 0,
   title: "",
   content: "",
+  imageList: []
 });
 
 const moveToEdit = () => {
@@ -23,6 +24,7 @@ const moveToEdit = () => {
 
 onMounted( () => {
   axios.get(`/nm/boards/${props.postId}`).then((response) => {
+    console.log(response.data)
     post.value = response.data;
   });
 })
@@ -33,6 +35,7 @@ onMounted( () => {
     <div class="content_area" method="post">
       <h2>{{post.title}}</h2>
       <div>{{post.content}}</div>
+      <div>{{post.imageList}}</div>
 
       <el-button type="warning" @click="moveToEdit()">수정</el-button>
     </div>
