@@ -34,9 +34,8 @@ public class BoardService {
                 .createDate(LocalDateTime.now())
                 .build();
 
-        Iterator<BoardImage> iterator = boardImages.iterator();
-        while (iterator.hasNext()){
-            BoardImage boardImage = iterator.next();
+        List<BoardImage> newBoardImages = new ArrayList<>(boardImages);
+        for (BoardImage boardImage: newBoardImages) {
             board.setBoardImages(boardImage);
         }
 
