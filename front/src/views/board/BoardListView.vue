@@ -32,6 +32,9 @@ const moveToRead = () => {
           <div>
             {{post.content}}
           </div>
+          <div>
+            {{post.boardImages[0]}}
+          </div>
         </li>
       </ul>
     </div>
