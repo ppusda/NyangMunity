@@ -24,7 +24,7 @@ const write = function (e: Event) {
 
   axios.post("/nm/boards/write", formData, {
   }).then(response => {
-    console.log(response)
+    router.replace({name: "home"})
   }).catch(response => {
     console.log(response)
   })
