@@ -38,9 +38,6 @@ public class BoardController {
 
     @PostMapping("/boards/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
-        log.info(String.valueOf(boardForm.getTitle()));
-        log.info(String.valueOf(boardForm.getContent()));
-
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         for(MultipartFile file : boardForm.getImgInput()){
