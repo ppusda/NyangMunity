@@ -45,8 +45,9 @@ const remove = () => {
       </div>
 
       <div class="mt-2">
-        <el-button type="primary" @click="edit()">글 수정</el-button>
-        <el-button type="danger" @click="remove()">글 삭제</el-button>
+        <a class="clButton btn btn-warning text-white m-1" @click="$router.go(-1)">취소</a>
+        <a class="clButton btn btn-primary text-white m-1" @click="edit()">글 수정</a>
+        <a class="clButton btn btn-danger text-white m-1" @click="remove()">글 삭제</a>
       </div>
     </div>
   </div>

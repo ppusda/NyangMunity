@@ -24,11 +24,10 @@ const write = function (e: Event) {
 
   axios.post("/nm/boards/write", formData, {
   }).then(response => {
-    router.replace({name: "home"})
+    router.replace({name: "boards"})
   }).catch(response => {
     console.log(response)
   })
-
 };
 
 const imageUpload = () => {
@@ -74,7 +73,8 @@ const imageUpload = () => {
         <el-input v-model="content" type="textarea" rows="3"></el-input>
       </div>
       <div class="mt-2">
-        <el-button type="primary" @click="write">글 작성완료</el-button>
+        <a class="clButton btn btn-warning text-white m-1" @click="$router.go(-1)">취소</a>
+        <a class="clButton btn btn-primary text-white m-1" @click="write">글 작성완료</a>
       </div>
     </form>
   </div>
