@@ -7,6 +7,7 @@ import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
+import cat.community.NyangMunity.response.BoardImageResponse;
 import cat.community.NyangMunity.response.BoardResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,10 +48,16 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
 
+        List<BoardImageResponse> boardImages = board.getBoardImages().stream()
+                                                    .map(BoardImageResponse::new)
+                                                    .collect(Collectors.toList());
+
         return BoardResponse.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
+                .boardImages(boardImages)
+                .createDate(board.getCreateDate())
                 .build();
     }
 
