@@ -40,7 +40,7 @@ onMounted( () => {
         <img class="thumbnail" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
       </div>
       <div>
-        <a class="clButton btn btn-warning text-white m-1" @click="$router.go(-1)">취소</a>
+        <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
         <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
       </div>
     </div>

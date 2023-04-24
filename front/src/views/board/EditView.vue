@@ -45,12 +45,32 @@ const remove = () => {
       </div>
 
       <div class="mt-2">
-        <a class="clButton btn btn-warning text-white m-1" @click="$router.go(-1)">취소</a>
+        <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
         <a class="clButton btn btn-primary text-white m-1" @click="edit()">글 수정</a>
-        <a class="clButton btn btn-danger text-white m-1" @click="remove()">글 삭제</a>
+        <a class="clButton btn btn-danger text-white m-1" data-bs-toggle="modal" data-bs-target="#boardDeleteModal">글 삭제</a>
+
+        <div class="modal fade" id="boardDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title text-black" >삭제</h5>
+              </div>
+              <div class="modal-body text-black">
+                <b>정말로 삭제하시겠습니까?</b>
+              </div>
+              <div class="modal-footer">
+                <a type="button" class="clButton btn btn-secondary text-white m-1" data-bs-dismiss="modal">취소</a>
+                <a type="button" class="clButton btn btn-danger text-white m-1" @click="remove()" data-bs-dismiss="modal">삭제</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+
     </div>
   </div>
+
 </template>
 
 <style>

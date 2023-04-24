@@ -10,7 +10,6 @@ export default defineComponent ({
     }
   }
 })
-
 </script>
 
 <template>

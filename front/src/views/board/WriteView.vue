@@ -73,7 +73,7 @@ const imageUpload = () => {
         <el-input v-model="content" type="textarea" rows="3"></el-input>
       </div>
       <div class="mt-2">
-        <a class="clButton btn btn-warning text-white m-1" @click="$router.go(-1)">취소</a>
+        <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
         <a class="clButton btn btn-primary text-white m-1" @click="write">글 작성완료</a>
       </div>
     </form>

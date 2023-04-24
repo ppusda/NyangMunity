@@ -48,8 +48,8 @@ const joinConfirm = function () {
         </tr>
         <tr>
           <td colspan="2">
+            <a class="clButton btn btn-secondary text-white" @click="$router.go(-1)">취소</a>
             <a class="clButton btn btn-primary m-3" @click="joinConfirm">회원가입</a>
-            <a class="clButton btn btn-warning text-white" @click="$router.go(-1)">취소</a>
           </td>
         </tr>
       </table>
