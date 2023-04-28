@@ -6,6 +6,7 @@ import ReadView from "../views/board/ReadView.vue"
 import EditView from "../views/board/EditView.vue"
 import LoginView from "../views/user/LoginView.vue"
 import JoinView from "../views/user/JoinView.vue"
+import MemeView from "../views/meme/MemeMainView.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,11 @@ const router = createRouter({
       path: "/user/join",
       name: "join",
       component: JoinView
+    },
+    {
+      path: "/meme",
+      name: "meme",
+      component: MemeView
     },
 
     // {

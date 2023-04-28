@@ -45,3 +45,7 @@ test {
 	scanForTestClasses = false
 	include "**/*Test.class"
 }
+
+bootJar {
+	enabled = true
+}
