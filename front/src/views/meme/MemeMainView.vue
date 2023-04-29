@@ -1,60 +1,71 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 
-const limit = ref<number>();
-
-function httpGetAsync(theUrl: string, callback: (responseText: string) => void ): void {
-  const xmlHttp = new XMLHttpRequest();
-
-  xmlHttp.onreadystatechange = function () {
-    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-      callback(xmlHttp.responseText);
-    }
+interface Gif {
+  title: string;
+  media_formats: {
+    gif: {
+      url: string;
+    };
   };
-
-  xmlHttp.open("GET", theUrl, true);
-
-  xmlHttp.send(null)
 }
 
-function tenorCallback_search(responsetext: string): void {
-  const response_objects = JSON.parse(responsetext);
-  const top_10_gifs = response_objects["results"];
+const gifs = ref<Gif[]>([]);
+const apikey = "AIzaSyBOopogP9plIccrEkvlnutu5M4-Ws6tnt0";
+const clientkey = "NyangMeme";
+const limit = 15;
+let posKey: string[] = []
+let currentPage = -1;
 
-  for(let i = 0; i < top_10_gifs.length; i++) {
-    const cmgif = document.getElementById(`cmg_${i}`) as HTMLImageElement;
-    cmgif.src = top_10_gifs[i]["media_formats"]["gif"]["url"];
+function getData(searchTerm: string, page: number): Promise<void> {
+  const search_url = `https://tenor.googleapis.com/v2/search?q=${searchTerm}&key=${apikey}&client_key=${clientkey}&limit=${limit}&pos=${posKey[page]}`;
+
+  return new Promise((resolve, reject) =>{
+    const xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+      if (xmlHttp.readyState === 4) {
+        if (xmlHttp.status === 200) {
+          const response_objects = JSON.parse(xmlHttp.responseText);
+          const gifs = response_objects["results"];
+          posKey.push(response_objects["next"]);
+          resolve(gifs);
+        }else{
+          reject(xmlHttp.statusText);
+        }
+      }
+    };
+
+    xmlHttp.open("GET", search_url, true);
+    xmlHttp.send(null)
+  });
+}
+
+async function searchGifs(searchTerm: string, page:number): Promise<void> {
+  try {
+    const searchResults = await getData(searchTerm, page);
+    gifs.value = searchResults;
+  } catch (error) {
+    console.error(error);
   }
 }
 
-function grab_data(): void {
-  const apikey = "AIzaSyBOopogP9plIccrEkvlnutu5M4-Ws6tnt0";
-  const clientkey = "NyangMeme";
-  const lmt = 15;
+onMounted(() => {
+  searchGifs("cat", currentPage);
+});
 
-  const search_term = "cat";
-  const search_url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${apikey}&client_key=${clientkey}&limit=${lmt}`;
-
-  httpGetAsync(search_url, tenorCallback_search);
+async function nextPage(): Promise<void> {
+  currentPage++;
+  await searchGifs("cat", currentPage);
 }
 
-grab_data()
-
-const cmgifs = document.getElementsByClassName("cmgs");
-
-// Add types for the document object
-declare global {
-  interface Document {
-    getElementById<T extends keyof HTMLElementTagNameMap>(
-        id: T
-    ): HTMLElementTagNameMap[T] | null;
-  }
-}
-
-for(const cmgif of cmgifs){
-  if (cmgif instanceof HTMLImageElement) {
-    cmgif.setAttribute("style", "width:498px;height:372px;");
+async function prevPage(): Promise<void> {
+  if (currentPage >= 0) {
+    currentPage--;
+    await searchGifs("cat", currentPage);
+  }else{
+    await searchGifs("cat", -1);
   }
 }
 
@@ -63,7 +74,11 @@ for(const cmgif of cmgifs){
 <template>
 
   <div class="container content_area w-100 h-100 text-white text-center">
-    <img v-for="index in 15" class="cmgs m-1" :key="`cmg_${index - 1}`" :id="`cmg_${index - 1}`" src="" alt="" style="width:220px;height:164px;">
+    <img v-for="(gif, index) in gifs" class="cmgs m-1 h-100 w-100" :id="`cmg_${index - 1}`" :src="gif.media_formats.gif.url" alt="">
+    <div class="mt-2">
+      <a class="clButton btn btn-secondary text-white m-1" @click="prevPage">이전페이지</a>
+      <a class="clButton btn btn-primary text-white m-1" @click="nextPage">다음페이지</a>
+    </div>
   </div>
 
 </template>
@@ -76,5 +91,10 @@ for(const cmgif of cmgifs){
     background: #333;
     padding: 1vw;
     border-radius: 15px;
+  }
+
+  .cmgs {
+    max-width: 220px;
+    max-height: 164px;
   }
 </style>

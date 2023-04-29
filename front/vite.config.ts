@@ -14,10 +14,14 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/nm/":{
+      "/nm/": {
         target: "http://localhost:8080",
-        rewrite: (path) => path.replace(/^\/nm/, ''),
-      }
-    }
-  }
+        rewrite: (path) => path.replace(/^\/nm/, ""),
+      },
+      "/tc/": {
+        target: "https://api.tenor.com",
+        rewrite: (path) => path.replace(/^\/tc/, ""),
+      },
+    },
+  },
 });
