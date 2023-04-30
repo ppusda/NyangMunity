@@ -21,7 +21,7 @@ const moveToWrite = () => {
 
 <template>
   <div class="container w-100 h-100 text-white text-center">
-    <div class="content_area">
+    <div class="content_area w-100">
       <ul class="boardList list-group">
         <li class="list-group-item" v-for="post in posts" :key="post.id">
           <div>
@@ -43,6 +43,10 @@ const moveToWrite = () => {
 </template>
 
 <style scoped>
+.content_area {
+  top: 5%;
+}
+
 .thumbnail{
   max-width: 128px;
   max-height: 128px;
