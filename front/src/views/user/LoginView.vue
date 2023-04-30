@@ -51,6 +51,10 @@ const login = function () {
 </template>
 
 <style scoped>
+  .content_area {
+    top: 15%;
+  }
+
   .login_page{
     font-size: 0.9vw;
   }

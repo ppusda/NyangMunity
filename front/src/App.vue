@@ -4,6 +4,8 @@ import MainHeader from './views/commons/MainHeader.vue';
 import HomeView from './views/HomeView.vue';
 import MainFooter from "./views/commons/MainFooter.vue";
 
+import main from"./assets/main.css";
+
 export default {
   name: 'App',
   components: {

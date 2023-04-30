@@ -135,12 +135,8 @@ function showToast(message: string): void {
 
 <style scoped>
   .content_area {
-    display: inline-block;
-    position: relative;
     top: 1.5%;
-    background: #333;
     padding: 1vw;
-    border-radius: 15px;
   }
 
   .cmgs {

@@ -58,6 +58,10 @@ const joinConfirm = function () {
 </template>
 
 <style scoped>
+  .content_area {
+    top: 15%;
+  }
+
   .join_page{
     width: 100%;
     height: 100%;

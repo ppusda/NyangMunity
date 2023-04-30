@@ -44,7 +44,8 @@ const moveToWrite = () => {
 
 <style scoped>
 .content_area {
-  top: 5%;
+  max-height: 80vh;
+  top: 2%;
 }
 
 .thumbnail{
@@ -54,7 +55,7 @@ const moveToWrite = () => {
 
 .boardList{
   overflow-y: scroll;
-  max-height: 20vw;
+  max-height: 63vh;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

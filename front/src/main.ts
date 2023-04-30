@@ -11,8 +11,6 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import "./assets/main.css";
-import "./assets/login.css";
-import "./assets/join.css";
 
 const app = createApp(App);
 

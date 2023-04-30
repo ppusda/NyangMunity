@@ -48,8 +48,11 @@ onMounted( () => {
 </template>
 
 <style scoped>
-.thumbnail{
-  max-width: 128px;
-  max-height: 128px;
-}
+  .content_area {
+    padding: 1vw;
+  }
+  .thumbnail{
+    max-width: 25vw;
+    max-height: 60vh;
+  }
 </style>
