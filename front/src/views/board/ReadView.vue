@@ -9,6 +9,10 @@ const props = defineProps({
     type: [Number, String],
     require: true,
   },
+  imageId: {
+    type: [Number, String],
+    require: true,
+  }
 });
 
 const post = ref({
@@ -21,6 +25,11 @@ const post = ref({
 
 const moveToEdit = () => {
   router.push({name: "edit", params: { postId: props.postId }})
+}
+
+function imageLike() {
+  axios.post(`/nm/image/like/${props.imageId}`).then(() => {
+  });
 }
 
 onMounted( () => {
@@ -36,12 +45,33 @@ onMounted( () => {
     <div class="content_area" method="post">
       <h2>{{post.title}}</h2>
       <div>{{post.content}}</div>
-      <div class="d-inline" v-if="post.boardImages && post.boardImages.length > 0" v-for="boardImage in post.boardImages">
-        <img class="thumbnail" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
+
+
+      <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active" v-if="post.boardImages && post.boardImages.length > 0" v-for="boardImage in post.boardImages">
+            <img class="thumbnail d-block w-100" :id="`${boardImage.id}`" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
+
       <div>
         <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
         <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
+        <a class="clButton btn btn-danger text-white m-1" @click="imageLike()">❤</a>
       </div>
     </div>
   </div>

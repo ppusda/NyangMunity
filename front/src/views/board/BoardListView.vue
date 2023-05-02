@@ -36,7 +36,7 @@ const moveToWrite = () => {
         </li>
       </ul>
       <div>
-        <a class="clButton btn btn-primary text-white m-1" @click="moveToWrite()">새로 글 쓰기</a>
+        <a class="clButton btn btn-primary text-white m-3" @click="moveToWrite()">새로 글 쓰기</a>
       </div>
     </div>
   </div>
