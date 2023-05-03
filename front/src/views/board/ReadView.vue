@@ -46,23 +46,30 @@ onMounted( () => {
       <h2>{{post.title}}</h2>
       <div>{{post.content}}</div>
 
-
-      <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+      <div id="imageSlider" class="carousel slide" data-bs-ride="true">
         <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          <button v-for="index in post.boardImages.length"
+                  :key="index"
+                  type="button"
+                  data-bs-target="#imageSlider"
+                  :data-bs-slide-to="index-1"
+                  :class="{'active': index-1 === 0}"
+                  aria-current="true">
+          </button>
         </div>
         <div class="carousel-inner">
-          <div class="carousel-item active" v-if="post.boardImages && post.boardImages.length > 0" v-for="boardImage in post.boardImages">
+          <div v-if="post.boardImages && post.boardImages.length > 0"
+               v-for="(boardImage, index) in post.boardImages"
+               class="carousel-item"
+               :class="{'active': index === 0}">
             <img class="thumbnail d-block w-100" :id="`${boardImage.id}`" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
           </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#imageSlider" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#imageSlider" data-bs-slide="next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Next</span>
         </button>
@@ -79,10 +86,12 @@ onMounted( () => {
 
 <style scoped>
   .content_area {
+    top: 1.5%;
     padding: 1vw;
+    max-width: 90vw;
   }
   .thumbnail{
-    max-width: 25vw;
     max-height: 60vh;
+    object-fit: cover;
   }
 </style>
