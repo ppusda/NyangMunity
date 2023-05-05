@@ -14,12 +14,15 @@
     "axios": "^1.2.0",
     "bootstrap": "^5.2.3",
     "element-plus": "^2.2.25",
+    "jquery": "^3.6.4",
+    "jquery-touch-events": "^1.0.7",
     "pinia": "^2.0.23",
     "vue": "^3.2.47",
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
+    "@types/jquery": "^3.5.16",
     "@types/jsdom": "^20.0.0",
     "@types/node": "^16.11.68",
     "@vitejs/plugin-vue": "^3.1.2",
