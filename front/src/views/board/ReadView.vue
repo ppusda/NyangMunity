@@ -4,6 +4,8 @@ import {defineProps, onMounted, ref} from "vue";
 import axios from "axios";
 import router from "@/router";
 
+import Carousel from 'bootstrap/js/dist/carousel'
+
 let isMouseDown = ref(false);
 let lastX = ref<number | null>(null);
 let lastY = ref<number | null>(null);
@@ -38,13 +40,6 @@ function imageLike() {
   });
 }
 
-onMounted( () => {
-  axios.get(`/nm/boards/${props.postId}`).then((response) => {
-    console.log(response.data)
-    post.value = response.data;
-  });
-});
-
 function handleMouseDown() {
   isMouseDown.value = true;
 }
@@ -64,13 +59,23 @@ function handleMouseMove(event: MouseEvent) {
   }
 }
 
+const myCarouselElement = document.querySelector('#imageSlider') as HTMLElement;
+const carousel = new Carousel(myCarouselElement);
+
 function showNextSlide() {
-  activeSlideIndex.value = (activeSlideIndex.value + 1) % 3;
+  carousel.next();
 }
 
 function showPrevSlide() {
-  activeSlideIndex.value = (activeSlideIndex.value + 2) % 3;
+  carousel.prev();
 }
+
+onMounted( () => {
+  axios.get(`/nm/boards/${props.postId}`).then((response) => {
+    console.log(response.data)
+    post.value = response.data;
+  });
+});
 
 </script>
 
