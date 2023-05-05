@@ -4,6 +4,12 @@ import {defineProps, onMounted, ref} from "vue";
 import axios from "axios";
 import router from "@/router";
 
+let isMouseDown = ref(false);
+let lastX = ref<number | null>(null);
+let lastY = ref<number | null>(null);
+
+const activeSlideIndex = ref(0);
+
 const props = defineProps({
   postId: {
     type: [Number, String],
@@ -39,6 +45,33 @@ onMounted( () => {
   });
 });
 
+function handleMouseDown() {
+  isMouseDown.value = true;
+}
+
+function handleMouseMove(event: MouseEvent) {
+  if (isMouseDown.value) {
+    const { clientX, clientY } = event;
+    if (lastX.value && lastY.value) {
+      if (clientX > lastX.value) {
+        showNextSlide();
+      } else if (clientX < lastX.value) {
+        showPrevSlide();
+      }
+    }
+    lastX.value = clientX;
+    lastY.value = clientY;
+  }
+}
+
+function showNextSlide() {
+  activeSlideIndex.value = (activeSlideIndex.value + 1) % 3;
+}
+
+function showPrevSlide() {
+  activeSlideIndex.value = (activeSlideIndex.value + 2) % 3;
+}
+
 </script>
 
 <template>
@@ -62,7 +95,9 @@ onMounted( () => {
           <div v-if="post.boardImages && post.boardImages.length > 0"
                v-for="(boardImage, index) in post.boardImages"
                class="carousel-item"
-               :class="{'active': index === 0}">
+               :class="{'active': index === 0}"
+               @mousedown="handleMouseDown"
+               @mousemove="handleMouseMove">
             <img class="thumbnail" :id="`${boardImage.id}`" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" @mousedown.prevent />
           </div>
         </div>
