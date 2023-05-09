@@ -17,10 +17,6 @@ const props = defineProps({
     type: [Number, String],
     require: true,
   },
-  imageId: {
-    type: [Number, String],
-    require: true,
-  }
 });
 
 const post = ref({
@@ -36,7 +32,7 @@ const moveToEdit = () => {
 }
 
 function imageLike() {
-  axios.post(`/nm/image/like/${props.imageId}`).then(() => {
+  axios.post(`/nm/boards/like/${props.postId}`).then(() => {
   });
 }
 
@@ -68,7 +64,6 @@ function handleMouseMove(event: MouseEvent) {
 
 onMounted( () => {
   axios.get(`/nm/boards/${props.postId}`).then((response) => {
-    console.log(response.data)
     post.value = response.data;
   });
 
@@ -130,7 +125,7 @@ function showPrevSlide() {
         <div>
           <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
           <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
-          <a class="clButton btn btn-danger text-white m-1" @click="imageLike()">❤</a>
+          <a class="clButton btn btn-danger text-white m-1" @click="imageLike()">🤍</a>
         </div>
       </div>
     </div>
