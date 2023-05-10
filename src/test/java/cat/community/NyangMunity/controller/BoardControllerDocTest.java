@@ -35,10 +35,10 @@ public class BoardControllerDocTest {
     @Test
     @DisplayName("글 단건 조회 테스트")
     void test1() throws Exception {
-        this.mockMvc.perform(get("/boards/{boardId}", 1288L)
+        this.mockMvc.perform(get("/boards/{boardId}", 1302L)
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("index"));
+                .andDo(document("apiInfo"));
     }
 
 }
