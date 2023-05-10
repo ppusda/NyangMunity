@@ -9,10 +9,14 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -29,14 +33,12 @@ public class BoardControllerDocTest {
     }
 
     @Test
-    @DisplayName("아무개")
-    void test1() {
-        this.mockMvc.perform(get("/").accept(MediaType.APPLICATION_JSON)) (1)
-                .andExpect(status().isOk()) (2)
-                .andDo(document("index")); (3)
-
-
+    @DisplayName("글 단건 조회 테스트")
+    void test1() throws Exception {
+        this.mockMvc.perform(get("/boards/{boardId}", 1288L)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("index"));
     }
-
 
 }

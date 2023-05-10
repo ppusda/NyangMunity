@@ -4,6 +4,7 @@ import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardEditor;
 import cat.community.NyangMunity.domain.BoardImage;
+import cat.community.NyangMunity.domain.BoardLike;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
@@ -78,6 +79,10 @@ public class BoardController {
         boardService.delete(boardId);
     }
 
+    @PostMapping("/boards/like/{boardId}")
+    public void boardLike(@PathVariable(name = "boardId") Long id ){
+//        BoardLike boardLike = boardService.like(id);
+    }
 //    @GetMapping("/write/{boardId}/rss")
 //    public Board getRss(@PathVariable(name = "boardId") Long id) {
 //        Board board = boardService.getId();

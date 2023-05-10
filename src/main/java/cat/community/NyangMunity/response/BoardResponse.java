@@ -2,6 +2,7 @@ package cat.community.NyangMunity.response;
 
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
+import cat.community.NyangMunity.domain.BoardLike;
 import lombok.Builder;
 import lombok.Getter;
 

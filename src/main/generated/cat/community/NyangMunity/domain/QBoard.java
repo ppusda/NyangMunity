@@ -24,6 +24,8 @@ public class QBoard extends EntityPathBase<Board> {
 
     public final ListPath<BoardImage, QBoardImage> boardImages = this.<BoardImage, QBoardImage>createList("boardImages", BoardImage.class, QBoardImage.class, PathInits.DIRECT2);
 
+    public final ListPath<BoardLike, QBoardLike> boardLikes = this.<BoardLike, QBoardLike>createList("boardLikes", BoardLike.class, QBoardLike.class, PathInits.DIRECT2);
+
     public final StringPath content = createString("content");
 
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);

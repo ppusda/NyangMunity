@@ -66,6 +66,7 @@ bootJar {
 	enabled = true
 	dependsOn asciidoctor
 	from ("${asciidoctor.outputDir}/html5") {
+		println ">>>>" + asciidoctor.outputDir
 		into 'static/docs'
 	}
 }
