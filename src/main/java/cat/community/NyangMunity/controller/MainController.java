@@ -8,8 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class MainController {
 
+    @GetMapping("/")
+    public String main() {
+        return "/docs/apiInfo";
+    }
 }
