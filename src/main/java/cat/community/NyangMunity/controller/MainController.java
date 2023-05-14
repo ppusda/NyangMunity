@@ -14,6 +14,6 @@ public class MainController {
 
     @GetMapping("/")
     public String main() {
-        return "/docs/apiInfo";
+        return "docs/apiInfo";
     }
 }

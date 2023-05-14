@@ -68,6 +68,6 @@ bootJar {
 
 	copy {
 		from asciidoctor.outputDir
-		into "src/main/resources/static/docs"
+		into "src/main/resources/template/docs"
 	}
 }
