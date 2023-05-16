@@ -33,9 +33,9 @@ public class BoardControllerDocTest {
     }
 
     @Test
-    @DisplayName("글 단건 조회 테스트")
+    @DisplayName("Search Board Test")
     void test1() throws Exception {
-        this.mockMvc.perform(get("/boards/{boardId}", 1302L)
+        this.mockMvc.perform(get("/boards/{boardId}", 1L)
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("apiInfo"));
