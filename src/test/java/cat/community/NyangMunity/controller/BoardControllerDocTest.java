@@ -33,12 +33,22 @@ public class BoardControllerDocTest {
     }
 
     @Test
-    @DisplayName("Search Board Test")
-    void test1() throws Exception {
-        this.mockMvc.perform(get("/boards/{boardId}", 1L)
+    @DisplayName("Board 단건 조회")
+    void getBoardItem() throws Exception {
+        this.mockMvc.perform(get("/boards/{boardId}", 1306L)
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("apiInfo"));
+                .andDo(document("getBoardItem"));
     }
+
+    @Test
+    @DisplayName("Board 전체 조회")
+    void getBoardList() throws Exception {
+        this.mockMvc.perform(get("/boards?page=1&size=5")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("getBoardList"));
+    }
+
 
 }

@@ -1,16 +1,33 @@
 = Nyangmunity API
 :toc:
 
-== 글 단건 조회
+= Board
+
+== Board 전체 조회
 
 === 요청
 
-include::{snippets}/apiInfo/http-request.adoc[]
+include::{snippets}/getBoardList/http-request.adoc[]
 
 === 응답
 
-include::{snippets}/apiInfo/http-response.adoc[]
+include::{snippets}/getBoardList/http-response.adoc[]
 
 === CURL
 
-include::{snippets}/apiInfo/curl-request.adoc[]
+include::{snippets}/getBoardList/curl-request.adoc[]
+
+
+== Board 단건 조회
+
+=== 요청
+
+include::{snippets}/getBoardItem/http-request.adoc[]
+
+=== 응답
+
+include::{snippets}/getBoardItem/http-response.adoc[]
+
+=== CURL
+
+include::{snippets}/getBoardItem/curl-request.adoc[]
