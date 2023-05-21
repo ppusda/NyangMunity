@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: Sidabslxl!@34
+  servlet:
+    multipart:
+      location: /home/ec2-user/
