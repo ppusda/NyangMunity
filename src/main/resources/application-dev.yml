@@ -5,4 +5,4 @@ spring:
     password: jdg1234
   servlet:
     multipart:
-      location: D:\NyangMunityImages\
+      location: C:\Users\ppusd\Pictures\NyangMunityImages
