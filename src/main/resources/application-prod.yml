@@ -3,6 +3,9 @@ spring:
     url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: Sidabslxl!@34
+  jpa:
+    hibernate:
+      ddl-auto: create
   servlet:
     multipart:
       location: /home/ec2-user/
