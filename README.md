@@ -17,6 +17,3 @@
 - Library & Framework : Spring Boot
 - Database : MySQL
 - ORM : JPA
-
-## 기타
-현재 Aws배포 준비 중
