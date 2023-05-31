@@ -23,7 +23,7 @@ const post = ref({
   id: 0,
   title: "",
   content: "",
-  boardImages: [],
+  boardImages: <any>[],
   createDate: ""
 });
 

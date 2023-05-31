@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import { RouterLink, RouterView } from "vue-router";
 import MainHeader from './views/commons/MainHeader.vue';
 import HomeView from './views/HomeView.vue';

@@ -4,7 +4,7 @@ import axios from "axios";
 import {ref} from "vue";
 import router from "@/router";
 
-const posts = ref([]);
+const posts = ref<any[]>([]);
 const imageSrc = ref("");
 
 axios.get("/nm/boards?page=1&size=5").then((response) => {

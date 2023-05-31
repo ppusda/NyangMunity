@@ -14,7 +14,7 @@ export default defineComponent ({
 
 <template>
       <div class="overlay d-flex justify-content-center align-content-center w-100 h-100 cat_page">
-        <img id="main_img" src="src/images/computer_cat.gif"/>
+        <img id="main_img" src="/src/images/computer_cat.gif"/>
       </div>
 </template>
 

@@ -5,7 +5,8 @@ import {useRouter} from "vue-router";
 
 const router = useRouter();
 
-const post = ref([]);
+const post = ref<any>({});
+
 
 const props = defineProps({
   postId: {

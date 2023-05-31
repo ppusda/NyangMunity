@@ -18,7 +18,7 @@ const limit = 15;
 let posKey: string[] = []
 let currentPage = -1;
 
-function getData(searchTerm: string, page: number): Promise<void> {
+function getData(searchTerm: string, page: number): Promise<Gif[]> {
   const search_url = `https://tenor.googleapis.com/v2/search?q=${searchTerm}&key=${apikey}&client_key=${clientkey}&limit=${limit}&pos=${posKey[page]}`;
 
   return new Promise((resolve, reject) =>{

@@ -35,7 +35,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final String PATH = "D:\\NyangMunityImages\\";
+    private final String PATH = "/home/ec2-user/";
 
     @PostMapping("/boards/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
@@ -67,7 +67,7 @@ public class BoardController {
     @GetMapping("/boards")
     public List<BoardResponse> readBoards(@ModelAttribute BoardSearch boardSearch){
         return boardService.getList(boardSearch);
-    } //pageableDefault는 기본 size값이 10이다.
+    }
 
     @PatchMapping("/boards/{boardId}")
     public void editBoard(@PathVariable Long boardId, @RequestBody @Valid BoardEdit request) {
@@ -83,6 +83,7 @@ public class BoardController {
     public void boardLike(@PathVariable(name = "boardId") Long id ){
 //        BoardLike boardLike = boardService.like(id);
     }
+
 //    @GetMapping("/write/{boardId}/rss")
 //    public Board getRss(@PathVariable(name = "boardId") Long id) {
 //        Board board = boardService.getId();

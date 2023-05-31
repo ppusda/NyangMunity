@@ -5,7 +5,7 @@
         <a class="navbar-brand align-middle" id="img_logo" href="/">
           <img id="logo" src="/src/images/logo.png" alt="" height="72">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarContent">
@@ -33,7 +33,10 @@
 </template>
 
 
-<script>
+<script lang="ts">
+export default {
+  name: "MainHeader.vue"
+}
 </script>
 
 <style scoped>
