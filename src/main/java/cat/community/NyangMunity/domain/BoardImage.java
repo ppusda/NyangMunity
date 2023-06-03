@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Entity @Table(name = "BoardImage")
+@Entity @Table
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardImage {
@@ -17,21 +17,21 @@ public class BoardImage {
         this.path = path;
     }
 
-    @Id @Column(name = "IMAGE_ID")
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
-    @Column(name = "NAME")
+    @Column
     private String name;
 
-    @Column(name = "SIZE")
+    @Column
     private Long size;
 
     @ManyToOne
-    @JoinColumn(name = "BOARD_ID")
+    @JoinColumn(name = "board_id")
     private Board board;
 
-    @Column(name = "PATH")
+    @Column
     private String path;
 
     public void setBoard(Board board) {

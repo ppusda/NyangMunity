@@ -22,21 +22,21 @@ public class Board {
         this.createDate = createDate;
     }
 
-    @Id @Column(name = "BOARD_ID")
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "TITLE")
+    @Column
     private String title;
 
-    @Column(name = "CONTENT")
+    @Column
     private String content;
 
-    @Column(name = "CREATE_DATE")
+    @Column
     private LocalDateTime createDate;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name="user_id")
     private User user;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -11,21 +11,17 @@ import java.time.LocalDateTime;
 @Entity @Table(name = "PET")
 public class Pet {
 
-    @Id @Column(name = "PET_ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "NAME")
     private String name;
 
-    @Column(name = "GENDER")
     private String gender;
 
-    @Column(name = "BIRTHDAY")
     private LocalDate birthday;
 
 }

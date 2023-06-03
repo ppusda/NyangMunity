@@ -22,23 +22,23 @@ public class User {
         this.createDate = createDate;
     }
 
-    @Id @Column(name = "USER_ID")
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "EMAIL", nullable = false)
+    @Column(nullable = false)
     private String email;
 
-    @Column(name = "PASSWORD", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "NICKNAME", nullable = false)
+    @Column(nullable = false)
     private String nickname;
 
-    @Column(name = "CREATE_DATE", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createDate;
 
-    @Column(name = "BIRTHDAY")
+    @Column
     private LocalDate birthday;
 
     @OneToMany(mappedBy = "user")

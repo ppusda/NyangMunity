@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity @Table(name = "BOARD_PET")
+@Entity @Table
 @IdClass(BoardPetId.class)
 @Getter @Setter
 public class BoardPet {
