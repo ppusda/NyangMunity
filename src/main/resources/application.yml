@@ -6,7 +6,6 @@ spring:
     active: dev
   jpa:
     hibernate:
-      ddl-auto: update
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -27,6 +26,9 @@ spring:
       max-request-size: 10MB
       location: /Users/ppusd/Desktop
       file-size-threshold: 0
+  mustache:
+    suffix: .html
+    prefix: classpath:/static/
 
 logging:
   level:

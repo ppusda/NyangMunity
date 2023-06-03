@@ -3,6 +3,9 @@ spring:
     url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: jdg1234
+  jpa:
+    hibernate:
+      ddl-auto: update
   servlet:
     multipart:
       location: C:\Users\ppusd\Pictures\NyangMunityImages

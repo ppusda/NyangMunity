@@ -5,7 +5,7 @@ spring:
     password: Sidabslxl!@34
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   servlet:
     multipart:
       location: /home/ec2-user/
