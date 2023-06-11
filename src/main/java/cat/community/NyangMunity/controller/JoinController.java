@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/nm/user")
 @RequiredArgsConstructor
 public class JoinController {
 

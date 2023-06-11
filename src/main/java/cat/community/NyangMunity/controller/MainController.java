@@ -2,9 +2,7 @@ package cat.community.NyangMunity.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 
@@ -12,8 +10,12 @@ import javax.mail.MessagingException;
 @RequiredArgsConstructor
 public class MainController {
 
-    @GetMapping("/")
+    @GetMapping("/api")
     public String main() {
         return "docs/apiInfo";
+    }
+    @RequestMapping(value = "/{path:(?!nm|api|static|assets).*}/**", method = RequestMethod.GET)
+    public String vueIndex(String path) {
+        return "index";
     }
 }

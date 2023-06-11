@@ -29,18 +29,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@RestController
+
 @Slf4j
+@RestController
+@RequestMapping("/nm")
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
-    private final String PATH = "/home/ec2-user/";
+    private final String PATH = "C:\\Users\\ppusd\\Pictures\\NyangMunityImages";
 
     @PostMapping("/boards/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
+        // todo file service 향후 적용 해보자
         for(MultipartFile file : boardForm.getImgInput()){
             BoardImage boardImage = BoardImage.builder()
                     .name(file.getOriginalFilename())
