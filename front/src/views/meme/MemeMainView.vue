@@ -73,7 +73,7 @@ async function prevPage(): Promise<void> {
 
 async function imageLoading(): Promise<void> {
   for(let i=0; i<15; i++){
-    gifs.value[i].media_formats.gif.url = "src/images/cat_loading.gif"
+    gifs.value[i].media_formats.gif.url = "/assets/images/cat_loading.gif"
   }
 }//https://gifer.com/en/Uond gif 사용
 
