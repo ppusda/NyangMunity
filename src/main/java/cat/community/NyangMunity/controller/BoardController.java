@@ -37,27 +37,31 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final String PATH = "C:\\Users\\ppusd\\Pictures\\NyangMunityImages";
+    private final String PATH = "C:\\Users\\ppusd\\Pictures\\NyangMunityImages"; // 배포 시 변경 (?)
+    // private final String PATH = "/home/ec2-user/nm/images/";
 
     @PostMapping("/boards/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
-        // todo file service 향후 적용 해보자
-        for(MultipartFile file : boardForm.getImgInput()){
-            BoardImage boardImage = BoardImage.builder()
-                    .name(file.getOriginalFilename())
-                    .path(PATH+ file.getOriginalFilename())
-                    .size(file.getSize())
-                    .build();
+        if(boardForm.getImgInput() != null){
+            // todo file service 향후 적용 해보자
+            for(MultipartFile file : boardForm.getImgInput()){
+                BoardImage boardImage = BoardImage.builder()
+                        .name(file.getOriginalFilename())
+                        .path(PATH+ file.getOriginalFilename())
+                        .size(file.getSize())
+                        .build();
 
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(PATH + file.getOriginalFilename());
-            Files.write(path, bytes);
-            log.info("Path: " + PATH + file.getOriginalFilename() + "에 저장 완료했습니다.");
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(PATH + file.getOriginalFilename());
+                Files.write(path, bytes);
+                log.info("Path: " + PATH + file.getOriginalFilename() + "에 저장 완료했습니다.");
 
-            boardImages.add(boardImage);
+                boardImages.add(boardImage);
+            }
         }
+
         boardService.write(boardForm, boardImages);
     }
 
