@@ -34,7 +34,7 @@ public class BoardResponse {
     @Builder
     public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages, LocalDateTime createDate) {
         this.id = id;
-        this.title = title.substring(0, Math.min(title.length(), 10));
+        this.title = title;
         this.content = content;
         this.boardImages = boardImages;
         this.createDate = createDate;
