@@ -33,6 +33,9 @@ const moveToWrite = () => {
           <div class="d-inline" v-if="post.boardImages && post.boardImages.length > 0" v-for="boardImage in post.boardImages">
             <img class="thumbnail" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
           </div>
+          <div class="d-inline" v-else>
+            <img class="thumbnail" src="/assets/images/cat_loading.gif"/>
+          </div>
         </li>
       </ul>
       <div>
