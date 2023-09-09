@@ -1,14 +1,10 @@
 package cat.community.NyangMunity.response;
 
 import cat.community.NyangMunity.domain.Board;
-import cat.community.NyangMunity.domain.BoardImage;
-import cat.community.NyangMunity.domain.BoardLike;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,5 @@
 package cat.community.NyangMunity.domain;
 
-import cat.community.NyangMunity.request.BoardEdit;
 import lombok.*;
 
 import javax.persistence.*;

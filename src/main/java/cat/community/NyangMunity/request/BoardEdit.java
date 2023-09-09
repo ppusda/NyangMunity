@@ -1,6 +1,5 @@
 package cat.community.NyangMunity.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

@@ -1,10 +1,8 @@
 package cat.community.NyangMunity.controller.form;
 
-import cat.community.NyangMunity.domain.User;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 

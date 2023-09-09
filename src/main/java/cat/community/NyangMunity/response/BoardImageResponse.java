@@ -3,7 +3,6 @@ package cat.community.NyangMunity.response;
 import cat.community.NyangMunity.domain.BoardImage;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
