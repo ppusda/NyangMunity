@@ -111,6 +111,12 @@ function showPrevSlide() {
                  @mouseup="handleMouseUp">
               <img class="thumbnail" :id="`${boardImage.id}`" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" @mousedown.prevent />
             </div>
+            <div v-else class="carousel-item active"
+                 @mousedown="handleMouseDown"
+                 @mousemove="handleMouseMove"
+                 @mouseup="handleMouseUp">
+              <img class="thumbnail" id="0" src="/assets/images/cat_loading.gif" @mousedown.prevent/>
+            </div>
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#imageSlider" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
