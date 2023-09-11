@@ -1,7 +1,11 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.exception.InvalidRequest;
+import cat.community.NyangMunity.exception.NyangmunityException;
+import cat.community.NyangMunity.exception.PostNotFound;
 import cat.community.NyangMunity.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,4 +31,22 @@ public class ExceptionController {
 
         return response;
     }
+
+    @ResponseBody
+    @ExceptionHandler(NyangmunityException.class)
+    public ResponseEntity<ErrorResponse> postNotFound(NyangmunityException e) {
+        int statusCode = e.statusCode();
+
+        ErrorResponse body = ErrorResponse.builder()
+                .code(String.valueOf(statusCode))
+                .message(e.getMessage())
+                .validation(e.getValidation())
+                .build();
+
+        ResponseEntity<ErrorResponse> response = ResponseEntity.status(statusCode)
+                .body(body);
+
+        return response;
+    }
+
 }

@@ -4,6 +4,7 @@ import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardEditor;
 import cat.community.NyangMunity.domain.BoardImage;
+import cat.community.NyangMunity.exception.PostNotFound;
 import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
@@ -45,7 +46,7 @@ public class BoardService {
     public BoardResponse read(Long id) {
         // Optional<Board> board = boardRepository.findById(id); // Optional로 Null 체크해도 됨
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         List<BoardImageResponse> boardImages = board.getBoardImages().stream()
                                                     .map(BoardImageResponse::new)
@@ -71,7 +72,7 @@ public class BoardService {
     @Transactional
     public void edit(Long id, BoardEdit boardEdit) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
 
@@ -87,7 +88,7 @@ public class BoardService {
     @Transactional
     public void delete(Long id) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         boardRepository.delete(board);
     }

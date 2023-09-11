@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.controller.form;
 
+import cat.community.NyangMunity.exception.InvalidRequest;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,13 @@ public class BoardForm {
         this.title = title;
         this.content = content;
         this.imgInput = imgInput;
+    }
+
+    // todo 테스트 코드 항목 중 "게시글 작성 시 제목에 '바보'는 포함될 수 없다." 를 테스트 해보려 함.
+   public void validate() {
+        if (title.contains("바보")) {
+            throw new InvalidRequest();
+        }
     }
 }
 

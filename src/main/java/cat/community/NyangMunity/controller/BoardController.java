@@ -2,6 +2,7 @@ package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
+import cat.community.NyangMunity.exception.InvalidRequest;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
@@ -30,6 +31,11 @@ public class BoardController {
     private final String PATH = "C:\\Users\\ppusd\\Pictures\\NyangMunityImages"; // 배포 시 변경 (?)
     // private final String PATH = "/home/ec2-user/nm/images/";
 
+    @GetMapping("/test")
+    public String test() {
+        return "hello";
+    }
+
     @PostMapping("/boards/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
@@ -52,6 +58,7 @@ public class BoardController {
             }
         }
 
+        log.info("boardForm.getTitle >> " + boardForm.getTitle());
         boardService.write(boardForm, boardImages);
     }
 
