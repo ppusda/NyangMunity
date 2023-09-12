@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.config.data.UserSession;
 import cat.community.NyangMunity.controller.form.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.exception.InvalidRequest;
@@ -32,8 +33,9 @@ public class BoardController {
     // private final String PATH = "/home/ec2-user/nm/images/";
 
     @GetMapping("/test")
-    public String test() {
-        return "hello";
+    public String test(UserSession userSession) {
+        log.info(">>> {}", userSession.name);
+        return userSession.name;
     }
 
     @PostMapping("/boards/write")
