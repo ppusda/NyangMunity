@@ -21,7 +21,7 @@ public class PostNotFound extends NyangmunityException{
     }
 
     @Override
-    public int statusCode() {
+    public int getStatusCode() {
         return 404;
     }
 }

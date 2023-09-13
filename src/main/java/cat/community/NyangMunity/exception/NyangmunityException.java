@@ -17,7 +17,7 @@ public abstract class NyangmunityException extends RuntimeException{
         super(message, cause);
     }
 
-    public abstract int statusCode();
+    public abstract int getStatusCode();
 
     public void addValidation(String filedName, String message){
         validation.put(filedName, message);

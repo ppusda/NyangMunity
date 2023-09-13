@@ -35,7 +35,7 @@ public class ExceptionController {
     @ResponseBody
     @ExceptionHandler(NyangmunityException.class)
     public ResponseEntity<ErrorResponse> postNotFound(NyangmunityException e) {
-        int statusCode = e.statusCode();
+        int statusCode = e.getStatusCode();
 
         ErrorResponse body = ErrorResponse.builder()
                 .code(String.valueOf(statusCode))
