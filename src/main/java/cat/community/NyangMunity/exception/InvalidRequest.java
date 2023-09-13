@@ -17,7 +17,7 @@ public class InvalidRequest extends NyangmunityException{
     }
 
     @Override
-    public int statusCode() {
+    public int getStatusCode() {
         return 400;
     }
 }
