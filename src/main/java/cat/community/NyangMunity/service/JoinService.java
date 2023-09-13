@@ -1,6 +1,6 @@
 package cat.community.NyangMunity.service;
 
-import cat.community.NyangMunity.controller.form.UserForm;
+import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.repository.JoinRepository;
 import lombok.RequiredArgsConstructor;

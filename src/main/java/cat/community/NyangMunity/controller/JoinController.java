@@ -1,12 +1,11 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.controller.form.UserForm;
+import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.service.JoinService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -18,13 +17,8 @@ public class JoinController {
 
     private final JoinService joinService;
 
-    @GetMapping("/join")
-    private void userJoin(){
-        System.out.println("test");
-    }
-
     @PostMapping("/join")
-    private void userJoinConfirm(@RequestBody @Valid UserForm userForm, HttpServletResponse response) throws IOException {
+    private void userJoinConfirm(@RequestBody @Valid UserForm userForm) throws IOException {
         joinService.register(userForm);
     }
 
