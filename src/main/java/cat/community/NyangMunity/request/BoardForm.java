@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.controller.form;
+package cat.community.NyangMunity.request;
 
 import cat.community.NyangMunity.exception.InvalidRequest;
 import lombok.*;
