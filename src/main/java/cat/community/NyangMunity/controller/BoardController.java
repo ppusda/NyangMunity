@@ -1,9 +1,8 @@
 package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.config.data.UserSession;
-import cat.community.NyangMunity.controller.form.BoardForm;
+import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
-import cat.community.NyangMunity.exception.InvalidRequest;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
@@ -33,9 +32,9 @@ public class BoardController {
     // private final String PATH = "/home/ec2-user/nm/images/";
 
     @GetMapping("/test")
-    public String test(UserSession userSession) {
-        log.info(">>> {}", userSession.name);
-        return userSession.name;
+    public Long test(UserSession userSession) {
+        log.info(">>> {}", userSession.id);
+        return userSession.id;
     }
 
     @PostMapping("/boards/write")
@@ -60,7 +59,6 @@ public class BoardController {
             }
         }
 
-        log.info("boardForm.getTitle >> " + boardForm.getTitle());
         boardService.write(boardForm, boardImages);
     }
 

@@ -1,6 +1,6 @@
 package cat.community.NyangMunity.service;
 
-import cat.community.NyangMunity.controller.form.BoardForm;
+import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.exception.PostNotFound;

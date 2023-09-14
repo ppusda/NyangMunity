@@ -1,32 +1,24 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.controller.form.BoardForm;
+import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.request.BoardEdit;
-import cat.community.NyangMunity.response.BoardResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.transaction.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
