@@ -1,8 +1,8 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.domain.User;
-import cat.community.NyangMunity.repository.JoinRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class JoinService {
 
-    private final JoinRepository joinRepository;
+    private final UserRepository userRepository;
 
     public void register(UserForm userForm) {
         User user = User.builder()
@@ -27,6 +27,6 @@ public class JoinService {
                 .createDate(LocalDateTime.now())
                 .build();
 
-        joinRepository.save(user);
+        userRepository.save(user);
     }
 }
