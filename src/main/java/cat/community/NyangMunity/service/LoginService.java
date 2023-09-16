@@ -1,31 +1,33 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.domain.Session;
 import cat.community.NyangMunity.domain.User;
-import cat.community.NyangMunity.repository.LoginRepository;
+import cat.community.NyangMunity.exception.InvalidSigninInformation;
+import cat.community.NyangMunity.repository.UserRepository;
+import cat.community.NyangMunity.request.UserForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginService {
-    private final LoginRepository loginRepository;
+
+    private final UserRepository userRepository;
 
     public List<User> findAll(){
-        return loginRepository.findAll();
+        return userRepository.findAll();
     }
 
-    public boolean userLogin(String email, String password) {
-        User user = loginRepository.findByEmailPassword(email, password);
-        if (user != null){
-            return true;
-        }else {
-            return false;
-        }
-
+    @Transactional
+    public String userLogin(UserForm userForm) {
+        User user = userRepository.findByEmailAndPassword(userForm.getEmail(), userForm.getPassword())
+                .orElseThrow(InvalidSigninInformation::new);
+        return user.addSession().getAccessToken();
     }
 }
 

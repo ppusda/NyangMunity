@@ -1,0 +1,15 @@
+### 로그인 요청
+
+POST http://localhost:8080/nm/user/login
+Content-Type: application/json
+
+{
+  "email": "ppusda@naver.com",
+  "password": "1234"
+}
+
+### 인증 페이지 요청
+
+GET http://localhost:8080/nm/test
+Content-Type: application/json
+Cookie: SESSION=0c25a791-7cf5-41a6-abb9-8a37a98a6cb9
