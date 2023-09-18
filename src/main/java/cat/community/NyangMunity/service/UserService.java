@@ -1,7 +1,9 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.domain.Session;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.exception.InvalidSigninInformation;
+import cat.community.NyangMunity.repository.SessionRepository;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -20,6 +23,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
 
     public List<User> findAll(){
         return userRepository.findAll();
@@ -42,6 +46,11 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    public String userCheck(String SID) {
+        Optional<Session> session = sessionRepository.findByAccessToken(SID);
+        return session.get().getUser().getNickname();
     }
 }
 

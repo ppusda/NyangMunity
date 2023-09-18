@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.request.SessionId;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,8 @@ public class UserController {
     }
 
     @PostMapping("/check")
-    private void loginCheck(@RequestParam @Valid String SID) {
-
+    private String loginCheck(@RequestBody SessionId SID) throws IOException{
+        return userService.userCheck(SID.getSID());
     }
 
     @RequestMapping("/kakaoLogin")

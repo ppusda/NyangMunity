@@ -1,6 +1,6 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.config.data.UserSession;
+import cat.community.NyangMunity.request.UserSession;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.request.BoardEdit;

@@ -1,6 +1,5 @@
 package cat.community.NyangMunity.request;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

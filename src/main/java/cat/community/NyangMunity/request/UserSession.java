@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.config.data;
+package cat.community.NyangMunity.request;
 
 public class UserSession {
     public final long id;
