@@ -52,5 +52,10 @@ public class UserService {
         Optional<Session> session = sessionRepository.findByAccessToken(SID);
         return session.get().getUser().getNickname();
     }
+
+    @Transactional
+    public void userLogout(String SID) {
+        sessionRepository.deleteByAccessToken(SID);
+    }
 }
 

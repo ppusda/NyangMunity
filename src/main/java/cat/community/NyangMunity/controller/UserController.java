@@ -23,19 +23,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/join")
-    private void userJoinConfirm(@RequestBody @Valid UserForm userForm) throws IOException {
+    private void userJoin(@RequestBody @Valid UserForm userForm) throws IOException {
         userService.register(userForm);
     }
 
     @PostMapping("/login")
-    private ResponseEntity<Object> loginComplete(@RequestBody @Valid UserForm userForm) throws IOException {
+    private ResponseEntity<Object> userLogin(@RequestBody @Valid UserForm userForm) throws IOException {
         String accessToken = userService.userLogin(userForm);
         ResponseCookie cookie = ResponseCookie.from("SESSION", accessToken)
                 .domain("localhost") // todo 향후 서버 환경에 따른 분리 필요
                 .path("/")
                 .httpOnly(false) // javascript가 cookie 값에 접근하지 못하게 하는 설정.
                 .secure(false)
-                .maxAge(Duration.ofDays(30))
+                .maxAge(Duration.ofDays(1))
                 .sameSite("Strict")
                 .build();
 
@@ -47,6 +47,11 @@ public class UserController {
     @PostMapping("/check")
     private String loginCheck(@RequestBody SessionId SID) throws IOException{
         return userService.userCheck(SID.getSID());
+    }
+
+    @PostMapping("/logout")
+    private void userLogout(@RequestBody SessionId SID) throws IOException {
+        userService.userLogout(SID.getSID());
     }
 
     @RequestMapping("/kakaoLogin")
