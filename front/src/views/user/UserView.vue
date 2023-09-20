@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import { useCookies } from "vue3-cookies";
 import axios from "axios";
 
 let cookieValue = ref("");
+const user = ref({
+  id: 0,
+  email: "",
+  password: "",
+  nickname: "",
+  birthday: "",
+});
+
 const { cookies } = useCookies();
 cookieValue.value = cookies.get("SESSION");
 
@@ -15,6 +23,14 @@ const userLogout = function () {
     router.replace({ name: "home" }). then(() => router.go(0));
   });
 };
+
+onMounted(async () => {
+    await axios.post("/nm/user/info",
+        {SID: cookieValue.value,}).then(response => {
+      user.value = response.data;
+    });
+});
+
 </script>
 
 <template>
@@ -39,7 +55,7 @@ const userLogout = function () {
           <tr>
             <td class="w-25"><a class="text-white">이메일 : </a></td>
             <td class="w-50">
-              <input class="w-100" id="email" name="email" type="text" />
+              <a class="w-100" id="email" name="email"></a>
             </td>
           </tr>
           <tr>
