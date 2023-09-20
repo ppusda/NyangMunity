@@ -6,7 +6,9 @@ import ReadView from "../views/board/ReadView.vue";
 import EditView from "../views/board/EditView.vue";
 import LoginView from "../views/user/LoginView.vue";
 import JoinView from "../views/user/JoinView.vue";
+import UserView from "../views/user/UserView.vue";
 import MemeView from "../views/meme/MemeMainView.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,19 +51,15 @@ const router = createRouter({
       component: JoinView,
     },
     {
+      path: "/user/info",
+      name: "info",
+      component: UserView,
+    },
+    {
       path: "/meme",
       name: "meme",
       component: MemeView,
     },
-
-    // {
-    //   path: "/about",
-    //   name: "about",
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import("../views/AboutView.vue"),
-    // },
   ],
 });
 

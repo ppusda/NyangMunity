@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import axios from "axios";
+import router from "@/router";
 
 const email = ref("")
 const password = ref("")
@@ -9,6 +10,9 @@ const login = function () {
   axios.post("/nm/user/login", {
     email: email.value,
     password: password.value
+  }).then(() => {
+    router.replace({name: "home"})
+        .then(() => router.go(0))
   });
 }
 
