@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -44,14 +45,16 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Board> boards = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Session> sessions = new ArrayList<>();
+    private List<Token> tokens = new ArrayList<>();
 
-    public Session addSession() {
-        Session session = Session.builder()
+    public Token addToken(String refreshToken) {
+        Token token = Token.builder()
                 .user(this)
+                .refreshToken(refreshToken)
                 .build();
-        sessions.add(session);
-        return session;
+        tokens.add(token);
+        return token;
     }
 }

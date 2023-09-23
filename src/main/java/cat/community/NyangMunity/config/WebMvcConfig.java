@@ -1,6 +1,6 @@
 package cat.community.NyangMunity.config;
 
-import cat.community.NyangMunity.repository.SessionRepository;
+import cat.community.NyangMunity.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -12,10 +12,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final SessionRepository sessionRepository;
+    private final TokenRepository tokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthResolver(sessionRepository));
+        resolvers.add(new AuthResolver(tokenRepository, jwtTokenProvider));
     }
 }

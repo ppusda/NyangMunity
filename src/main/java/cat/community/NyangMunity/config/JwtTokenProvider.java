@@ -2,10 +2,7 @@ package cat.community.NyangMunity.config;
 
 import cat.community.NyangMunity.exception.Unauthorized;
 import cat.community.NyangMunity.request.UserSession;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -36,16 +33,21 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .signWith(key)
-                .setExpiration(new Date(now.getTime() + (1000L * 60 * 180)))
+                .setExpiration(new Date(now.getTime() + (1000L * 60)))
                 .setIssuedAt(now)
                 .compact();
     }
 
-    public Jws<Claims> getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token); // validate가 정상적으로 이루어졌다면 다음단계로 넘어가지만, 그렇지않으면 여기서 멈춤.
+    public Claims getClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody(); // This line will not be reached if the token is expired.
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 
     public boolean validateToken(String token) {
@@ -53,7 +55,7 @@ public class JwtTokenProvider {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(token);
+                    .parseClaimsJws(token); // validate가 정상적으로 이루어졌다면 다음단계로 넘어가지만, 그렇지않으면 여기서 멈춤.
             return true;
         } catch(JwtException e) {
             return false;

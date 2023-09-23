@@ -15,7 +15,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,25 +43,24 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
             throw new Unauthorized();
         }
 
-        String accessToken = cookies[0].getValue();
-
         try {
+            String accessToken = cookies[0].getValue();
             if(jwtTokenProvider.validateToken(accessToken)){
-                String userId = jwtTokenProvider.getClaims(accessToken).getBody().getSubject();
+                String userId = jwtTokenProvider.getClaims(accessToken).getSubject();
                 return new UserSession(Long.parseLong(userId), accessToken);
             } else{
-                String userId = jwtTokenProvider.getClaims(accessToken).getBody().getSubject();
-                Optional<Token> token = tokenRepository.findByUser_Id(Long.parseLong(userId));
+                String userId = jwtTokenProvider.getClaims(accessToken).getSubject();
+                List<Token> token = tokenRepository.findByUserId(Long.parseLong(userId));
 
-                String refreshToken = token.get().getRefreshToken();
+                String refreshToken = token.get(0).getRefreshToken();
                 if(jwtTokenProvider.validateToken(refreshToken)) {
                     String newAccessToken = jwtTokenProvider.createAccessToken(Long.parseLong(userId));
                     return new UserSession(Long.parseLong(userId), newAccessToken);
                 }else {
+                    tokenRepository.deleteByUserId(Long.parseLong(userId));
                     throw new Unauthorized();
                 }
             }
-
         } catch (JwtException e) {
             throw new Unauthorized();
         }

@@ -1,19 +1,25 @@
 package cat.community.NyangMunity.service;
 
-import cat.community.NyangMunity.domain.Session;
+import cat.community.NyangMunity.config.AppConfig;
+import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.domain.Token;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.exception.InvalidSigninInformation;
-import cat.community.NyangMunity.repository.SessionRepository;
+import cat.community.NyangMunity.repository.TokenRepository;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,17 +29,20 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final SessionRepository sessionRepository;
+    private final TokenRepository tokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public List<User> findAll(){
         return userRepository.findAll();
     }
 
     @Transactional
-    public String userLogin(UserForm userForm) {
+    public Long userLogin(UserForm userForm) {
         User user = userRepository.findByEmailAndPassword(userForm.getEmail(), userForm.getPassword())
                 .orElseThrow(InvalidSigninInformation::new);
-        return user.addSession().getAccessToken();
+
+        user.addToken(jwtTokenProvider.createRefreshToken(user.getId()));
+        return user.getId();
     }
 
     public void register(UserForm userForm) {
@@ -41,21 +50,21 @@ public class UserService {
                 .email(userForm.getEmail())
                 .password(userForm.getPassword())
                 .nickname(userForm.getNickname())
-                .birthday(LocalDate.parse(userForm.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .birthday(userForm.getBirthday() != null && !userForm.getBirthday().isEmpty()
+                        ? LocalDate.parse(userForm.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
                 .createDate(LocalDateTime.now())
                 .build();
 
         userRepository.save(user);
     }
 
-    public String userCheck(String SID) {
-        Optional<Session> session = sessionRepository.findByAccessToken(SID);
-        return session.get().getUser().getNickname();
+    public User userCheck(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.get();
     }
 
-    @Transactional
-    public void userLogout(String SID) {
-        sessionRepository.deleteByAccessToken(SID);
+    public void userLogout(Long userId) {
+        tokenRepository.deleteByUserId(userId);
     }
 }
 
