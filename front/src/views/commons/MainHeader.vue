@@ -11,7 +11,7 @@ onMounted(async () => {
   cookieValue.value = cookies.get('SESSION');
   if(cookieValue.value != "") {
     await axios.post("/nm/user/check", {SID: cookieValue.value,}).then(response => {
-        nickName.value = response.data;
+        nickName.value = response.data.nickname;
     })
   }
 });

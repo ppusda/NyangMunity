@@ -1,12 +1,11 @@
 package cat.community.NyangMunity.request;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-@Getter @Setter @ToString
+@Getter @Setter
+@NoArgsConstructor
 public class UserForm {
     @NotBlank(message = "ID를 입력해주세요.")
     private String email;
@@ -16,4 +15,10 @@ public class UserForm {
     private String nickname;
     private String birthday;
 
+    @Builder
+    public UserForm(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
 }

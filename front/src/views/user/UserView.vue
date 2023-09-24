@@ -19,7 +19,8 @@ cookieValue.value = cookies.get("SESSION");
 const router = useRouter();
 
 const userLogout = function () {
-  axios.post("/nm/user/logout", { SID: cookieValue.value }).then(() => {
+  axios.post("/nm/user/logout").then(() => {
+    cookies.remove("SESSION");
     router.replace({ name: "home" }). then(() => router.go(0));
   });
 };

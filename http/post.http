@@ -12,4 +12,5 @@ Content-Type: application/json
 
 GET http://localhost:8080/nm/test
 Content-Type: application/json
-Cookie: SESSION=0c25a791-7cf5-41a6-abb9-8a37a98a6cb9
+#Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.VgnbXwnnMsY5IC_SQCGrgaTmtyeDaG-6Nc9KypnHNHc
+Cookie: SID=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.VgnbXwnnMsY5IC_SQCGrgaTmtyeDaG-6Nc9KypnHNHc
