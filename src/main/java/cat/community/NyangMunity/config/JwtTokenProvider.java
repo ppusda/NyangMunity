@@ -23,7 +23,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .signWith(key)
-                .setExpiration(new Date(now.getTime() + (1000L * 30)))
+                .setExpiration(new Date(now.getTime() + (1000L * 60 * 30)))
                 .setIssuedAt(now)
                 .compact();
     }
@@ -33,7 +33,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .signWith(key)
-                .setExpiration(new Date(now.getTime() + (1000L * 60)))
+                .setExpiration(new Date(now.getTime() + (1000L * 60 * 60 * 3)))
                 .setIssuedAt(now)
                 .compact();
     }
