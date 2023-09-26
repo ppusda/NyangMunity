@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardEditor;
@@ -25,12 +26,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
 
+    private final UserRepository userRepository;
     private final BoardRepository boardRepository;
 
-    public void write(BoardForm boardForm, ArrayList<BoardImage> boardImages){
+    public void write(BoardForm boardForm, ArrayList<BoardImage> boardImages, Long uid){
         Board board = Board.builder()
                 .title(boardForm.getTitle())
                 .content(boardForm.getContent())
+                .user(userRepository.findById(uid).get())
                 .boardImages(boardImages)
                 .createDate(LocalDateTime.now())
                 .build();

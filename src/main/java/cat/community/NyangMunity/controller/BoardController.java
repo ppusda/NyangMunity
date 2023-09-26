@@ -31,14 +31,8 @@ public class BoardController {
     private final String PATH = "C:\\Users\\ppusd\\Pictures\\NyangMunityImages"; // 배포 시 변경 (?)
     // private final String PATH = "/home/ec2-user/nm/images/";
 
-    @GetMapping("/test")
-    public Long test(UserSession userSession) {
-        log.info(">>> {}", userSession.id);
-        return userSession.id;
-    }
-
     @PostMapping("/boards/write")
-    public void BoardWrite(@ModelAttribute BoardForm boardForm) throws IOException {
+    public void BoardWrite(@ModelAttribute BoardForm boardForm, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         if(boardForm.getImgInput() != null){
@@ -59,7 +53,7 @@ public class BoardController {
             }
         }
 
-        boardService.write(boardForm, boardImages);
+        boardService.write(boardForm, boardImages, userSession.id);
     }
 
     @GetMapping("/boards/{boardId}")
@@ -74,17 +68,17 @@ public class BoardController {
     }
 
     @PatchMapping("/boards/{boardId}")
-    public void editBoard(@PathVariable Long boardId, @RequestBody @Valid BoardEdit request) {
+    public void editBoard(@PathVariable Long boardId, @RequestBody @Valid BoardEdit request, UserSession userSession) {
         boardService.edit(boardId, request);
     }
 
     @DeleteMapping("/boards/{boardId}")
-    public void delete(@PathVariable Long boardId) {
+    public void delete(@PathVariable Long boardId, UserSession userSession) {
         boardService.delete(boardId);
     }
 
     @PostMapping("/boards/like/{boardId}")
-    public void boardLike(@PathVariable(name = "boardId") Long id ){
+    public void boardLike(@PathVariable(name = "boardId") Long id, UserSession userSession){
 //        BoardLike boardLike = boardService.like(id);
     }
 

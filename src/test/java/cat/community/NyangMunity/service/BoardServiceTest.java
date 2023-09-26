@@ -56,7 +56,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // when
-        boardService.write(boardForm, boardImages);
+        boardService.write(boardForm, boardImages, 1L);
 
         // then
         assertEquals(1L, boardRepository.count());

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 
 import axios from "axios";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import router from "@/router";
+import {useCookies} from "vue3-cookies";
 
 const posts = ref<any[]>([]);
 const imageSrc = ref("");
@@ -13,8 +14,15 @@ axios.get("/nm/boards?page=1&size=5").then((response) => {
   });
 });
 
+const { cookies } = useCookies();
 const moveToWrite = () => {
-  router.push({name: "write"});
+  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(response => {
+      router.push({ name: "write" });
+  }).catch(error => {
+      if (error.response) {
+        router.push({ name: "login" })
+      }
+  });
 }
 
 </script>

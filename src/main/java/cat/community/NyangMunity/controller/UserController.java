@@ -67,7 +67,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/logout") // todo access, refresh로 변경 후 작업할 것임
+    @PostMapping("/logout")
     private void userLogout(UserSession session) {
         userService.userLogout(session.id);
     }
