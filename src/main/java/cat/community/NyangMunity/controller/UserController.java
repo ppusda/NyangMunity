@@ -38,7 +38,7 @@ public class UserController {
                 .path("/")
                 .httpOnly(false) // javascript가 cookie 값에 접근하지 못하게 하는 설정.
                 .secure(false)
-                .maxAge(Duration.ofDays(1))
+                .maxAge(Duration.ofHours(3))
                 .sameSite("Strict")
                 .build();
 
@@ -55,7 +55,7 @@ public class UserController {
                     .path("/")
                     .httpOnly(false)
                     .secure(false)
-                    .maxAge(Duration.ofDays(1))
+                    .maxAge(Duration.ofHours(3))
                     .sameSite("Strict")
                     .build();
             return ResponseEntity.ok()
