@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.config.JwtTokenProvider;
 import cat.community.NyangMunity.request.UserSession;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
@@ -57,8 +58,11 @@ public class BoardController {
     }
 
     @GetMapping("/boards/{boardId}")
-    public BoardResponse readBoard(@PathVariable(name = "boardId") Long id) {
+    public BoardResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
         BoardResponse boardResponse = boardService.read(id);
+        if(boardResponse.getWriter().getId() == userSession.id) {
+            boardResponse.setWriterCheck(true);
+        }
         return boardResponse;
     }
 

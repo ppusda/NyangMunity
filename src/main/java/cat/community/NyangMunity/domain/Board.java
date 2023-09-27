@@ -1,5 +1,7 @@
 package cat.community.NyangMunity.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -35,12 +37,15 @@ public class Board {
     private LocalDateTime createDate;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="user_id")
     private User user;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardImage> boardImages = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
 

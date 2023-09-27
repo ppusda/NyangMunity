@@ -2,11 +2,12 @@
 import {defineProps, onMounted, ref} from "vue";
 import axios from "axios";
 import {useRouter} from "vue-router";
+import {useCookies} from "vue3-cookies";
 
 const router = useRouter();
+const { cookies } = useCookies();
 
 const post = ref<any>({});
-
 
 const props = defineProps({
   postId: {
@@ -15,13 +16,20 @@ const props = defineProps({
   },
 });
 
-axios.get(`/nm/boards/${props.postId}`).then((response) => {
-  post.value = response.data;
+axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(checkResponse => {
+    axios.get(`/nm/boards/${props.postId}`).then((response) => {
+      post.value = response.data;
+    });
+}).catch(error => {
+    if (error.response) {
+      alert("비정상적인 접근입니다.");
+      router.replace({name: "home"});
+    }
 });
 
 const edit = () => {
   axios.patch(`/nm/boards/${props.postId}`, post.value).then(() => {
-    router.replace({name: "boards"})
+    router.replace({name: "boards"});
   });
 }
 

@@ -38,9 +38,9 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
         }
 
         Cookie[] cookies = servletRequest.getCookies();
-        if(cookies.length == 0){
+        if(cookies == null || cookies.length == 0){
             log.error(">>> No Have AccessToken");
-            throw new Unauthorized();
+            return new UserSession(0L, "guest");
         }
 
         try {

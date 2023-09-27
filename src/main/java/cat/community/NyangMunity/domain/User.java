@@ -42,6 +42,7 @@ public class User {
     @Column
     private LocalDate birthday;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Board> boards = new ArrayList<>();
 

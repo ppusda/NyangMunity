@@ -1,15 +1,17 @@
 <script setup lang="ts">
 
-import {defineProps, onMounted, ref} from "vue";
+import {defineProps, onMounted, reactive, ref} from "vue";
 import axios from "axios";
 import router from "@/router";
 
 import { Carousel } from 'bootstrap';
+import {useCookies} from "vue3-cookies";
 
 let isMouseDown = ref(false);
 let lastX = ref<number | null>(0);
 
 const myCarouselElement = ref<HTMLElement|null>(null);
+const { cookies } = useCookies();
 const carousel = ref<Carousel>();
 
 const props = defineProps({
@@ -27,8 +29,16 @@ const post = ref({
   createDate: ""
 });
 
+let writerCheck = reactive({ value: "" });
+
 const moveToEdit = () => {
-  router.push({name: "edit", params: { postId: props.postId }})
+  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(response => {
+    router.push({name: "edit", params: { postId: props.postId }})
+  }).catch(error => {
+    if (error.response) {
+      alert("비정상적인 접근입니다.");
+    }
+  });
 }
 
 function imageLike() {
@@ -65,6 +75,7 @@ function handleMouseMove(event: MouseEvent) {
 onMounted( () => {
   axios.get(`/nm/boards/${props.postId}`).then((response) => {
     post.value = response.data;
+    writerCheck.value = response.data.writerCheck;
   });
 
   myCarouselElement.value = document.querySelector('#imageSlider');
@@ -128,10 +139,30 @@ function showPrevSlide() {
           </button>
         </div>
 
-        <div>
-          <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
+        <div v-if="writerCheck && writerCheck.value">
+          <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
           <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
           <a class="clButton btn btn-danger text-white m-1" @click="imageLike()">🤍</a>
+        </div>
+        <div v-else>
+          <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
+          <a class="clButton btn btn-danger text-white m-1" data-bs-toggle="modal" data-bs-target="#boardLikeModal">🤍</a>
+
+          <div class="modal fade" id="boardLikeModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title text-black" >좋아요</h5>
+                </div>
+                <div class="modal-body text-black">
+                  <b>로그인이 필요합니다.</b>
+                </div>
+                <div class="modal-footer">
+                  <a type="button" class="clButton btn btn-primary text-white m-1" data-bs-dismiss="modal">확인</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

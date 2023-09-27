@@ -61,6 +61,7 @@ public class BoardService {
                 .content(board.getContent())
                 .boardImages(boardImages)
                 .createDate(board.getCreateDate())
+                .writer(board.getUser())
                 .build();
     }
 

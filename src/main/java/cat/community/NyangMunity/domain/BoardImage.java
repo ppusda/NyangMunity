@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class BoardImage {
     private Long size;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "board_id")
     private Board board;
 
