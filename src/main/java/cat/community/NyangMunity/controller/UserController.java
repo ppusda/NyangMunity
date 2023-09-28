@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.config.CookieProvider;
 import cat.community.NyangMunity.config.JwtTokenProvider;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.request.UserSession;
@@ -23,6 +24,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CookieProvider cookieProvider;
 
     @PostMapping("/join")
     private void userJoin(@RequestBody @Valid UserForm userForm) throws IOException {
@@ -32,15 +34,7 @@ public class UserController {
     @PostMapping("/login")
     private ResponseEntity<Object> userLogin(@RequestBody @Valid UserForm userForm) throws IOException {
         Long userId = userService.userLogin(userForm);
-
-        ResponseCookie cookie = ResponseCookie.from("SESSION", jwtTokenProvider.createAccessToken(userId))
-                .domain("localhost") // todo 향후 서버 환경에 따른 분리 필요
-                .path("/")
-                .httpOnly(false) // javascript가 cookie 값에 접근하지 못하게 하는 설정.
-                .secure(false)
-                .maxAge(Duration.ofHours(3))
-                .sameSite("Strict")
-                .build();
+        ResponseCookie cookie = cookieProvider.createCookie(jwtTokenProvider.createAccessToken(userId));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -50,17 +44,10 @@ public class UserController {
     @PostMapping("/check")
     private ResponseEntity<Object> loginCheck(UserSession session) {
         if(!session.token.isEmpty()) {
-            ResponseCookie cookie = ResponseCookie.from("SESSION", session.token)
-                    .domain("localhost") // todo 향후 서버 환경에 따른 분리 필요
-                    .path("/")
-                    .httpOnly(false)
-                    .secure(false)
-                    .maxAge(Duration.ofHours(3))
-                    .sameSite("Strict")
-                    .build();
+            ResponseCookie cookie = cookieProvider.createCookie(session.token);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(userService.userCheck(session.id));
+                    .body(userService.userCheck(session.id).getNickname());
         }else {
             return ResponseEntity.ok()
                     .build();

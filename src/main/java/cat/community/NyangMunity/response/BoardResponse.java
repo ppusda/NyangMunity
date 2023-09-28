@@ -18,7 +18,7 @@ public class BoardResponse {
     private final String content;
     private final List<BoardImageResponse> boardImages;
     private final LocalDateTime createDate;
-    private final User writer;
+    private final Long uid;
 
     private boolean writerCheck = false;
 
@@ -30,17 +30,17 @@ public class BoardResponse {
                 .map(BoardImageResponse::new)
                 .collect(Collectors.toList());
         this.createDate = board.getCreateDate();
-        this.writer = board.getUser();
+        this.uid = board.getUser().getId();
     } // 무한루프로 인한 BoardDTO 내에서 BoardImageDTO 설정
 
     @Builder
-    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages, LocalDateTime createDate, User writer) {
+    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages, LocalDateTime createDate, Long uid) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.boardImages = boardImages;
         this.createDate = createDate;
-        this.writer = writer;
+        this.uid = uid;
     }
 
     public void setWriterCheck(boolean writerCheck) {

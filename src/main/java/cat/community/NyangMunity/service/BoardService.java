@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.exception.Unauthorized;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
@@ -61,7 +62,7 @@ public class BoardService {
                 .content(board.getContent())
                 .boardImages(boardImages)
                 .createDate(board.getCreateDate())
-                .writer(board.getUser())
+                .uid(board.getUser().getId())
                 .build();
     }
 
@@ -74,26 +75,35 @@ public class BoardService {
     // 위처럼 설정 시 5개를 자동으로 얻어와준다
 
     @Transactional
-    public void edit(Long id, BoardEdit boardEdit) {
+    public void edit(Long id, BoardEdit boardEdit, Long uid) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(PostNotFound::new);
 
-        BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
+        if(board.getUser().getId() == uid) {
+            BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
 
-        BoardEditor boardEditor = boardEditorBuilder
-                .title(boardEdit.getTitle())
-                .content(boardEdit.getContent())
-                .build();
+            BoardEditor boardEditor = boardEditorBuilder
+                    .title(boardEdit.getTitle())
+                    .content(boardEdit.getContent())
+                    .build();
 
-        board.edit(boardEditor);
-        // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
+            board.edit(boardEditor); // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
+        }else {
+            log.error(">>> 권한이 없습니다.");
+            throw new Unauthorized();
+        }
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Long uid) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(PostNotFound::new);
 
-        boardRepository.delete(board);
+        if(board.getUser().getId() == uid) {
+            log.error(">>> 권한이 없습니다.");
+            boardRepository.delete(board);
+        }else {
+            throw new Unauthorized();
+        }
     }
 }

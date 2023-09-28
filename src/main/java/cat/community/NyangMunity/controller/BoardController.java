@@ -60,7 +60,7 @@ public class BoardController {
     @GetMapping("/boards/{boardId}")
     public BoardResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
         BoardResponse boardResponse = boardService.read(id);
-        if(boardResponse.getWriter().getId() == userSession.id) {
+        if(boardResponse.getUid() == userSession.id) {
             boardResponse.setWriterCheck(true);
         }
         return boardResponse;
@@ -73,12 +73,12 @@ public class BoardController {
 
     @PatchMapping("/boards/{boardId}")
     public void editBoard(@PathVariable Long boardId, @RequestBody @Valid BoardEdit request, UserSession userSession) {
-        boardService.edit(boardId, request);
+        boardService.edit(boardId, request, userSession.id);
     }
 
     @DeleteMapping("/boards/{boardId}")
     public void delete(@PathVariable Long boardId, UserSession userSession) {
-        boardService.delete(boardId);
+        boardService.delete(boardId, userSession.id);
     }
 
     @PostMapping("/boards/like/{boardId}")
