@@ -10,10 +10,10 @@ import javax.persistence.*;
 @Getter @Setter
 public class BoardPet {
 
-    @Id @ManyToOne @JoinColumn(name = "BOARD_ID", columnDefinition = "BIGINT")
+    @Id @ManyToOne @JoinColumn(name = "board_id", columnDefinition = "BIGINT")
     private Board board;
 
-    @Id @ManyToOne @JoinColumn(name = "PET_ID", columnDefinition = "BIGINT")
+    @Id @ManyToOne @JoinColumn(name = "pet_id", columnDefinition = "BIGINT")
     private Pet pet;
 
 }

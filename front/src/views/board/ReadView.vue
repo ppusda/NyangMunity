@@ -9,6 +9,7 @@ import {useCookies} from "vue3-cookies";
 
 let isMouseDown = ref(false);
 let lastX = ref<number | null>(0);
+let likeCheck = reactive({value: false})
 
 const myCarouselElement = ref<HTMLElement|null>(null);
 const { cookies } = useCookies();
@@ -32,7 +33,7 @@ const post = ref({
 let writerCheck = reactive({ value: "" });
 
 const moveToEdit = () => {
-  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(response => {
+  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(() => {
     router.push({name: "edit", params: { postId: props.postId }})
   }).catch(error => {
     if (error.response) {
@@ -40,9 +41,17 @@ const moveToEdit = () => {
     }
   });
 }
+function boardLikeCheck() {
+  axios.post(`/nm/boards/like/check/${props.postId}`, {SID: cookies.get('SESSION'),}).then(response => {
+    console.log(response);
+    likeCheck.value = response.data;
+  });
+}
+boardLikeCheck();
 
-function imageLike() {
-  axios.post(`/nm/boards/like/${props.postId}`).then(() => {
+function boardLike() {
+  axios.post(`/nm/boards/like/${props.postId}`, {SID: cookies.get('SESSION'),}).then(() => {
+    boardLikeCheck();
   });
 }
 
@@ -142,7 +151,12 @@ function showPrevSlide() {
         <div v-if="writerCheck && writerCheck.value">
           <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
           <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
-          <a class="clButton btn btn-danger text-white m-1" @click="imageLike()">🤍</a>
+          <div v-if="likeCheck && likeCheck.value === true">
+            <a class="clButton btn btn-danger text-white m-1" @click="boardLike()">❤</a>
+          </div>
+          <div v-else>
+            <a class="clButton btn btn-danger text-white m-1" @click="boardLike()">🤍</a>
+          </div>
         </div>
         <div v-else>
           <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>

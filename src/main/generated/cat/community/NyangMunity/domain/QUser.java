@@ -22,6 +22,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final DatePath<java.time.LocalDate> birthday = createDate("birthday", java.time.LocalDate.class);
 
+    public final ListPath<BoardLike, QBoardLike> boardLikes = this.<BoardLike, QBoardLike>createList("boardLikes", BoardLike.class, QBoardLike.class, PathInits.DIRECT2);
+
     public final ListPath<Board, QBoard> boards = this.<Board, QBoard>createList("boards", Board.class, QBoard.class, PathInits.DIRECT2);
 
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);

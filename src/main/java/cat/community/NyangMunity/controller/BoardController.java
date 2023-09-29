@@ -1,6 +1,5 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.config.JwtTokenProvider;
 import cat.community.NyangMunity.request.UserSession;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
@@ -82,8 +81,13 @@ public class BoardController {
     }
 
     @PostMapping("/boards/like/{boardId}")
-    public void boardLike(@PathVariable(name = "boardId") Long id, UserSession userSession){
-//        BoardLike boardLike = boardService.like(id);
+    public void boardLike(@PathVariable(name = "boardId") Long bid, UserSession userSession){
+        boardService.like(bid, userSession.id);
+    }
+
+    @PostMapping("/boards/like/check/{boardId}")
+    public boolean boardLikeCheck(@PathVariable(name = "boardId") Long bid, UserSession userSession){
+        return boardService.likeCheck(bid, userSession.id);
     }
 
 //    @GetMapping("/write/{boardId}/rss")

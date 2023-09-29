@@ -50,6 +50,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Token> tokens = new ArrayList<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BoardLike> boardLikes = new ArrayList<>();
+
     public Token addToken(String refreshToken) {
         Token token = Token.builder()
                 .user(this)

@@ -1,11 +1,10 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.domain.*;
 import cat.community.NyangMunity.exception.Unauthorized;
+import cat.community.NyangMunity.repository.BoardLikeRepository;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.BoardForm;
-import cat.community.NyangMunity.domain.Board;
-import cat.community.NyangMunity.domain.BoardEditor;
-import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.exception.PostNotFound;
 import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.request.BoardEdit;
@@ -20,6 +19,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +29,7 @@ public class BoardService {
 
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
     public void write(BoardForm boardForm, ArrayList<BoardImage> boardImages, Long uid){
         Board board = Board.builder()
@@ -47,9 +48,9 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    public BoardResponse read(Long id) {
+    public BoardResponse read(Long bid) {
         // Optional<Board> board = boardRepository.findById(id); // Optional로 Null 체크해도 됨
-        Board board = boardRepository.findById(id)
+        Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
         List<BoardImageResponse> boardImages = board.getBoardImages().stream()
@@ -75,8 +76,8 @@ public class BoardService {
     // 위처럼 설정 시 5개를 자동으로 얻어와준다
 
     @Transactional
-    public void edit(Long id, BoardEdit boardEdit, Long uid) {
-        Board board = boardRepository.findById(id)
+    public void edit(Long bid, BoardEdit boardEdit, Long uid) {
+        Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
         if(board.getUser().getId() == uid) {
@@ -95,8 +96,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void delete(Long id, Long uid) {
-        Board board = boardRepository.findById(id)
+    public void delete(Long bid, Long uid) {
+        Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
         if(board.getUser().getId() == uid) {
@@ -104,6 +105,33 @@ public class BoardService {
             boardRepository.delete(board);
         }else {
             throw new Unauthorized();
+        }
+    }
+
+    public void like(Long bid, Long uid) {
+        if(likeCheck(bid, uid)) {
+            boardLikeRepository.deleteByBoardIdAndUserId(bid, uid);
+        }else {
+            Board board = boardRepository.findById(bid)
+                    .orElseThrow(PostNotFound::new);
+
+            User user = userRepository.findById(uid)
+                    .orElseThrow(PostNotFound::new);
+
+            BoardLike boardLike = BoardLike.builder()
+                    .board(board)
+                    .user(user)
+                    .build();
+
+            boardLikeRepository.save(boardLike);
+        }
+    }
+
+    public boolean likeCheck(Long bid, Long uid) {
+        if(boardLikeRepository.findByBoardIdAndUserId(bid, uid).isPresent()) {
+            return true;
+        }else {
+            return false;
         }
     }
 }

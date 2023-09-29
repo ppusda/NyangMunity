@@ -26,8 +26,6 @@ public class QBoardLike extends EntityPathBase<BoardLike> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Integer> likeCheck = createNumber("likeCheck", Integer.class);
-
     public final QUser user;
 
     public QBoardLike(String variable) {
