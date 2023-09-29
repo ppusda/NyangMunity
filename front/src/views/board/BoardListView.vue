@@ -16,7 +16,7 @@ axios.get("/nm/boards?page=1&size=5").then((response) => {
 
 const { cookies } = useCookies();
 const moveToWrite = () => {
-  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(response => {
+  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(() => {
       router.push({ name: "write" });
   }).catch(error => {
       if (error.response) {

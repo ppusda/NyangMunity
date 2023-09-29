@@ -16,7 +16,7 @@ const props = defineProps({
   },
 });
 
-axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(checkResponse => {
+axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(() => {
     axios.get(`/nm/boards/${props.postId}`).then((response) => {
       post.value = response.data;
     });
