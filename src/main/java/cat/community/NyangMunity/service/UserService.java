@@ -36,12 +36,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    @Transactional
     public Long userLogin(UserForm userForm) {
         User user = userRepository.findByEmailAndPassword(userForm.getEmail(), userForm.getPassword())
                 .orElseThrow(InvalidSigninInformation::new);
 
+        if(!user.getTokens().isEmpty()) {
+            tokenRepository.deleteByUserId(user.getId());
+        }
+
         user.addToken(jwtTokenProvider.createRefreshToken(user.getId()));
+
         return user.getId();
     }
 
