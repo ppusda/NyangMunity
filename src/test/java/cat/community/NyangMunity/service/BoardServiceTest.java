@@ -1,5 +1,7 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
@@ -7,6 +9,7 @@ import cat.community.NyangMunity.exception.PostNotFound;
 import cat.community.NyangMunity.repository.BoardRepository;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
+import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.response.BoardResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +39,9 @@ class BoardServiceTest {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
     void clean() {
@@ -69,10 +75,16 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 1개 조회")
     void test2() {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         Board bd = Board.builder()
                 .title("foo")
                 .content("bar")
                 .boardImages(boardImages)
+                .user(userService.userInfo(userId))
                 .build();
         boardRepository.save(bd);
 
@@ -89,16 +101,23 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 여러개 조회")
     void test3() throws Exception {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         boardRepository.saveAll(List.of(
                 Board.builder()
                         .title("title_1")
                         .content("content_1")
                         .boardImages(boardImages)
+                        .user(userService.userInfo(userId))
                         .build(),
                 Board.builder()
                         .title("title_2")
                         .content("content_2")
                         .boardImages(boardImages)
+                        .user(userService.userInfo(userId))
                         .build()
         )); // 한번에 저장
 
@@ -117,11 +136,17 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 1페이지 조회")
     void test4() throws Exception {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         List<Board> requestBoards = IntStream.range(0, 20)
                 .mapToObj(i -> Board.builder()
                         .title("빵국이 제목 " + i)
                         .content("빵국이 입니다 " + i)
                         .boardImages(boardImages)
+                        .user(userService.userInfo(userId))
                         .build())
                 .collect(Collectors.toList());
 
@@ -144,9 +169,15 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 제목 수정")
     void test5() throws Exception {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         Board board = Board.builder()
                         .title("빵국이제목")
                         .content("빵국입니다")
+                        .user(userService.userInfo(userId))
                         .build();
 
         boardRepository.save(board); // 한번에 저장
@@ -156,7 +187,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                                 .build();
 
         // when
-        boardService.edit(board.getId(), boardEdit);
+        boardService.edit(board.getId(), boardEdit, userId);
 
         // then
         Board changedBoard = boardRepository.findById(board.getId())
@@ -168,9 +199,15 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 내용 수정")
     void test6() throws Exception {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         Board board = Board.builder()
                 .title("빵국이 제목")
                 .content("빵국입니다")
+                .user(userService.userInfo(userId))
                 .build();
 
         boardRepository.save(board); // 한번에 저장
@@ -181,7 +218,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // when
-        boardService.edit(board.getId(), boardEdit);
+        boardService.edit(board.getId(), boardEdit, userId);
 
         // then
         Board changedBoard = boardRepository.findById(board.getId())
@@ -194,15 +231,21 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("게시글 삭제")
     void test7() throws Exception {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         Board board = Board.builder()
                 .title("빵국이 제목")
                 .content("빵국입니다")
+                .user(userService.userInfo(userId))
                 .build();
 
         boardRepository.save(board);
 
         // when
-        boardService.delete(board.getId());
+        boardService.delete(board.getId(), userId);
 
         // then
         Assertions.assertEquals(0, boardRepository.count());
@@ -229,6 +272,11 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 삭제 - 존재하지 않는 글")
     void test9() {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         Board bd = Board.builder()
                 .title("foo")
                 .content("bar")
@@ -238,7 +286,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         // then
         assertThrows(PostNotFound.class, () -> {
-            boardService.delete(bd.getId() + 1L);
+            boardService.delete(bd.getId() + 1L, userId);
         });
     }
 
@@ -246,6 +294,11 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 수정 - 존재하지 않는 글")
     void test10() {
         // given
+        Long userId = userService.userLogin(UserForm.builder()
+                .email("qwe")
+                .password("qwe")
+                .build());
+
         Board bd = Board.builder()
                 .title("foo")
                 .content("bar")
@@ -260,7 +313,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         // then
         assertThrows(PostNotFound.class, () -> {
-            boardService.edit(bd.getId() + 1L, boardEdit);
+            boardService.edit(bd.getId() + 1L, boardEdit, userId);
         });
     }
 

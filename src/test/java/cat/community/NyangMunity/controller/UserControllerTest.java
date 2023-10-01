@@ -1,9 +1,12 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.domain.Session;
+import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.domain.Token;
 import cat.community.NyangMunity.domain.User;
-import cat.community.NyangMunity.repository.SessionRepository;
+import cat.community.NyangMunity.repository.TokenRepository;
 import cat.community.NyangMunity.repository.UserRepository;
+import cat.community.NyangMunity.request.UserForm;
+import cat.community.NyangMunity.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.servlet.http.Cookie;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest
 @AutoConfigureMockMvc
 @SpringBootTest
-class LoginControllerTest {
+class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -39,13 +44,19 @@ class LoginControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private SessionRepository sessionRepository;
+    private UserService userService;
+
+    @Autowired
+    private TokenRepository tokenRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
         // 각각의 테스트를 실행하기 전에 수행되는 메서드 (중요)
     void clean(){
         userRepository.deleteAll();
-        sessionRepository.deleteAll();
+        tokenRepository.deleteAll();
     }
 
     // bootJar 실패로 인한 이전 테스트 내역 주석 처리 (23/09/13 해결)
@@ -77,69 +88,56 @@ class LoginControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("로그인 성공 후 세션 응답")
-    void sessionTest() throws Exception{
-        // given
-        User user = User.builder()
-                .email("ppusda@naver.com")
-                .password("1234")
-                .nickname("국")
-                .createDate(LocalDateTime.now())
-                .build();
-
-        userRepository.save(user);
-
-        String json = objectMapper.writeValueAsString(user);
-
-        // expected
-        mockMvc.perform(post("/nm/user/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
-                ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(Matchers.notNullValue()))
-                .andDo(print());
-    }
-
-    @Test
     @DisplayName("로그인 후 권한이 필요한 페이지에 접속한다.")
     void accessPermissionPage() throws Exception{
         // given
-        User user = User.builder()
+        userService.register(UserForm.builder()
                 .email("ppusda@naver.com")
                 .password("1234")
-                .nickname("국")
-                .createDate(LocalDateTime.now())
-                .build();
+                .nickname("빵")
+                .build());
 
-        Session session = user.addSession();
-        userRepository.save(user);
+        Long uid = userService.userLogin(UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234")
+                .nickname("빵")
+                .build());
+
+        String token = jwtTokenProvider.createAccessToken(uid);
 
         // expected
-        mockMvc.perform(get("/nm/test")
-                        .header("Authorization", session.getAccessToken())
+        mockMvc.perform(post("/nm/user/info")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .cookie(new Cookie("SESSION", token))
+                        .content("{SID:"+token+"}")
                 ).andExpect(status().isOk())
                 .andDo(print());
     }
 
     @Test
+    @Transactional
     @DisplayName("검증되지 않은 세션 값으로 권한이 필요한 페이지에 접근 할 수 없다.")
     void CantAccessPermissionPage() throws Exception{
         // given
-        User user = User.builder()
+        userService.register(UserForm.builder()
                 .email("ppusda@naver.com")
                 .password("1234")
-                .nickname("국")
-                .createDate(LocalDateTime.now())
-                .build();
+                .nickname("빵")
+                .build());
 
-        Session session = user.addSession();
-        userRepository.save(user);
+        Long uid = userService.userLogin(UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234")
+                .nickname("빵")
+                .build());
+
+        List<Token> tokens = tokenRepository.findByUserId(uid);
 
         // expected
-        mockMvc.perform(get("/nm/test")
-                        .header("Authorization", session.getAccessToken() + "-other")
+        mockMvc.perform(post("/nm/user/info")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .cookie(new Cookie("SESSION", tokens.get(0).getRefreshToken() + "-other"))
+                        .content("{SID:"+tokens.get(0).getRefreshToken() + "-other"+"}")
                 ).andExpect(status().isUnauthorized())
                 .andDo(print());
     }
