@@ -42,6 +42,12 @@ dependencies {
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	/**
+	 * scrypt
+	 **/
+	implementation 'org.springframework.security:spring-security-crypto'
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+
+	/**
 	 * File Upload
 	 **/
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
