@@ -15,6 +15,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +31,7 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
+    @Transactional
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
         if (servletRequest == null) {

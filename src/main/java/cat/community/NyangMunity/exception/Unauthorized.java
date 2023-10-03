@@ -11,11 +11,6 @@ public class Unauthorized extends NyangmunityException{
         super(MESSAGE);
     }
 
-    public Unauthorized(String fieldName, String message) {
-        super(MESSAGE);
-        addValidation(fieldName, message);
-    }
-
     @Override
     public int getStatusCode() {
         return 401;

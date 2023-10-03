@@ -1,16 +1,12 @@
 package cat.community.NyangMunity.exception;
 
-import lombok.Getter;
-
-@Getter
-public class PostNotFound extends NyangmunityException{
-
-    private static final String MESSAGE = "존재하지 않는 글입니다.";
+public class AlreadyExistsEmailException extends NyangmunityException{
+    private static final String MESSAGE = "이미 가입된 이메일 입니다.";
 
     private String fieldName;
     private String message;
 
-    public PostNotFound() {
+    public AlreadyExistsEmailException() {
         super(MESSAGE);
     }
 
