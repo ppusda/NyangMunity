@@ -2,6 +2,7 @@ package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.config.CookieProvider;
 import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.request.UserSession;
 import cat.community.NyangMunity.service.UserService;
@@ -46,11 +47,31 @@ public class UserController {
             ResponseCookie cookie = cookieProvider.createCookie(session.token);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(userService.userCheck(session.id).getNickname());
+                    .body(userService.userInfo(session.id).getNickname());
         }else {
             return ResponseEntity.ok()
                     .build();
         }
+    }
+
+    @PostMapping("/info")
+    private User userInfo(UserSession session) {
+        return userService.userInfo(session.id);
+    }
+
+    @PostMapping("/pwdCheck")
+    private boolean userCheck(@RequestParam String pwdCheck, UserSession session) {
+        return userService.userCheck(pwdCheck, session.id);
+    }
+
+    @PostMapping("/edit")
+    private void userEdit(UserForm userForm, UserSession session) {
+        userService.userEdit(userForm, session.id);
+    }
+
+    @PostMapping("/cancel")
+    private void userCancel(UserSession session) {
+        userService.userCancel(session.id);
     }
 
     @PostMapping("/logout")

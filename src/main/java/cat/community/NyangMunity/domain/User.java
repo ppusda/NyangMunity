@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Table(name = "USER")
-@Getter @Setter
+@Entity
+@Getter @Table(name = "USER")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class User {
 
@@ -27,7 +27,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -53,6 +53,19 @@ public class User {
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
+
+    public UserEditor.UserEditorBuilder toEditor() {
+        return UserEditor.builder()
+                .nickname(nickname)
+                .password(password)
+                .birthday(birthday);
+    }
+
+    public void edit(UserEditor userEditor) {
+        nickname = userEditor.getNickname();
+        password = userEditor.getPassword();
+        birthday = userEditor.getBirthday();
+    }
 
     public Token addToken(String refreshToken) {
         Token token = Token.builder()

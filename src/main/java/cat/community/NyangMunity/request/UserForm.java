@@ -3,6 +3,7 @@ package cat.community.NyangMunity.request;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 @Getter @Setter
 @NoArgsConstructor

@@ -3,6 +3,7 @@ package cat.community.NyangMunity.service;
 import cat.community.NyangMunity.config.JwtTokenProvider;;
 import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.domain.User;
+import cat.community.NyangMunity.domain.UserEditor;
 import cat.community.NyangMunity.exception.AlreadyExistsEmailException;
 import cat.community.NyangMunity.exception.InvalidSigninInformation;
 import cat.community.NyangMunity.exception.Unauthorized;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,9 +64,11 @@ public class UserService {
         }
     }
 
-    public User userCheck(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return user.get();
+    public boolean userCheck(String nowPassword, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(Unauthorized::new);
+
+        return scryptPasswordEncoder.matches(nowPassword, user.getPassword());
     }
 
     public void userLogout(Long userId) {
@@ -74,8 +78,30 @@ public class UserService {
     public User userInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(Unauthorized::new);
-
         return user;
+    }
+
+    @Transactional
+    public void userEdit(UserForm userForm, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(Unauthorized::new);
+
+        UserEditor.UserEditorBuilder userEditorBuilder = user.toEditor();
+
+        UserEditor userEditor = userEditorBuilder
+                .nickname(userForm.getNickname() != null && !userForm.getNickname().isEmpty()
+                        ? userForm.getNickname() : user.getNickname())
+                .password(userForm.getPassword() != null && !userForm.getPassword().isEmpty()
+                        ? scryptPasswordEncoder.encrypt(userForm.getPassword()) : user.getPassword())
+                .birthday(userForm.getBirthday() != null && !userForm.getBirthday().isEmpty() && !userForm.getBirthday().equals("null")
+                        ? LocalDate.parse(userForm.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
+                .build();
+
+        user.edit(userEditor);
+    }
+
+    public void userCancel(Long uid) {
+        userRepository.deleteById(uid);
     }
 }
 
