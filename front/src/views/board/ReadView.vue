@@ -9,7 +9,10 @@ import {useCookies} from "vue3-cookies";
 
 let isMouseDown = ref(false);
 let lastX = ref<number | null>(0);
-let likeCheck = reactive({value: false})
+const likeCheck = reactive({value: false});
+const writerCheck = reactive({value: false});
+const userCheck = reactive({value: false});
+const nickName = reactive({ value: "" });
 
 const myCarouselElement = ref<HTMLElement|null>(null);
 const { cookies } = useCookies();
@@ -30,8 +33,6 @@ const post = ref({
   createDate: ""
 });
 
-let writerCheck = reactive({ value: "" });
-
 const moveToEdit = () => {
   axios.post("/nm/user/check").then(() => {
     router.push({name: "edit", params: { postId: props.postId }})
@@ -41,9 +42,9 @@ const moveToEdit = () => {
     }
   });
 }
+
 function boardLikeCheck() {
   axios.post(`/nm/boards/like/check/${props.postId}`).then(response => {
-    console.log(response);
     likeCheck.value = response.data;
   });
 }
@@ -80,12 +81,18 @@ function handleMouseMove(event: MouseEvent) {
   }
 }
 
-
-onMounted( () => {
-  axios.get(`/nm/boards/${props.postId}`).then((response) => {
+onMounted( async () => {
+  await axios.get(`/nm/boards/${props.postId}`).then(response => {
     post.value = response.data;
     writerCheck.value = response.data.writerCheck;
   });
+
+  if(cookies.get('SESSION') && cookies.get('SESSION') !== "") {
+    await axios.post("/nm/user/check", ).then(response => {
+      nickName.value = response.data;
+      userCheck.value = true;
+    })
+  }
 
   myCarouselElement.value = document.querySelector('#imageSlider');
   if (myCarouselElement.value) {
@@ -148,9 +155,11 @@ function showPrevSlide() {
           </button>
         </div>
 
-        <div class="d-inline-flex" v-if="writerCheck && writerCheck.value">
-          <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
-          <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
+        <div class="d-inline-flex" v-if="userCheck && userCheck.value === true">
+          <a class="clButton btn btn-secondary text-white m-1" @click="$router.replace({name: 'boards'})">목록으로</a>
+          <div v-if="writerCheck && writerCheck.value === true">
+            <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
+          </div>
           <div v-if="likeCheck && likeCheck.value === true">
             <a class="clButton btn btn-danger text-white m-1" @click="boardLike()">❤</a>
           </div>
@@ -159,7 +168,7 @@ function showPrevSlide() {
           </div>
         </div>
         <div class="d-inline-flex" v-else>
-          <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
+          <a class="clButton btn btn-secondary text-white m-1" @click="$router.replace({name: 'boards'})">목록으로</a>
           <a class="clButton btn btn-danger text-white m-1" data-bs-toggle="modal" data-bs-target="#boardLikeModal">🤍</a>
 
           <div class="modal fade" id="boardLikeModal" tabindex="-1" role="dialog" aria-hidden="true">

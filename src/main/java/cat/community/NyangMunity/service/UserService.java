@@ -30,6 +30,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
+    @Transactional
     public Long userLogin(UserForm userForm) {
         User user = userRepository.findByEmail(userForm.getEmail())
                 .orElseThrow(InvalidSigninInformation::new);
@@ -71,6 +72,7 @@ public class UserService {
         return scryptPasswordEncoder.matches(nowPassword, user.getPassword());
     }
 
+    @Transactional
     public void userLogout(Long userId) {
         tokenRepository.deleteByUserId(userId);
     }

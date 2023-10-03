@@ -1,25 +1,30 @@
-<script lang="ts">
+<script setup lang="ts">
 import axios from "axios";
-import { defineComponent } from 'vue';
+import {defineComponent, reactive, ref} from 'vue';
 
-export default defineComponent ({
-  name: 'home',
-  methods: {
-    community: function () {
-      axios.get("/nm/community");
-    }
-  }
-})
+const post = ref({
+  bid: 0,
+  boardImages: <any>[],
+  nickName: ""
+});
+
+let rdNum = reactive({ value: 0 });
+
+axios.post("/nm/boards/like", ).then(response => {
+  post.value = response.data;
+  rdNum.value = Math.floor(Math.random() * post.value.boardImages.length);
+});
+
 </script>
 
 <template>
   <div class="container login_page w-100 h-100 text-white text-center">
     <div class="content_area">
       <div class="overlay d-flex justify-content-center align-content-center w-100 h-100 cat_page">
-        <img id="main_img" src="/src/images/computer_cat.gif"/>
+        <img id="main_img" :src="`data:image/jpeg;base64,${post.boardImages[rdNum.value].imageBytes}`"/>
       </div>
       <div class="today_cat">
-        <a> 오늘의 고양이 NyangMunity!</a>
+        <router-link :to="{name: 'read', params: {postId: post.bid}}">가장 인기많은 글은 {{ post.nickName }} 님의 글 입니다!</router-link>
       </div>
     </div>
   </div>

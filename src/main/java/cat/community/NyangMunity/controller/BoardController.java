@@ -6,6 +6,7 @@ import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
+import cat.community.NyangMunity.response.LikeBoardResponse;
 import cat.community.NyangMunity.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +89,11 @@ public class BoardController {
     @PostMapping("/boards/like/check/{boardId}")
     public boolean boardLikeCheck(@PathVariable(name = "boardId") Long bid, UserSession userSession){
         return boardService.likeCheck(bid, userSession.id);
+    }
+
+    @PostMapping("/boards/like")
+    public LikeBoardResponse maxLikeBoard() {
+        return boardService.maxLikeBoard();
     }
 
 //    @GetMapping("/write/{boardId}/rss")

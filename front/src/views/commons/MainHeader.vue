@@ -3,14 +3,12 @@ import {ref, onMounted, reactive} from 'vue';
 import { useCookies } from 'vue3-cookies';
 import axios from "axios";
 
-let cookieValue = reactive({ value: "" });
 let nickName = reactive({ value: "" });
 const { cookies } = useCookies();
 
 onMounted(async () => {
-  cookieValue.value = cookies.get('SESSION');
-  if(cookieValue.value && cookieValue.value !== "") {
-    await axios.post("/nm/user/check", {SID: cookieValue.value,}).then(response => {
+  if(cookies.get('SESSION') && cookies.get('SESSION') !== "") {
+    await axios.post("/nm/user/check", ).then(response => {
         nickName.value = response.data;
     })
   }

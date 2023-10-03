@@ -11,6 +11,7 @@ import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardImageResponse;
 import cat.community.NyangMunity.response.BoardResponse;
+import cat.community.NyangMunity.response.LikeBoardResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -134,4 +135,19 @@ public class BoardService {
             return false;
         }
     }
+
+    public LikeBoardResponse maxLikeBoard() {
+        Board board = boardLikeRepository.getMaxLikeBoard().get(0).getBoard();
+
+        List<BoardImageResponse> boardImages = board.getBoardImages().stream()
+                .map(BoardImageResponse::new)
+                .collect(Collectors.toList());
+
+        return LikeBoardResponse.builder()
+                .bid(board.getId())
+                .boardImages(boardImages)
+                .nickName(board.getUser().getNickname())
+                .build();
+    }
+
 }
