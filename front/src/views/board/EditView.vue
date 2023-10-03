@@ -16,13 +16,13 @@ const props = defineProps({
   },
 });
 
-axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(() => {
+axios.post("/nm/user/check").then(() => {
     axios.get(`/nm/boards/${props.postId}`).then((response) => {
       post.value = response.data;
     });
 }).catch(error => {
     if (error.response) {
-      alert("비정상적인 접근입니다.");
+      alert(error.response.data.message);
       router.replace({name: "home"});
     }
 });

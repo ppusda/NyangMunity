@@ -4,7 +4,6 @@ import {ref} from "vue";
 import axios from "axios";
 import {useRouter} from "vue-router";
 import homeView from "@/views/HomeView.vue";
-import {useCookies} from "vue3-cookies";
 
 const title = ref("");
 const content = ref("");
@@ -13,8 +12,7 @@ const router = useRouter();
 
 const write = function (e: Event) {
   e.preventDefault();
-
-  const { cookies } = useCookies();
+  
   const fileInput = document.getElementById('imgInput') as HTMLInputElement;
 
   const formData = new FormData();
@@ -23,13 +21,14 @@ const write = function (e: Event) {
   Array.from(fileInput.files ?? []).forEach((file) =>{
     formData.append('imgInput', file)
   });
-  formData.append('SID', cookies.get('SESSION'));
 
   axios.post("/nm/boards/write", formData, {
-  }).then(response => {
+  }).then(() => {
     router.replace({name: "boards"})
-  }).catch(response => {
-    console.log(response)
+  }).catch(error => {
+    if(error.response) {
+      alert(error.response.data.message);
+    }
   })
 };
 

@@ -3,7 +3,6 @@
 import axios from "axios";
 import {onMounted, ref} from "vue";
 import router from "@/router";
-import {useCookies} from "vue3-cookies";
 
 const posts = ref<any[]>([]);
 const imageSrc = ref("");
@@ -14,9 +13,9 @@ axios.get("/nm/boards?page=1&size=5").then((response) => {
   });
 });
 
-const { cookies } = useCookies();
+
 const moveToWrite = () => {
-  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(() => {
+  axios.post("/nm/user/check").then(() => {
       router.push({ name: "write" });
   }).catch(error => {
       if (error.response) {

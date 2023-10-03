@@ -33,16 +33,16 @@ const post = ref({
 let writerCheck = reactive({ value: "" });
 
 const moveToEdit = () => {
-  axios.post("/nm/user/check", {SID: cookies.get('SESSION'),}).then(() => {
+  axios.post("/nm/user/check").then(() => {
     router.push({name: "edit", params: { postId: props.postId }})
   }).catch(error => {
     if (error.response) {
-      alert("비정상적인 접근입니다.");
+      alert(error.response.data.message);
     }
   });
 }
 function boardLikeCheck() {
-  axios.post(`/nm/boards/like/check/${props.postId}`, {SID: cookies.get('SESSION'),}).then(response => {
+  axios.post(`/nm/boards/like/check/${props.postId}`).then(response => {
     console.log(response);
     likeCheck.value = response.data;
   });
@@ -50,7 +50,7 @@ function boardLikeCheck() {
 boardLikeCheck();
 
 function boardLike() {
-  axios.post(`/nm/boards/like/${props.postId}`, {SID: cookies.get('SESSION'),}).then(() => {
+  axios.post(`/nm/boards/like/${props.postId}`).then(() => {
     boardLikeCheck();
   });
 }
@@ -148,7 +148,7 @@ function showPrevSlide() {
           </button>
         </div>
 
-        <div v-if="writerCheck && writerCheck.value">
+        <div class="d-inline-flex" v-if="writerCheck && writerCheck.value">
           <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
           <a class="clButton btn btn-primary text-white m-1" @click="moveToEdit()">수정</a>
           <div v-if="likeCheck && likeCheck.value === true">
@@ -158,7 +158,7 @@ function showPrevSlide() {
             <a class="clButton btn btn-danger text-white m-1" @click="boardLike()">🤍</a>
           </div>
         </div>
-        <div v-else>
+        <div class="d-inline-flex" v-else>
           <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">목록으로</a>
           <a class="clButton btn btn-danger text-white m-1" data-bs-toggle="modal" data-bs-target="#boardLikeModal">🤍</a>
 

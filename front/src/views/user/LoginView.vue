@@ -3,8 +3,8 @@ import {ref} from "vue";
 import axios from "axios";
 import router from "@/router";
 
-const email = ref("")
-const password = ref("")
+const email = ref("");
+const password = ref("");
 
 const login = function () {
   axios.post("/nm/user/login", {
@@ -13,6 +13,12 @@ const login = function () {
   }).then(() => {
     router.replace({name: "home"})
         .then(() => router.go(0))
+  }).catch(error => {
+    if(error.response){
+      alert(error.response.data.message);
+    } else {
+      alert("계정이 올바르지 않습니다.");
+    }
   });
 }
 
