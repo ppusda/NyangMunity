@@ -68,6 +68,10 @@ public class BoardService {
                 .build();
     }
 
+    public Long getCount() {
+        return boardRepository.count();
+    }
+
     public List<BoardResponse> getList(BoardSearch boardSearch) {
         return boardRepository.getList(boardSearch).stream()
                 .map(BoardResponse::new)

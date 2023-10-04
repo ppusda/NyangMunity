@@ -6,6 +6,7 @@ import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.request.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardResponse;
+import cat.community.NyangMunity.response.BoardResult;
 import cat.community.NyangMunity.response.LikeBoardResponse;
 import cat.community.NyangMunity.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -67,8 +68,11 @@ public class BoardController {
     }
 
     @GetMapping("/boards")
-    public List<BoardResponse> readBoards(@ModelAttribute BoardSearch boardSearch){
-        return boardService.getList(boardSearch);
+    public BoardResult readBoards(@ModelAttribute BoardSearch boardSearch){
+        return BoardResult.builder()
+                .boardList(boardService.getList(boardSearch))
+                .totalCnt(boardService.getCount())
+                .build();
     }
 
     @PatchMapping("/boards/{boardId}")

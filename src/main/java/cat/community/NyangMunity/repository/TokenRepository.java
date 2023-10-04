@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
     List<Token> findByUserId(Long userId);
+
+    @Transactional
     Optional<Token> deleteByUserId(Long userId);
 }

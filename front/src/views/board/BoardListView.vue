@@ -1,18 +1,31 @@
 <script setup lang="ts">
 
 import axios from "axios";
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import router from "@/router";
+import paginate from "vuejs-paginate-next";
 
-const posts = ref<any[]>([]);
-const imageSrc = ref("");
+const posts = reactive<any[]>([]);
 
-axios.get("/nm/boards?page=1&size=5").then((response) => {
-  response.data.forEach((res: any) => {
-    posts.value.push(res);
+const page = reactive({ value: 1 });
+const pageCount = 5;
+const totalPage = reactive({ value: 0 });
+
+const movePage = (pageValue: any) => {
+  axios.get("/nm/boards?page="+pageValue+"&size="+pageCount, ).then(response => {
+    totalPage.value = Math.ceil(response.data.totalCnt / pageCount);
+    posts.splice(0, posts.length);
+    response.data.boardList.forEach((res: any) => {
+      posts.push(res);
+    });
   });
-});
+}
 
+movePage(page.value);
+
+const clickCallback = (page: any) => {
+  console.log(page)
+}
 
 const moveToWrite = () => {
   axios.post("/nm/user/check").then(() => {
@@ -45,9 +58,14 @@ const moveToWrite = () => {
           </div>
         </li>
       </ul>
-      <div>
-        <a class="clButton btn btn-primary text-white m-3" @click="moveToWrite()">새로 글 쓰기</a>
+      <div class="d-inline-flex pagination-container">
+        <paginate
+          :pageCount="totalPage.value"
+          :containerClass="'pagination'"
+          :clickHandler="movePage">
+        </paginate>
       </div>
+      <a class="clButton btn btn-primary text-white m-3" @click="moveToWrite()">새로 글 쓰기</a>
     </div>
   </div>
 </template>
@@ -80,5 +98,9 @@ const moveToWrite = () => {
 
 .clButton{
   color: white;
+}
+
+.pagination{
+  margin-top: 1rem;
 }
 </style>

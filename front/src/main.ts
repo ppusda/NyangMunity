@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import VueCookies from "vue3-cookies";
+import Paginate from "vuejs-paginate-next";
 
 import App from "./App.vue";
 import router from "./router";
@@ -19,5 +20,8 @@ app.use(createPinia());
 app.use(router);
 app.use(ElementPlus);
 app.use(VueCookies);
+app.use(Paginate);
+
+app.component("vue-paginate", Paginate);
 
 app.mount("#app");

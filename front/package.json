@@ -18,7 +18,9 @@
     "pinia": "^2.0.23",
     "vue": "^3.2.47",
     "vue-router": "^4.1.5",
-    "vue3-cookies": "^1.0.6"
+    "vue3-cookies": "^1.0.6",
+    "vuejs-paginate": "^2.1.0",
+    "vuejs-paginate-next": "^1.0.2"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
