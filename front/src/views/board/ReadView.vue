@@ -9,6 +9,7 @@ import {useCookies} from "vue3-cookies";
 
 let isMouseDown = ref(false);
 let lastX = ref<number | null>(0);
+
 const likeCheck = reactive({value: false});
 const writerCheck = reactive({value: false});
 const userCheck = reactive({value: false});

@@ -1,26 +1,34 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.config.AppConfig;
 import cat.community.NyangMunity.domain.*;
 import cat.community.NyangMunity.exception.Unauthorized;
+import cat.community.NyangMunity.repository.BoardImageRepository;
 import cat.community.NyangMunity.repository.BoardLikeRepository;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.exception.PostNotFound;
 import cat.community.NyangMunity.repository.BoardRepository;
-import cat.community.NyangMunity.request.BoardEdit;
+import cat.community.NyangMunity.response.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardImageResponse;
 import cat.community.NyangMunity.response.BoardResponse;
 import cat.community.NyangMunity.response.LikeBoardResponse;
+import cat.community.NyangMunity.service.util.BoardProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +39,7 @@ public class BoardService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final BoardImageRepository boardImageRepository;
 
     public void write(BoardForm boardForm, ArrayList<BoardImage> boardImages, Long uid){
         Board board = Board.builder()
@@ -81,18 +90,27 @@ public class BoardService {
     // 위처럼 설정 시 5개를 자동으로 얻어와준다
 
     @Transactional
-    public void edit(Long bid, BoardEdit boardEdit, Long uid) {
+    public void edit(Long bid, BoardEdit boardEdit, ArrayList<BoardImage> boardImages, Long uid) {
         Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
         if(board.getUser().getId() == uid) {
-            BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
+            if(boardEdit.getRemoveList() != null && !boardEdit.getRemoveList().isEmpty()) {
+                for (Long id: boardEdit.getRemoveList()) {
+                    boardImageRepository.deleteById(id);
+                }
+            }
 
+            for (BoardImage boardImage: boardImages) {
+                board.setBoardImages(boardImage);
+            }
+            boardRepository.save(board);
+
+            BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
             BoardEditor boardEditor = boardEditorBuilder
                     .title(boardEdit.getTitle())
                     .content(boardEdit.getContent())
                     .build();
-
             board.edit(boardEditor); // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
         }else {
             log.error(">>> 권한이 없습니다.");

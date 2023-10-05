@@ -13,13 +13,13 @@ const router = useRouter();
 const write = function (e: Event) {
   e.preventDefault();
   
-  const fileInput = document.getElementById('imgInput') as HTMLInputElement;
+  const fileInput = document.getElementById("imgInput") as HTMLInputElement;
 
   const formData = new FormData();
-  formData.append('title', title.value);
-  formData.append('content', content.value);
+  formData.append("title", title.value);
+  formData.append("content", content.value);
   Array.from(fileInput.files ?? []).forEach((file) =>{
-    formData.append('imgInput', file)
+    formData.append("boardImages", file);
   });
 
   axios.post("/nm/boards/write", formData, {
@@ -33,20 +33,24 @@ const write = function (e: Event) {
 };
 
 const imageUpload = () => {
-  const fileDOM = document.getElementById('imgInput') as HTMLInputElement;
+  const fileDOM = document.getElementById("imgInput") as HTMLInputElement;
 
-  fileDOM?.addEventListener('change', () => {
-    const preview = document.getElementById('previewDiv');
+  fileDOM?.addEventListener("change", () => {
+    const preview = document.getElementById("previewDiv");
     preview!.innerHTML = '';
     if (!fileDOM.files) {
       return;
     }
-    for(let i = 0; i < 3; i++){
-      const urls = URL.createObjectURL(fileDOM.files[i]);
-      document.getElementById("previewDiv")!.innerHTML += '<img class="image-box" src="'+urls+'">';
-    }
-    if (fileDOM.files.length > 3) {
-      document.getElementById("previewDiv")!.innerHTML += '<h6>+'+(fileDOM.files.length-3)+' More...</h6>';
+    if (fileDOM.files.length <= 10) {
+      for(let i = 0; i < 3; i++){
+        const urls = URL.createObjectURL(fileDOM.files[i]);
+        document.getElementById("previewDiv")!.innerHTML += '<img class="image-box" src="'+urls+'">';
+      }
+      if (fileDOM.files.length > 3) {
+        document.getElementById("previewDiv")!.innerHTML += '<h6>+'+(fileDOM.files.length-3)+' More...</h6>';
+      }
+    }else {
+      alert("이미지는 최대 10개까지만 입력 가능합니다.");
     }
   });
 }
@@ -106,7 +110,7 @@ const imageUpload = () => {
   }
 
   .image-box {
-    max-width: 8vw;
-    max-height: 8vw;
+    max-width: 4vw;
+    max-height: 4vw;
   }
 </style>

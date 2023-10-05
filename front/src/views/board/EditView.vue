@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {defineProps, onMounted, ref} from "vue";
+import {defineProps, onMounted, reactive, ref} from "vue";
 import axios from "axios";
 import {useRouter} from "vue-router";
 import {useCookies} from "vue3-cookies";
@@ -7,7 +7,13 @@ import {useCookies} from "vue3-cookies";
 const router = useRouter();
 const { cookies } = useCookies();
 
-const post = ref<any>({});
+const post = ref({
+  id: 0,
+  title: "",
+  content: "",
+  boardImages: <any>[],
+  createDate: ""
+});
 
 const props = defineProps({
   postId: {
@@ -15,6 +21,9 @@ const props = defineProps({
     require: true,
   },
 });
+
+let removeList :any[] = reactive([]);
+
 
 axios.post("/nm/user/check").then(() => {
     axios.get(`/nm/boards/${props.postId}`).then((response) => {
@@ -28,7 +37,19 @@ axios.post("/nm/user/check").then(() => {
 });
 
 const edit = () => {
-  axios.patch(`/nm/boards/${props.postId}`, post.value).then(() => {
+  const fileInput = document.getElementById('imgInput') as HTMLInputElement;
+
+  const formData = new FormData();
+  formData.append('title', post.value.title);
+  formData.append('content', post.value.content);
+  Array.from(removeList ?? []).forEach((id) =>{
+    formData.append('removeList', id);
+  });
+  Array.from(fileInput.files ?? []).forEach((file) =>{
+    formData.append('boardImages', file)
+  });
+
+  axios.patch(`/nm/boards/${props.postId}`, formData).then(() => {
     router.replace({name: "boards"});
   });
 }
@@ -37,6 +58,39 @@ const remove = () => {
   axios.delete(`/nm/boards/${props.postId}`).then(() => {
     router.replace({name: "boards"})
   });
+}
+
+const imageUpload = () => {
+  let fileDOM = document.getElementById('imgInput') as HTMLInputElement;
+
+  fileDOM?.addEventListener('change', () => {
+    const preview = document.getElementById('previewDiv');
+    preview!.innerHTML = '';
+    if (!fileDOM.files) {
+      return;
+    }
+    if (post.value.boardImages.length + fileDOM.files.length <= 10) {
+      for(let i = 0; i < 3; i++){
+        const urls = URL.createObjectURL(fileDOM.files[i]);
+        document.getElementById("previewDiv")!.innerHTML += '<img class="image-box" src="'+urls+'">';
+      }
+      if (fileDOM.files.length > 3) {
+        document.getElementById("previewDiv")!.innerHTML += '<h6>+'+(fileDOM.files.length-3)+' More...</h6>';
+      }
+    }else {
+      alert("이미지는 최대 10개까지만 입력 가능합니다.");
+      fileDOM = null;
+    }
+  });
+}
+
+const removeImage = (id:any) => {
+  removeList.push(id);
+  const img = document.getElementById('img'+id) as HTMLImageElement;
+  const imgRemoveButton = document.getElementById('imgRemoveBtn'+id) as HTMLButtonElement;
+
+  img.remove();
+  imgRemoveButton.remove();
 }
 
 </script>
@@ -48,11 +102,23 @@ const remove = () => {
       <div>
         <el-input v-model="post.title"/>
       </div>
-
-      <div class="mt-2">
-        <el-input v-model="post.content" type="textarea" rows="15"></el-input>
+      <div class="mt-2 d-inline-flex" id="previewDiv">
       </div>
-
+      <div class="mt-2">
+        <label for="imgInput">
+          <div type="button" class="btn-upload" @click="imageUpload">파일 업로드하기</div>
+        </label>
+        <input type="file" class="imgInput" name="imgInput" id="imgInput" multiple>
+      </div>
+      <div class="mt-2">
+        <el-input v-model="post.content" type="textarea" rows="3"></el-input>
+      </div>
+      <hr>
+      <div class="mt-2 d-inline-flex" id="imgDiv" v-for="boardImage in post.boardImages">
+        <img class="image-box" :id="`img${boardImage.id}`" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`">
+        <a :id="`imgRemoveBtn${boardImage.id}`" @click="removeImage(boardImage.id)" class="clButton m-1">❌</a>
+      </div>
+      <hr>
       <div class="mt-2">
         <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
         <a class="clButton btn btn-primary text-white m-1" @click="edit()">글 수정</a>
@@ -83,5 +149,10 @@ const remove = () => {
 </template>
 
 <style>
-
+.image-box {
+  max-width: 4vw;
+  max-height: 4vw;
+  object-fit: cover;
+  margin: 0.5vw;
+}
 </style>

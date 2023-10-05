@@ -54,6 +54,11 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
                 String userId = jwtTokenProvider.getClaims(accessToken).getSubject();
                 List<Token> token = tokenRepository.findByUserId(Long.parseLong(userId));
 
+                if(token.isEmpty()) {
+                    log.error(">>> No Have RefreshToken");
+                    return new UserSession(0L, "guest");
+                }
+
                 String refreshToken = token.get(0).getRefreshToken();
                 if(jwtTokenProvider.validateToken(refreshToken)) {
                     String newAccessToken = jwtTokenProvider.createAccessToken(Long.parseLong(userId));

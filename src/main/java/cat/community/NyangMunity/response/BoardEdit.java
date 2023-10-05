@@ -1,8 +1,11 @@
-package cat.community.NyangMunity.request;
+package cat.community.NyangMunity.response;
 
+import cat.community.NyangMunity.domain.BoardImage;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Setter
 @Getter
@@ -10,11 +13,10 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class BoardEdit {
 
-    @NotBlank(message = "제목을 입력해주세요.")
     private String title;
-
-    @NotBlank(message = "content를 입력해주세요.")
     private String content;
+    private List<MultipartFile> boardImages;
+    private List<Long> removeList;
 
     @Builder
     public BoardEdit(String title, String content) {

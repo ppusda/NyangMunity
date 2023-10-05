@@ -18,13 +18,13 @@ public class BoardForm {
     @NotBlank(message = "content를 입력해주세요.")
     private String content;
 
-    private List<MultipartFile> imgInput;
+    private List<MultipartFile> boardImages;
 
     @Builder
-    public BoardForm(String title, String content, List<MultipartFile> imgInput) {
+    public BoardForm(String title, String content, List<MultipartFile> boardImages) {
         this.title = title;
         this.content = content;
-        this.imgInput = imgInput;
+        this.boardImages = boardImages;
     }
 
     // todo 테스트 코드 항목 중 "게시글 작성 시 제목에 '바보'는 포함될 수 없다." 를 테스트 해보려 함.
