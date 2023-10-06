@@ -79,7 +79,7 @@ const imageUpload = () => {
       }
     }else {
       alert("이미지는 최대 10개까지만 입력 가능합니다.");
-      fileDOM = null;
+      fileDOM.value = '';
     }
   });
 }

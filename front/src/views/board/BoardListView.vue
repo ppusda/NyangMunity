@@ -23,10 +23,6 @@ const movePage = (pageValue: any) => {
 
 movePage(page.value);
 
-const clickCallback = (page: any) => {
-  console.log(page)
-}
-
 const moveToWrite = () => {
   axios.post("/nm/user/check").then(() => {
       router.push({ name: "write" });
@@ -43,18 +39,25 @@ const moveToWrite = () => {
   <div class="container w-100 h-100 text-white text-center">
     <div class="content_area w-100">
       <ul class="boardList list-group">
-        <li class="list-group-item" v-for="post in posts" :key="post.id">
+        <li class="board list-group-item" v-for="post in posts" :key="post.id">
           <div>
             <router-link :to="{name: 'read', params: {postId: post.id}}">{{post.title}}</router-link>
           </div>
           <div>
             {{post.content}}
           </div>
-          <div class="d-inline" v-if="post.boardImages && post.boardImages.length > 0" v-for="boardImage in post.boardImages">
-            <img class="thumbnail" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
-          </div>
-          <div class="d-inline" v-else>
-            <img class="thumbnail" src="/assets/images/cat_loading.gif"/>
+          <div class="d-inline-flex">
+            <div class="d-flex justify-content-center align-items-center" v-if="post.boardImages && post.boardImages.length > 0" v-for="(boardImage, index) in post.boardImages.slice(0, Math.min(3, post.boardImages.length))">
+              <div class="thumbnailDiv" v-if="index <= 1">
+                <img class="thumbnail" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
+              </div>
+              <div v-else>
+                <div class="thumbnail more-images">+{{ post.boardImages.length - 2 }}</div>
+              </div>
+            </div>
+            <div class="d-inline" v-else>
+              <img class="thumbnail" src="/assets/images/cat_loading.gif"/>
+            </div>
           </div>
         </li>
       </ul>
@@ -100,7 +103,19 @@ const moveToWrite = () => {
   color: white;
 }
 
-.pagination{
-  margin-top: 1rem;
+.more-images{
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  color: white;
+  bottom: 4.5%;
+  left: 57.5%;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.thumbnailDiv{
+  width: 128px;
 }
 </style>
