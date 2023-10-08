@@ -11,6 +11,39 @@ const page = reactive({ value: 1 });
 const pageCount = 5;
 const totalPage = reactive({ value: 0 });
 
+const getWriteTime = (time: any) => {
+  let answer = "";
+
+  let now = new Date();
+  let writeTime = new Date(time);
+  let calc = Math.floor((now.getTime() - writeTime.getTime()) / 1000);
+
+  answer = calc + "초 전";
+  if(calc >= 60) {
+    calc = Math.floor(calc / 60);
+    answer = calc + "분 전";
+    if(calc >= 60) {
+      calc = Math.floor(calc / 60);
+      answer = calc + "시간 전";
+      if(calc >= 24) {
+        calc = Math.floor(calc / 24);
+        answer = calc + "일 전";
+        if(calc >= 30) {
+          calc = Math.floor(calc / 30);
+          answer = calc + "달 전";
+          if(calc >= 12) {
+            Math.floor(calc / 12);
+            answer = calc + "년 전";
+          }
+        }
+      }
+    }
+  }
+
+  return answer;
+
+}
+
 const movePage = (pageValue: any) => {
   axios.get("/nm/boards?page="+pageValue+"&size="+pageCount, ).then(response => {
     totalPage.value = Math.ceil(response.data.totalCnt / pageCount);
@@ -41,10 +74,10 @@ const moveToWrite = () => {
       <ul class="boardList list-group">
         <li class="board list-group-item" v-for="post in posts" :key="post.id">
           <div>
-            <router-link :to="{name: 'read', params: {postId: post.id}}">{{post.title}}</router-link>
-          </div>
-          <div>
-            {{post.content}}
+            <h3>
+              <router-link :to="{name: 'read', params: {postId: post.id}}">{{post.title}}</router-link>
+            </h3>
+            <h6>작성자: {{post.writer}} - {{getWriteTime(post.createDate)}}</h6>
           </div>
           <div class="d-inline-flex">
             <div class="d-flex justify-content-center align-items-center" v-if="post.boardImages && post.boardImages.length > 0" v-for="(boardImage, index) in post.boardImages.slice(0, Math.min(3, post.boardImages.length))">
@@ -118,4 +151,5 @@ const moveToWrite = () => {
 .thumbnailDiv{
   width: 128px;
 }
+
 </style>

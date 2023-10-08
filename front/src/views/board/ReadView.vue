@@ -31,7 +31,8 @@ const post = ref({
   title: "",
   content: "",
   boardImages: <any>[],
-  createDate: ""
+  createDate: "",
+  writer: ""
 });
 
 const moveToEdit = () => {
@@ -114,8 +115,10 @@ function showPrevSlide() {
 <template>
   <html @mouseup="handleMouseUp">
     <div class="container w-100 h-100 text-white text-center" @mouseup="handleMouseUp">
-      <div class="content_area" method="post">
+      <div class="content_area scroll" method="post">
         <h2>{{post.title}}</h2>
+        <h6>작성자: {{post.writer}}</h6>
+        <hr>
         <div>{{post.content}}</div>
 
         <div id="imageSlider" class="carousel slide" data-bs-ride="true">
@@ -155,7 +158,7 @@ function showPrevSlide() {
             <span class="visually-hidden">Next</span>
           </button>
         </div>
-
+        <hr>
         <div class="d-inline-flex" v-if="userCheck && userCheck.value === true">
           <a class="clButton btn btn-secondary text-white m-1" @click="$router.replace({name: 'boards'})">목록으로</a>
           <div v-if="writerCheck && writerCheck.value === true">
@@ -198,6 +201,8 @@ function showPrevSlide() {
     top: 1.5%;
     padding: 1vw;
     width: 100%;
+    overflow-y: scroll;
+    max-height: 83vh;
   }
 
   .thumbnail{
@@ -207,5 +212,13 @@ function showPrevSlide() {
 
   .carousel-item {
     position: static;
+  }
+
+  .scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  #imageSlider {
+    margin-top: 1vw;
   }
 </style>

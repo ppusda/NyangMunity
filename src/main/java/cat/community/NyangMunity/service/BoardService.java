@@ -74,6 +74,7 @@ public class BoardService {
                 .boardImages(boardImages)
                 .createDate(board.getCreateDate())
                 .uid(board.getUser().getId())
+                .writer(board.getUser().getNickname())
                 .build();
     }
 

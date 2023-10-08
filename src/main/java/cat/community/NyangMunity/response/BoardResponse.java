@@ -1,10 +1,8 @@
 package cat.community.NyangMunity.response;
 
 import cat.community.NyangMunity.domain.Board;
-import cat.community.NyangMunity.domain.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +16,9 @@ public class BoardResponse {
     private final String content;
     private final List<BoardImageResponse> boardImages;
     private final LocalDateTime createDate;
+
     private final Long uid;
+    private final String writer;
 
     private boolean writerCheck = false;
 
@@ -31,16 +31,18 @@ public class BoardResponse {
                 .collect(Collectors.toList());
         this.createDate = board.getCreateDate();
         this.uid = board.getUser().getId();
+        this.writer = board.getUser().getNickname();
     } // 무한루프로 인한 BoardDTO 내에서 BoardImageDTO 설정
 
     @Builder
-    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages, LocalDateTime createDate, Long uid) {
+    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages, LocalDateTime createDate, Long uid, String writer) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.boardImages = boardImages;
         this.createDate = createDate;
         this.uid = uid;
+        this.writer = writer;
     }
 
     public void setWriterCheck(boolean writerCheck) {
