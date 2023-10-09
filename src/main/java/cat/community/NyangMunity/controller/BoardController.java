@@ -1,5 +1,7 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.exception.EmptyInputValueException;
+import cat.community.NyangMunity.exception.InvalidRequest;
 import cat.community.NyangMunity.request.UserSession;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.BoardImage;
@@ -35,7 +37,16 @@ public class BoardController {
             boardImages = boardProvider.getImageList(boardForm.getBoardImages());
         }
 
-        boardService.write(boardForm, boardImages, userSession.id);
+        if(boardForm.getTitle().isEmpty()){
+            throw new EmptyInputValueException();
+        }
+
+        try {
+            boardService.write(boardForm, boardImages, userSession.id);
+        } catch (Exception e) {
+            throw new InvalidRequest();
+        }
+
     }
 
     @GetMapping("/boards/{boardId}")

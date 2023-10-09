@@ -39,19 +39,23 @@ axios.post("/nm/user/check").then(() => {
 const edit = () => {
   const fileInput = document.getElementById('imgInput') as HTMLInputElement;
 
-  const formData = new FormData();
-  formData.append('title', post.value.title);
-  formData.append('content', post.value.content);
-  Array.from(removeList ?? []).forEach((id) =>{
-    formData.append('removeList', id);
-  });
-  Array.from(fileInput.files ?? []).forEach((file) =>{
-    formData.append('boardImages', file)
-  });
+  if(post.value.title && post.value.title != '') {
+    const formData = new FormData();
+    formData.append('title', post.value.title);
+    formData.append('content', post.value.content);
+    Array.from(removeList ?? []).forEach((id) =>{
+      formData.append('removeList', id);
+    });
+    Array.from(fileInput.files ?? []).forEach((file) =>{
+      formData.append('boardImages', file)
+    });
 
-  axios.patch(`/nm/boards/${props.postId}`, formData).then(() => {
-    router.replace({name: "boards"});
-  });
+    axios.patch(`/nm/boards/${props.postId}`, formData).then(() => {
+      router.replace({name: "boards"});
+    });
+  } else {
+    alert("제목은 필수 입력사항입니다.");
+  }
 }
 
 const remove = () => {
@@ -61,27 +65,41 @@ const remove = () => {
 }
 
 const imageUpload = () => {
-  let fileDOM = document.getElementById('imgInput') as HTMLInputElement;
+  const fileDOM = document.getElementById("imgInput") as HTMLInputElement;
 
-  fileDOM?.addEventListener('change', () => {
-    const preview = document.getElementById('previewDiv');
-    preview!.innerHTML = '';
-    if (!fileDOM.files) {
-      return;
-    }
-    if (post.value.boardImages.length + fileDOM.files.length <= 10) {
-      for(let i = 0; i < 3; i++){
-        const urls = URL.createObjectURL(fileDOM.files[i]);
-        document.getElementById("previewDiv")!.innerHTML += '<img class="image-box" src="'+urls+'">';
+  if (fileDOM && !fileDOM.hasAttribute("listener")) {
+    fileDOM.setAttribute("listener", "true");
+    fileDOM?.addEventListener("change", () => {
+      const preview = document.getElementById("previewDiv");
+      const extension = fileDOM.value.substring(fileDOM.value.lastIndexOf(".")+1, fileDOM.value.length).toLowerCase();
+      if(extension != "jpg" && extension != "png" &&  extension != "gif" &&  extension != "bmp" && extension != "JPEG") {
+        preview!.innerHTML = '';
+        fileDOM!.value = '';
+        alert("지원되지 않는 확장자입니다.");
+        return;
+      } else{
+        preview!.innerHTML = '';
+        if (!fileDOM.files) {
+          return;
+        }
+        if (fileDOM.files.length <= 10) {
+          for(let i = 0; i < 3; i++){
+            const urls = URL.createObjectURL(fileDOM.files[i]);
+            document.getElementById("previewDiv")!.innerHTML += '<img class="image-box" src="'+urls+'">';
+          }
+          if (fileDOM.files.length > 3) {
+            document.getElementById("previewDiv")!.innerHTML += '<h6>+'+(fileDOM.files.length-3)+' More...</h6>';
+          }
+          return;
+        }else {
+          alert("이미지는 최대 10개까지만 입력 가능합니다.");
+          preview!.innerHTML = '';
+          fileDOM!.value = '';
+          return;
+        }
       }
-      if (fileDOM.files.length > 3) {
-        document.getElementById("previewDiv")!.innerHTML += '<h6>+'+(fileDOM.files.length-3)+' More...</h6>';
-      }
-    }else {
-      alert("이미지는 최대 10개까지만 입력 가능합니다.");
-      fileDOM.value = '';
-    }
-  });
+    });
+  }
 }
 
 const removeImage = (id:any) => {
@@ -108,7 +126,7 @@ const removeImage = (id:any) => {
         <label for="imgInput">
           <div type="button" class="btn-upload" @click="imageUpload">파일 업로드하기</div>
         </label>
-        <input type="file" class="imgInput" name="imgInput" id="imgInput" multiple>
+        <input type="file" class="imgInput" name="imgInput" id="imgInput" accept="image/*" multiple>
       </div>
       <div class="mt-2">
         <el-input v-model="post.content" type="textarea" rows="3"></el-input>
