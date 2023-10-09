@@ -142,6 +142,7 @@ function showToast(message: string): void {
   .cmgs {
     max-width: 220px;
     max-height: 164px;
+    object-fit: cover;
   }
 
   .content_area{
