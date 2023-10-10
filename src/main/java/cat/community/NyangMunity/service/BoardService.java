@@ -2,6 +2,7 @@ package cat.community.NyangMunity.service;
 
 import cat.community.NyangMunity.config.AppConfig;
 import cat.community.NyangMunity.domain.*;
+import cat.community.NyangMunity.exception.EmptyMaxLikedBoardException;
 import cat.community.NyangMunity.exception.Unauthorized;
 import cat.community.NyangMunity.repository.BoardImageRepository;
 import cat.community.NyangMunity.repository.BoardLikeRepository;
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -160,17 +162,23 @@ public class BoardService {
     }
 
     public LikeBoardResponse maxLikeBoard() {
-        Board board = boardLikeRepository.getMaxLikeBoard().get(0).getBoard();
+        List<BoardLike> maxBoardLike = boardLikeRepository.getMaxLikeBoard();
 
-        List<BoardImageResponse> boardImages = board.getBoardImages().stream()
-                .map(BoardImageResponse::new)
-                .collect(Collectors.toList());
+        if(!maxBoardLike.isEmpty()) {
+            Board board = maxBoardLike.get(0).getBoard();
 
-        return LikeBoardResponse.builder()
-                .bid(board.getId())
-                .boardImages(boardImages)
-                .nickName(board.getUser().getNickname())
-                .build();
+            List<BoardImageResponse> boardImages = board.getBoardImages().stream()
+                    .map(BoardImageResponse::new)
+                    .collect(Collectors.toList());
+
+            return LikeBoardResponse.builder()
+                    .bid(board.getId())
+                    .boardImages(boardImages)
+                    .nickName(board.getUser().getNickname())
+                    .build();
+        }else {
+            throw new EmptyMaxLikedBoardException();
+        }
     }
 
 }
