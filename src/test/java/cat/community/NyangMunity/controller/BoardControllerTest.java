@@ -1,17 +1,16 @@
 package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.config.JwtTokenProvider;
-import cat.community.NyangMunity.domain.User;
-import cat.community.NyangMunity.repository.UserRepository;
-import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.repository.BoardRepository;
-import cat.community.NyangMunity.request.BoardEdit;
+import cat.community.NyangMunity.request.BoardForm;
+import cat.community.NyangMunity.response.BoardEdit;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.servlet.http.Cookie;
 import javax.transaction.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,7 +78,8 @@ class BoardControllerTest {
 
         mockMvc.perform(post("/nm/boards/write")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"제목\", \"content\": \"내용입니다.\"SID:\"+token+\"}")
+                        .param("title", "제목")
+                        .param("content", "설명입니다.")
                         .cookie(new Cookie("SESSION", token))
                 ).andExpect(status().isOk())
                 .andDo(print());
@@ -90,48 +89,51 @@ class BoardControllerTest {
     @DisplayName("post 요청 시 json을 출력한다.")
     void test() throws Exception{
         // 23/09/11 데이터가 Json이 아닌 MultiPart로 넘어가는 것을 발견하였다. (테스트가 정상 작동하지 않음)
-        // todo title, content Json으로 보내고 Image는 따로 MultiPart로 보내는 걸 목표로 해봐야될 것 같다.
-/*        BoardForm boardForm = BoardForm.builder()
-                .title("제목입니다.")
-                .content("내용입니다.")
-                .build();
+        // 23/10/09 임시조치, Image 향후 추가 예정
+        Long uid = userService.userLogin(UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234")
+                .nickname("빵")
+                .build());
 
-        String json = objectMapper.writeValueAsString(boardForm);
-
-        System.out.println(json);
+        String token = jwtTokenProvider.createAccessToken(uid);
 
         mockMvc.perform(post("/nm/boards/write")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
+                        .param("title", "제목입니다.")
+                        .param("content", "내용입니다.")
+                        .cookie(new Cookie("SESSION", token))
                 ).andExpect(status().isOk())
                 .andDo(print());
 
         Assertions.assertEquals(1L, boardRepository.count());
         Board board = boardRepository.findAll().get(0);
         assertEquals("제목입니다.", board.getTitle());
-        assertEquals("내용입니다..", board.getContent());*/
+        assertEquals("내용입니다.", board.getContent());
     }
 
     @Test
     @DisplayName("post 요청 시 DB에 값을 저장한다.")
     void postRequestInputDB() throws Exception {
-        // 위와 같은 이유로 주석처리
-/*
-        BoardForm boardForm = BoardForm.builder()
-                .title("제목입니다.")
-                .content("내용입니다.")
-                .build();
-        String json = objectMapper.writeValueAsString(boardForm);
+        Long uid = userService.userLogin(UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234")
+                .nickname("빵")
+                .build());
+
+        String token = jwtTokenProvider.createAccessToken(uid);
 
         //when
         mockMvc.perform(post("/nm/boards/write")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .content(json)
+                        .param("title", "제목입니다.")
+                        .param("content", "내용입니다.")
+                        .cookie(new Cookie("SESSION", token))
                 ).andExpect(status().isOk())
                 .andDo(print());
 
         // then
-        Assertions.assertEquals(1L, boardRepository.count());*/
+        Assertions.assertEquals(1L, boardRepository.count());
     }
 
     @Test
@@ -185,9 +187,9 @@ class BoardControllerTest {
         mockMvc.perform(get("/nm/boards?page=1&size=10") ///read/nm/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Matchers.is(10)))
-                .andExpect(jsonPath("$[0].title").value("빵국이 제목 19"))
-                .andExpect(jsonPath("$[0].content").value("빵국이 입니다 19"))
+                .andExpect(jsonPath("$.boardList.length()", Matchers.is(10)))
+                .andExpect(jsonPath("$.boardList[0].title").value("빵국이 제목 19"))
+                .andExpect(jsonPath("$.boardList[0].content").value("빵국이 입니다 19"))
                 .andDo(print());
     }
 
@@ -196,9 +198,10 @@ class BoardControllerTest {
     @DisplayName("페이지를 0으로 요청하면 첫 페이지를 가져온다.")
     void test6() throws Exception {
         // given
-        Long userId = userService.userLogin(UserForm.builder()
+        Long uid = userService.userLogin(UserForm.builder()
                 .email("ppusda@naver.com")
                 .password("1234")
+                .nickname("빵")
                 .build());
 
         List<Board> requestBoards = IntStream.range(0, 20)
@@ -206,7 +209,7 @@ class BoardControllerTest {
                         .title("빵국이 제목 " + i)
                         .content("빵국이 입니다 " + i)
                         .boardImages(boardImages)
-                        .user(userService.userInfo(userId))
+                        .user(userService.userInfo(uid))
                         .build())
                 .collect(Collectors.toList());
 
@@ -216,9 +219,9 @@ class BoardControllerTest {
         mockMvc.perform(get("/nm/boards?page=0&size=10") ///read/nm/boards?page=1&size=10&sort=id,desc 와 같이 이용도 가능
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Matchers.is(10)))
-                .andExpect(jsonPath("$[0].title").value("빵국이 제목 19"))
-                .andExpect(jsonPath("$[0].content").value("빵국이 입니다 19"))
+                .andExpect(jsonPath("$.boardList.length()", Matchers.is(10)))
+                .andExpect(jsonPath("$.boardList[0].title").value("빵국이 제목 19"))
+                .andExpect(jsonPath("$.boardList[0].content").value("빵국이 입니다 19"))
                 .andDo(print());
     }
 

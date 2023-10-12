@@ -1,15 +1,18 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.exception.AlreadyExistsEmailException;
+import cat.community.NyangMunity.exception.InvalidSigninInformation;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +26,10 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    @AfterEach //@BeforeEach
+    @Autowired
+    private ScryptPasswordEncoder scryptPasswordEncoder;
+
+    @BeforeEach //@AfterEach
     void clean() { userRepository.deleteAll(); }
 
     @Test
@@ -43,8 +49,8 @@ class UserServiceTest {
         Assertions.assertEquals(1, userRepository.count());
 
         User user = userRepository.findAll().iterator().next();
-        assertEquals("ppusda", user.getEmail());
-        assertEquals("1234", user.getPassword());
+        assertEquals("ppusda@naver.com", user.getEmail());
+        assertTrue(scryptPasswordEncoder.matches("1234", user.getPassword()));
         assertEquals("빵", user.getNickname());
     }
 
@@ -57,9 +63,56 @@ class UserServiceTest {
                 .password("1234")
                 .nickname("빵")
                 .build();
+        userService.register(userForm);
 
         // expected
         assertThrows(AlreadyExistsEmailException.class, () -> userService.register(userForm));
+
+    }
+
+    @Test
+    @DisplayName("로그인 성공")
+    void loginSuccess() {
+        // given
+        User registerForm = User.builder()
+                .email("ppusda@naver.com")
+                .password(scryptPasswordEncoder.encrypt("1234"))
+                .nickname("빵")
+                .createDate(LocalDateTime.now())
+                .build();
+
+        userRepository.save(registerForm);
+
+        UserForm loginForm = UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234")
+                .build();
+
+        // when
+        Long userId = userService.userLogin(loginForm);
+
+        // then
+        assertNotNull(userId);
+    }
+
+    @Test
+    @DisplayName("로그인 시 비밀번호 틀림")
+    void loginFail() {
+        // given
+        UserForm registerForm = UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234")
+                .nickname("빵")
+                .build();
+        userService.register(registerForm);
+
+        UserForm loginForm = UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("5678")
+                .build();
+
+        // when
+        assertThrows(InvalidSigninInformation.class, () -> userService.userLogin(loginForm));
 
     }
 }

@@ -1,6 +1,7 @@
 package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.domain.Token;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.repository.TokenRepository;
@@ -8,7 +9,6 @@ import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,6 +52,9 @@ class UserControllerTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private ScryptPasswordEncoder scryptPasswordEncoder;
+
     @BeforeEach
         // 각각의 테스트를 실행하기 전에 수행되는 메서드 (중요)
     void clean(){
@@ -61,22 +64,42 @@ class UserControllerTest {
 
     // bootJar 실패로 인한 이전 테스트 내역 주석 처리 (23/09/13 해결)
     @Test
+    @DisplayName("회원가입 성공")
+    void registerTest() throws Exception{
+        // given
+        UserForm userForm = UserForm.builder()
+                .email("ppusda@naver.com")
+                .password("1234") // Scrypt, Bcrypt
+                .nickname("빵")
+                .build();
+
+        String json = objectMapper.writeValueAsString(userForm);
+
+        // expected
+        mockMvc.perform(post("/nm/user/join")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                ).andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("로그인 성공")
     void loginTest() throws Exception{
         // given
         userRepository.save(User.builder()
                 .email("ppusda@naver.com")
-                .password("1234")
+                .password(scryptPasswordEncoder.encrypt("1234"))
                 .nickname("국")
                 .createDate(LocalDateTime.now())
                 .build());
 
-        User user = User.builder()
+        UserForm userform = UserForm.builder()
                 .email("ppusda@naver.com")
                 .password("1234") // Scrypt, Bcrypt
                 .build();
 
-        String json = objectMapper.writeValueAsString(user);
+        String json = objectMapper.writeValueAsString(userform);
 
         // expected
         mockMvc.perform(post("/nm/user/login")

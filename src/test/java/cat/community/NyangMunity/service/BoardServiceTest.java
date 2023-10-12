@@ -1,13 +1,12 @@
 package cat.community.NyangMunity.service;
 
-import cat.community.NyangMunity.config.JwtTokenProvider;
-import cat.community.NyangMunity.domain.User;
+import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
 import cat.community.NyangMunity.exception.PostNotFound;
 import cat.community.NyangMunity.repository.BoardRepository;
-import cat.community.NyangMunity.request.BoardEdit;
+import cat.community.NyangMunity.response.BoardEdit;
 import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.response.BoardResponse;
@@ -43,6 +42,9 @@ class BoardServiceTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void clean() {
         boardRepository.deleteAll();
@@ -62,7 +64,9 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // when
-        boardService.write(boardForm, boardImages, 1L);
+        Long uid = userRepository.findByEmail("ppusda@naver.com").get().getId();
+
+        boardService.write(boardForm, boardImages, uid);
 
         // then
         assertEquals(1L, boardRepository.count());
@@ -76,8 +80,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test2() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         Board bd = Board.builder()
@@ -102,8 +106,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test3() throws Exception {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         boardRepository.saveAll(List.of(
@@ -137,8 +141,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test4() throws Exception {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         List<Board> requestBoards = IntStream.range(0, 20)
@@ -170,8 +174,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test5() throws Exception {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         Board board = Board.builder()
@@ -187,7 +191,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                                 .build();
 
         // when
-        boardService.edit(board.getId(), boardEdit, userId);
+        boardService.edit(board.getId(), boardEdit, boardImages, userId);
 
         // then
         Board changedBoard = boardRepository.findById(board.getId())
@@ -200,8 +204,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test6() throws Exception {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         Board board = Board.builder()
@@ -218,7 +222,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // when
-        boardService.edit(board.getId(), boardEdit, userId);
+        boardService.edit(board.getId(), boardEdit, boardImages, userId);
 
         // then
         Board changedBoard = boardRepository.findById(board.getId())
@@ -232,8 +236,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test7() throws Exception {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         Board board = Board.builder()
@@ -273,8 +277,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test9() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         Board bd = Board.builder()
@@ -295,8 +299,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     void test10() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
-                .email("qwe")
-                .password("qwe")
+                .email("ppusda@naver.com")
+                .password("1234")
                 .build());
 
         Board bd = Board.builder()
@@ -313,7 +317,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         // then
         assertThrows(PostNotFound.class, () -> {
-            boardService.edit(bd.getId() + 1L, boardEdit, userId);
+            boardService.edit(bd.getId() + 1L, boardEdit, boardImages, userId);
         });
     }
 
