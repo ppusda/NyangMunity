@@ -30,6 +30,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
+    @Transactional
     public Long userLogin(UserForm userForm) {
         User user = userRepository.findByEmail(userForm.getEmail())
                 .orElseThrow(InvalidSigninInformation::new);
