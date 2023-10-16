@@ -11,6 +11,7 @@ public class AppConfig {
 
     public byte[] jwtKey; // .yml 파일 작성에 따라 다양하게 사용가능 String, List, Map, Object...
     public String imagePath;
+    public String domain;
 
     public void setJwtKey(String jwtKey) {
         this.jwtKey = Base64.getDecoder().decode(jwtKey);
@@ -26,6 +27,14 @@ public class AppConfig {
 
     public String getImagePath() {
         return imagePath;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public CommonsMultipartResolver multipartResolver() {

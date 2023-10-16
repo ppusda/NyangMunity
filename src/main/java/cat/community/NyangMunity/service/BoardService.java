@@ -15,22 +15,14 @@ import cat.community.NyangMunity.request.BoardSearch;
 import cat.community.NyangMunity.response.BoardImageResponse;
 import cat.community.NyangMunity.response.BoardResponse;
 import cat.community.NyangMunity.response.LikeBoardResponse;
-import cat.community.NyangMunity.service.util.BoardProvider;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -97,7 +89,7 @@ public class BoardService {
         Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
-        if(board.getUser().getId() == uid) {
+        if(board.getUser().getId().equals(uid)) {
             if(boardEdit.getRemoveList() != null && !boardEdit.getRemoveList().isEmpty()) {
                 for (Long id: boardEdit.getRemoveList()) {
                     boardImageRepository.deleteById(id);
@@ -126,7 +118,7 @@ public class BoardService {
         Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
-        if(board.getUser().getId() == uid) {
+        if(board.getUser().getId().equals(uid)) {
             log.error(">>> 권한이 없습니다.");
             boardRepository.delete(board);
         }else {
@@ -162,10 +154,11 @@ public class BoardService {
     }
 
     public LikeBoardResponse maxLikeBoard() {
-        List<BoardLike> maxBoardLike = boardLikeRepository.getMaxLikeBoard();
+        List<Tuple> maxBoardLike = boardLikeRepository.getMaxLikeBoard();
 
         if(!maxBoardLike.isEmpty()) {
-            Board board = maxBoardLike.get(0).getBoard();
+            Board board = boardRepository.findById((maxBoardLike.get(0).get(QBoardLike.boardLike.board.id)))
+                    .orElseThrow(EmptyMaxLikedBoardException::new);
 
             List<BoardImageResponse> boardImages = board.getBoardImages().stream()
                     .map(BoardImageResponse::new)
