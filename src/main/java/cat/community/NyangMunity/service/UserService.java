@@ -5,11 +5,13 @@ import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.domain.UserEditor;
 import cat.community.NyangMunity.exception.AlreadyExistsEmailException;
+import cat.community.NyangMunity.exception.InvalidRequest;
 import cat.community.NyangMunity.exception.InvalidSigninInformation;
 import cat.community.NyangMunity.exception.Unauthorized;
 import cat.community.NyangMunity.repository.TokenRepository;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
+import cat.community.NyangMunity.service.util.TokenRefresher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenRefresher tokenRefresher;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
     @Transactional
@@ -40,10 +42,10 @@ public class UserService {
         }
 
         if(!user.getTokens().isEmpty()) {
-            tokenRepository.deleteByUserId(user.getId());
+            tokenRefresher.removeRefreshToken(user);
         }
 
-        user.addToken(jwtTokenProvider.createRefreshToken(user.getId()));
+        tokenRefresher.addRefreshToken(user);
 
         return user.getId();
     }
@@ -78,9 +80,13 @@ public class UserService {
     }
 
     public User userInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(Unauthorized::new);
-        return user;
+        if(!userId.equals(0L)){
+            User user = userRepository.findById(userId)
+                    .orElseThrow(Unauthorized::new);
+            return user;
+        } else{
+            throw new InvalidRequest();
+        }
     }
 
     @Transactional
@@ -102,8 +108,13 @@ public class UserService {
         user.edit(userEditor);
     }
 
-    public void userCancel(Long uid) {
-        userRepository.deleteById(uid);
+    public void userCancel(Long userId) {
+        if(!userId.equals(0L)){
+            userRepository.deleteById(userId);
+        } else{
+            throw new InvalidRequest();
+        }
+
     }
 }
 
