@@ -32,6 +32,7 @@ const write = function (e: Event) {
       }else {
         alert("비정상적인 접근입니다.");
       }
+      router.replace({name: "home"});
     })
   } else {
     alert("제목은 필수 입력사항입니다.");

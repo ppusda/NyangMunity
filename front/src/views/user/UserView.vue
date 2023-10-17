@@ -63,12 +63,22 @@ const cancelUser = function () {
     } else {
       alert("비밀번호가 올바르지 않습니다.");
     }
+  }).catch(error => {
+    if(error.response) {
+      alert(error.response.data.message);
+      router.replace({name: "home"});
+    }
   });
 };
 
 onMounted(async () => {
     await axios.post("/nm/user/info", ).then(response => {
       user.value = response.data;
+    }).catch(error => {
+      if(error.response) {
+        alert(error.response.data.message);
+        router.replace({name: "home"});
+      }
     });
 });
 
