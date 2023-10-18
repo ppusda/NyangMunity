@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^1.2.0",
     "bootstrap": "^5.2.3",
+    "dotenv": "^16.3.1",
     "element-plus": "^2.2.25",
     "jquery-touch-events": "^1.0.7",
     "pinia": "^2.0.23",

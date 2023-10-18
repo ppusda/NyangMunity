@@ -12,14 +12,14 @@ interface Gif {
 }
 
 const gifs = ref<Gif[]>([]);
-const apikey = "AIzaSyBOopogP9plIccrEkvlnutu5M4-Ws6tnt0";
-const clientkey = "NyangMeme";
+const { VITE_APP_SECRET_KEY } = import.meta.env;
+const { VITE_APP_CLIENT_KEY } = import.meta.env;
 const limit = 15;
 let posKey: string[] = []
 let currentPage = -1;
 
 function getData(searchTerm: string, page: number): Promise<Gif[]> {
-  const search_url = `https://tenor.googleapis.com/v2/search?q=${searchTerm}&key=${apikey}&client_key=${clientkey}&limit=${limit}&pos=${posKey[page]}`;
+  const search_url = `https://tenor.googleapis.com/v2/search?q=${searchTerm}&key=${VITE_APP_SECRET_KEY}&client_key=${VITE_APP_CLIENT_KEY}&limit=${limit}&pos=${posKey[page]}`;
 
   return new Promise((resolve, reject) =>{
     const xmlHttp = new XMLHttpRequest();
