@@ -86,7 +86,7 @@ const imageUpload = () => {
 <template>
 
   <div class="container w-100 h-100 text-white text-center">
-    <form class="content_area">
+    <form class="content_area scroll">
       <div>
         <el-input v-model="title" placeholder="제목을 입력해주세요" />
       </div>
@@ -99,7 +99,7 @@ const imageUpload = () => {
         <input type="file" class="imgInput" name="imgInput" id="imgInput" accept="image/*" multiple>
       </div>
       <div class="mt-2">
-        <el-input v-model="content" type="textarea" rows="3"></el-input>
+        <el-input v-model="content" input-style="max-height: 200px" type="textarea" rows="3"></el-input>
       </div>
       <div class="mt-2">
         <a class="clButton btn btn-secondary text-white m-1" @click="$router.go(-1)">취소</a>
@@ -110,6 +110,14 @@ const imageUpload = () => {
 </template>
 
 <style>
+  .content_area {
+    top: 1.5%;
+    padding: 1vw;
+    width: 100%;
+    overflow-y: scroll;
+    max-height: 83vh;
+  }
+
   .btn-upload {
     width: 150px;
     height: 30px;
@@ -136,4 +144,9 @@ const imageUpload = () => {
     max-width: 4vw;
     max-height: 4vw;
   }
+
+  .scroll::-webkit-scrollbar {
+    display: none;
+  }
+
 </style>

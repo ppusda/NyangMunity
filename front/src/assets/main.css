@@ -5,4 +5,5 @@
     background: #333;
     padding: 5vw 15vw;
     border-radius: 15px;
+    overflow-y: unset;
 }

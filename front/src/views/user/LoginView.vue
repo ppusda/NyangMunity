@@ -28,7 +28,7 @@ const login = function () {
   <input value="true" type="text" name="loginState" id="loginState" hidden="true"/>
 
   <div class="container login_page w-100 h-100 text-white text-center">
-    <form class="content_area">
+    <form class="content_area d-flex justify-content-center">
       <table>
         <tr>
           <td class="w-25 me-2">ID :</td> <td class="w-auto"><el-input id="email" v-model="email" type="text"></el-input></td>
@@ -49,7 +49,7 @@ const login = function () {
           </td>
         </tr>
         <tr>
-          <td colspan="2" style="font-size: 2px">--------------- 처음이신가요? ---------------</td>
+          <td colspan="2" style="font-size: 1.5vh">--------------- 처음이신가요? ---------------</td>
         </tr>
         <tr>
           <td colspan="2"> <RouterLink to="/user/join">회원가입</RouterLink></td>

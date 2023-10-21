@@ -116,7 +116,7 @@ const removeImage = (id:any) => {
 <template>
 
   <div class="container w-100 h-100 text-white text-center">
-    <div class="content_area" method="post">
+    <div class="content_area scroll" method="post">
       <div>
         <el-input v-model="post.title"/>
       </div>
@@ -129,7 +129,7 @@ const removeImage = (id:any) => {
         <input type="file" class="imgInput" name="imgInput" id="imgInput" accept="image/*" multiple>
       </div>
       <div class="mt-2">
-        <el-input v-model="post.content" type="textarea" rows="3"></el-input>
+        <el-input v-model="post.content" input-style="max-height: 200px" type="textarea" rows="3"></el-input>
       </div>
       <hr>
       <div class="mt-2 d-inline-flex" id="imgDiv" v-for="boardImage in post.boardImages">
@@ -167,10 +167,22 @@ const removeImage = (id:any) => {
 </template>
 
 <style>
+.content_area {
+  top: 1.5%;
+  padding: 1vw;
+  width: 100%;
+  overflow-y: scroll;
+  max-height: 83vh;
+}
+
 .image-box {
   max-width: 4vw;
   max-height: 4vw;
   object-fit: cover;
   margin: 0.5vw;
 }
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
 </style>
