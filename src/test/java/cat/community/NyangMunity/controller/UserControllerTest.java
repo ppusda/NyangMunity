@@ -160,7 +160,6 @@ class UserControllerTest {
         mockMvc.perform(post("/nm/user/info")
                         .contentType(MediaType.APPLICATION_JSON)
                         .cookie(new Cookie("SESSION", tokens.get(0).getRefreshToken() + "-other"))
-                        .content("{SID:"+tokens.get(0).getRefreshToken() + "-other"+"}")
                 ).andExpect(status().isUnauthorized())
                 .andDo(print());
     }

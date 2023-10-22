@@ -1,12 +1,17 @@
 package cat.community.NyangMunity.controller;
 
+import cat.community.NyangMunity.config.CookieProvider;
 import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.domain.Board;
 import cat.community.NyangMunity.domain.BoardImage;
+import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.repository.BoardRepository;
+import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.BoardForm;
 import cat.community.NyangMunity.response.BoardEdit;
 import cat.community.NyangMunity.request.UserForm;
+import cat.community.NyangMunity.service.BoardService;
 import cat.community.NyangMunity.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -17,12 +22,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.servlet.http.Cookie;
 import javax.transaction.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,10 +59,22 @@ class BoardControllerTest {
     private BoardRepository boardRepository;
 
     @Autowired
+    private BoardService boardService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ScryptPasswordEncoder scryptPasswordEncoder;
+
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private CookieProvider cookieProvider;
 
     @BeforeEach // 각각의 테스트를 실행하기 전에 수행되는 메서드 (중요)
     void clean(){
@@ -252,7 +272,7 @@ class BoardControllerTest {
         // expected
         mockMvc.perform(patch("/nm/boards/{boardId}", board.getId()) // PATCH /nm/boards/{boardId}
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(boardEdit)+"{SID:"+token+"}")
+                        .content(objectMapper.writeValueAsString(boardEdit))
                         .cookie(new Cookie("SESSION", token))
                 ).andExpect(status().isOk())
                 .andDo(print());
@@ -280,7 +300,6 @@ class BoardControllerTest {
         //expected
         mockMvc.perform(delete("/nm/boards/{boardId}", board.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                        .content("{SID:"+token+"}")
                         .cookie(new Cookie("SESSION", token))
                 ).andExpect(status().isOk())
                 .andDo(print());
