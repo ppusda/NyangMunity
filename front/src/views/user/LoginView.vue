@@ -6,6 +6,9 @@ import router from "@/router";
 const email = ref("");
 const password = ref("");
 
+const { VITE_APP_KAKAO_CLIENT_KEY } = import.meta.env;
+const { VITE_APP_KAKAO_REDIRECT_URL } = import.meta.env;
+
 const login = function () {
   axios.post("/nm/user/login", {
     email: email.value,
@@ -43,7 +46,7 @@ const login = function () {
         </tr>
         <tr>
           <td colspan="2" class="w-auto">
-            <a class="clButton btn btn-warning pt-1 text-white" href="https://kauth.kakao.com/oauth/authorize?client_id=78effdc7d3e403e800af579ee0059fef&redirect_uri=http://localhost:8080/loginKakao&response_type=code">
+            <a class="clButton btn btn-warning pt-1 text-white" :href="`https://kauth.kakao.com/oauth/authorize?client_id=${VITE_APP_KAKAO_CLIENT_KEY}&redirect_uri=${VITE_APP_KAKAO_REDIRECT_URL}&response_type=code`">
               카카오 로그인
             </a>
           </td>

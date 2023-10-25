@@ -1,11 +1,13 @@
 package cat.community.NyangMunity.config;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.util.Base64;
 
+@Getter @Setter
 @ConfigurationProperties(prefix = "nyangmunity")
 public class AppConfig {
 
@@ -15,26 +17,6 @@ public class AppConfig {
 
     public void setJwtKey(String jwtKey) {
         this.jwtKey = Base64.getDecoder().decode(jwtKey);
-    }
-
-    public byte[] getJwtKey() {
-        return jwtKey;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
     public CommonsMultipartResolver multipartResolver() {
