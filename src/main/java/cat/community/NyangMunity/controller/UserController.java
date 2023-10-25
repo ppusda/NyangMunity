@@ -2,12 +2,15 @@ package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.config.CookieProvider;
 import cat.community.NyangMunity.config.JwtTokenProvider;
+import cat.community.NyangMunity.config.KakaoAuthProvider;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.request.UserSession;
+import cat.community.NyangMunity.response.KakaoTokenResponse;
 import cat.community.NyangMunity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
+    private final KakaoAuthProvider kakaoAuthProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieProvider cookieProvider;
 
@@ -79,8 +83,11 @@ public class UserController {
         userService.userLogout(session.id);
     }
 
-    @RequestMapping("/kakaoLogin")
-    public String loginKakao(){
-        return "/main";
+    @GetMapping("/kakaoLogin")
+    public void loginKakao(@RequestParam String code) throws JSONException {
+        KakaoTokenResponse tokenResponse = kakaoAuthProvider.getToken(code);
+        log.info(tokenResponse.getAccess_token());
+        log.info(tokenResponse.getRefresh_token());
     }
+
 }

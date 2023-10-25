@@ -32,10 +32,11 @@ public class KakaoAuthProvider {
     public KakaoTokenResponse getToken(String code) throws JSONException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Accept", "application/json");
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("client_id", clientKey);
-        params.add("secret_key", secretKey);
+        params.add("client_id", clientKey + " a");
+        params.add("client_secret", secretKey);
         params.add("redirect_uri", redirectUri);
         params.add("grant_type", grantType);
         params.add("code", code);
