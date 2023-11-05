@@ -1,6 +1,7 @@
 package cat.community.NyangMunity.service;
 
 import cat.community.NyangMunity.config.JwtTokenProvider;;
+import cat.community.NyangMunity.config.KakaoAuthProvider;
 import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.domain.UserEditor;
@@ -11,9 +12,11 @@ import cat.community.NyangMunity.exception.Unauthorized;
 import cat.community.NyangMunity.repository.TokenRepository;
 import cat.community.NyangMunity.repository.UserRepository;
 import cat.community.NyangMunity.request.UserForm;
+import cat.community.NyangMunity.response.KakaoTokenResponse;
 import cat.community.NyangMunity.service.util.TokenRefresher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -30,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final TokenRefresher tokenRefresher;
+    private final KakaoAuthProvider kakaoAuthProvider;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
     @Transactional
@@ -114,7 +118,14 @@ public class UserService {
         } else{
             throw new InvalidRequest();
         }
+    }
 
+    public void kakaoLogin(String code) {
+        KakaoTokenResponse tokenResponse = kakaoAuthProvider.getToken(code);
+        log.info(tokenResponse.getAccess_token());
+        log.info(tokenResponse.getRefresh_token());
+
+        log.info(kakaoAuthProvider.getUserInfo(tokenResponse.getAccess_token()).getKakaoAccount().toString());
     }
 }
 
