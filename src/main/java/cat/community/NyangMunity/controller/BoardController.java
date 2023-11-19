@@ -22,14 +22,14 @@ import java.util.ArrayList;
 
 @Slf4j
 @RestController
-@RequestMapping("/nm")
+@RequestMapping("/boards")
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
     private final BoardProvider boardProvider;
 
-    @PostMapping("/boards/write")
+    @PostMapping("/write")
     public void BoardWrite(@ModelAttribute BoardForm boardForm, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class BoardController {
 
     }
 
-    @GetMapping("/boards/{boardId}")
+    @GetMapping("/{boardId}")
     public BoardResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
         BoardResponse boardResponse = boardService.read(id);
         if(boardResponse.getUid() == userSession.id) {
@@ -58,7 +58,7 @@ public class BoardController {
         return boardResponse;
     }
 
-    @GetMapping("/boards")
+    @GetMapping
     public BoardResult readBoards(@ModelAttribute BoardSearch boardSearch){
         return BoardResult.builder()
                 .boardList(boardService.getList(boardSearch))
@@ -66,7 +66,7 @@ public class BoardController {
                 .build();
     }
 
-    @PatchMapping("/boards/{boardId}")
+    @PatchMapping("/{boardId}")
     public void editBoard(@PathVariable Long boardId, @ModelAttribute BoardEdit boardEdit, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
@@ -77,22 +77,22 @@ public class BoardController {
         boardService.edit(boardId, boardEdit, boardImages, userSession.id);
     }
 
-    @DeleteMapping("/boards/{boardId}")
+    @DeleteMapping("/{boardId}")
     public void delete(@PathVariable Long boardId, UserSession userSession) {
         boardService.delete(boardId, userSession.id);
     }
 
-    @PostMapping("/boards/like/{boardId}")
+    @PostMapping("/like/{boardId}")
     public void boardLike(@PathVariable(name = "boardId") Long bid, UserSession userSession){
         boardService.like(bid, userSession.id);
     }
 
-    @PostMapping("/boards/like/check/{boardId}")
+    @PostMapping("/like/check/{boardId}")
     public boolean boardLikeCheck(@PathVariable(name = "boardId") Long bid, UserSession userSession){
         return boardService.likeCheck(bid, userSession.id);
     }
 
-    @PostMapping("/boards/like")
+    @PostMapping("/like")
     public LikeBoardResponse maxLikeBoard() {
         return boardService.maxLikeBoard();
     }

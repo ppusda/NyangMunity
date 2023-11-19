@@ -2,14 +2,12 @@ package cat.community.NyangMunity.controller;
 
 import cat.community.NyangMunity.config.CookieProvider;
 import cat.community.NyangMunity.config.JwtTokenProvider;
-import cat.community.NyangMunity.config.KakaoAuthProvider;
 import cat.community.NyangMunity.domain.User;
 import cat.community.NyangMunity.request.UserForm;
 import cat.community.NyangMunity.request.UserSession;
 import cat.community.NyangMunity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +18,7 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
-@RequestMapping("/nm/user")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -29,12 +27,12 @@ public class UserController {
     private final CookieProvider cookieProvider;
 
     @PostMapping("/join")
-    private void userJoin(@RequestBody @Valid UserForm userForm) throws IOException {
+    private void userJoin(@RequestBody @Valid UserForm userForm) {
         userService.register(userForm);
     }
 
     @PostMapping("/login")
-    private ResponseEntity<Object> userLogin(@RequestBody @Valid UserForm userForm) throws IOException {
+    private ResponseEntity<Object> userLogin(@RequestBody @Valid UserForm userForm) {
         Long userId = userService.userLogin(userForm);
         ResponseCookie cookie = cookieProvider.createCookie(jwtTokenProvider.createAccessToken(userId));
 
