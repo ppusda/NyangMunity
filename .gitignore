@@ -40,3 +40,7 @@ out/
 ./front/.env
 /src/main/resources/application-secret.yml
 
+### Server Connect ###
+./ca.crt
+./ca.key
+
