@@ -36,4 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
-### Setting or Testing Files ###
+### Settings ###
+./front/.env
+/src/main/resources/application-secret.yml
+

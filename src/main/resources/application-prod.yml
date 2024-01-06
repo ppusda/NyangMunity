@@ -1,0 +1,20 @@
+spring:
+  config:
+    import: classpath:application-secret.yml
+  datasource:
+    url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${custom.prod-mysql-username}
+    password: ${custom.prod-mysql-password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart:
+      location: /home/ec2-user/nm/images/
+
+nyangmunity:
+  image-path: /home/ec2-user/nm/images/
+  domain: 52.79.200.204
+
+kakao:
+  redirect-uri: "http://52.79.200.204/nm/user/kakaoLogin"
