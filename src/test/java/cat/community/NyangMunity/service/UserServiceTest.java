@@ -1,11 +1,12 @@
 package cat.community.NyangMunity.service;
 
-import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
-import cat.community.NyangMunity.domain.User;
-import cat.community.NyangMunity.exception.AlreadyExistsEmailException;
-import cat.community.NyangMunity.exception.InvalidSigninInformation;
-import cat.community.NyangMunity.repository.UserRepository;
-import cat.community.NyangMunity.request.UserForm;
+import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
+import cat.community.NyangMunity.user.entity.User;
+import cat.community.NyangMunity.global.exception.AlreadyExistsEmailException;
+import cat.community.NyangMunity.global.exception.InvalidSigninInformation;
+import cat.community.NyangMunity.user.repository.UserRepository;
+import cat.community.NyangMunity.user.request.UserForm;
+import cat.community.NyangMunity.user.service.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

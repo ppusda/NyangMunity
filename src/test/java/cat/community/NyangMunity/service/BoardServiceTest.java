@@ -1,15 +1,17 @@
 package cat.community.NyangMunity.service;
 
-import cat.community.NyangMunity.repository.UserRepository;
-import cat.community.NyangMunity.request.BoardForm;
-import cat.community.NyangMunity.domain.Board;
-import cat.community.NyangMunity.domain.BoardImage;
-import cat.community.NyangMunity.exception.PostNotFound;
-import cat.community.NyangMunity.repository.BoardRepository;
-import cat.community.NyangMunity.response.BoardEdit;
-import cat.community.NyangMunity.request.BoardSearch;
-import cat.community.NyangMunity.request.UserForm;
-import cat.community.NyangMunity.response.BoardResponse;
+import cat.community.NyangMunity.board.service.BoardService;
+import cat.community.NyangMunity.user.repository.UserRepository;
+import cat.community.NyangMunity.board.request.BoardForm;
+import cat.community.NyangMunity.board.entity.Board;
+import cat.community.NyangMunity.board.entity.BoardImage;
+import cat.community.NyangMunity.global.exception.PostNotFound;
+import cat.community.NyangMunity.board.repository.BoardRepository;
+import cat.community.NyangMunity.board.response.BoardEdit;
+import cat.community.NyangMunity.board.request.BoardSearch;
+import cat.community.NyangMunity.user.request.UserForm;
+import cat.community.NyangMunity.board.response.BoardResponse;
+import cat.community.NyangMunity.user.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

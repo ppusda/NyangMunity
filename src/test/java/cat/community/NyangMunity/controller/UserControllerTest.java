@@ -1,13 +1,13 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.config.JwtTokenProvider;
-import cat.community.NyangMunity.crypto.ScryptPasswordEncoder;
-import cat.community.NyangMunity.domain.Token;
-import cat.community.NyangMunity.domain.User;
-import cat.community.NyangMunity.repository.TokenRepository;
-import cat.community.NyangMunity.repository.UserRepository;
-import cat.community.NyangMunity.request.UserForm;
-import cat.community.NyangMunity.service.UserService;
+import cat.community.NyangMunity.global.config.JwtTokenProvider;
+import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
+import cat.community.NyangMunity.token.entity.Token;
+import cat.community.NyangMunity.user.entity.User;
+import cat.community.NyangMunity.token.repository.TokenRepository;
+import cat.community.NyangMunity.user.repository.UserRepository;
+import cat.community.NyangMunity.user.request.UserForm;
+import cat.community.NyangMunity.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

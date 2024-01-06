@@ -2,6 +2,10 @@ package cat.community.NyangMunity.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import cat.community.NyangMunity.board.entity.Board;
+import cat.community.NyangMunity.board.entity.BoardLike;
+import cat.community.NyangMunity.user.entity.User;
+import cat.community.NyangMunity.token.entity.Token;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

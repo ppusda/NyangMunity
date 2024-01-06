@@ -1,7 +1,7 @@
 package cat.community.NyangMunity;
 
-import cat.community.NyangMunity.config.AppConfig;
-import cat.community.NyangMunity.config.KakaoAuthProvider;
+import cat.community.NyangMunity.global.config.AppConfig;
+import cat.community.NyangMunity.global.config.KakaoAuthProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
