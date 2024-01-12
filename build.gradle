@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.5.9'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
 
 	/**
 	 * AsciiDoctor
@@ -11,7 +11,10 @@ plugins {
 
 group = 'cat.community'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+
+java {
+	sourceCompatibility = '17'
+}
 
 configurations {
 	compileOnly {
@@ -60,11 +63,13 @@ dependencies {
 	compileOnly 'javax.mail:mail:1.4.7'
 
 	/**
-	 * JPA, MYSQL, QUERYDSL
+	 * MYSQL
 	 **/
-	implementation 'mysql:mysql-connector-java'
-	runtimeOnly 'mysql:mysql-connector-java'
+	implementation 'mysql:mysql-connector-java:8.0.26'
 
+	/**
+	 * JPA, QUERYDSL
+	 **/
 	implementation 'com.querydsl:querydsl-core'
 	implementation 'com.querydsl:querydsl-jpa'
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
