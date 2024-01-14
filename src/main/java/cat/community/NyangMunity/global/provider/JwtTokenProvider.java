@@ -1,5 +1,6 @@
-package cat.community.NyangMunity.global.config;
+package cat.community.NyangMunity.global.provider;
 
+import cat.community.NyangMunity.global.config.AppConfig;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;

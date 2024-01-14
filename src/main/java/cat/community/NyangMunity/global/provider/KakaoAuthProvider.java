@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.global.config;
+package cat.community.NyangMunity.global.provider;
 
 import cat.community.NyangMunity.user.response.KakaoTokenResponse;
 import cat.community.NyangMunity.user.response.KakaoUserResponse;
@@ -16,8 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-@Component @Getter @Setter
-@Slf4j
+@Getter @Setter
 @ConfigurationProperties(prefix = "kakao")
 public class KakaoAuthProvider {
 

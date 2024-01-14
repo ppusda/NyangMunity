@@ -1,5 +1,6 @@
-package cat.community.NyangMunity.global.config;
+package cat.community.NyangMunity.global.provider;
 
+import cat.community.NyangMunity.global.config.AppConfig;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
