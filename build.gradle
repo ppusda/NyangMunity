@@ -68,13 +68,12 @@ dependencies {
 	implementation 'mysql:mysql-connector-java:8.0.26'
 
 	/**
-	 * JPA, QUERYDSL
+	 * QueryDSL
 	 **/
-	implementation 'com.querydsl:querydsl-core'
-	implementation 'com.querydsl:querydsl-jpa'
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	/**
 	 * AsciiDOC - SpringRESTDOC
@@ -92,7 +91,7 @@ dependencies {
 	/**
 	 * GSON
 	 **/
-	implementation 'com.google.code.gson:gson:2.8.7'
+	implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 ext {
