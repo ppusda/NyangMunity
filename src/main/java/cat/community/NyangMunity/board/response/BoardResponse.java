@@ -16,11 +16,9 @@ public class BoardResponse {
     private final String content;
     private final List<BoardImageResponse> boardImages;
     private final LocalDateTime createDate;
-
     private final Long uid;
     private final String writer;
-
-    private boolean writerCheck = false;
+    private final Boolean writerCheck;
 
     public BoardResponse(Board board) {
         this.id = board.getId();
@@ -32,10 +30,12 @@ public class BoardResponse {
         this.createDate = board.getCreateDate();
         this.uid = board.getUser().getId();
         this.writer = board.getUser().getNickname();
+        this.writerCheck = false;
     } // 무한루프로 인한 BoardDTO 내에서 BoardImageDTO 설정
 
     @Builder
-    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages, LocalDateTime createDate, Long uid, String writer) {
+    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages,
+            LocalDateTime createDate, Long uid, String writer, Boolean writerCheck) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -43,9 +43,6 @@ public class BoardResponse {
         this.createDate = createDate;
         this.uid = uid;
         this.writer = writer;
-    }
-
-    public void setWriterCheck(boolean writerCheck) {
         this.writerCheck = writerCheck;
     }
 }

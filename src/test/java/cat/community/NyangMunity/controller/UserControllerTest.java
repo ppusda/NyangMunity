@@ -1,6 +1,6 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.global.config.JwtTokenProvider;
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.token.entity.Token;
 import cat.community.NyangMunity.user.entity.User;

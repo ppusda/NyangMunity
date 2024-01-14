@@ -1,12 +1,11 @@
 package cat.community.NyangMunity.token.util;
 
-import cat.community.NyangMunity.global.config.JwtTokenProvider;
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.token.repository.TokenRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import javax.transaction.Transactional;
 
 @Component
 @RequiredArgsConstructor

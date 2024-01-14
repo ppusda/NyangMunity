@@ -2,15 +2,12 @@ package cat.community.NyangMunity.board.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-@Getter
-@Setter
-@Builder
-public class BoardSearch {
+@Getter @Builder
+public class BoardListRequest {
 
     private static final Integer MAX_SIZE = 2000;
 
@@ -20,7 +17,7 @@ public class BoardSearch {
     @Builder.Default
     private Integer size = 10;
 
-    public BoardSearch(Integer page, Integer size) {
+    public BoardListRequest(Integer page, Integer size) {
         this.page = page;
         this.size = size;
     }

@@ -2,13 +2,13 @@ package cat.community.NyangMunity.service;
 
 import cat.community.NyangMunity.board.service.BoardService;
 import cat.community.NyangMunity.user.repository.UserRepository;
-import cat.community.NyangMunity.board.request.BoardForm;
+import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.board.entity.Board;
 import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.global.exception.PostNotFound;
 import cat.community.NyangMunity.board.repository.BoardRepository;
-import cat.community.NyangMunity.board.response.BoardEdit;
-import cat.community.NyangMunity.board.request.BoardSearch;
+import cat.community.NyangMunity.board.request.BoardEditRequest;
+import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.board.response.BoardResponse;
 import cat.community.NyangMunity.user.service.UserService;
@@ -60,7 +60,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
     @DisplayName("글 작성")
     void test1(){
         // given
-        BoardForm boardForm = BoardForm.builder()
+        BoardFormRequest boardFormRequest = BoardFormRequest.builder()
                 .title("제목입니다.")
                 .content("내용입니다.")
                 .build();
@@ -68,7 +68,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
         // when
         Long uid = userRepository.findByEmail("ppusda@naver.com").get().getId();
 
-        boardService.write(boardForm, boardImages, uid);
+        boardService.write(boardFormRequest, boardImages, uid);
 
         // then
         assertEquals(1L, boardRepository.count());
@@ -127,12 +127,12 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                         .build()
         )); // 한번에 저장
 
-        BoardSearch boardSearch = BoardSearch.builder()
+        BoardListRequest boardListRequest = BoardListRequest.builder()
                 .page(1)
                 .build();
 
         // when
-        List<BoardResponse> boardList = boardService.getList(boardSearch);
+        List<BoardResponse> boardList = boardService.getList(boardListRequest);
 
         // then
         assertEquals(2L, boardList.size());
@@ -158,13 +158,13 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         boardRepository.saveAll(requestBoards); // 한번에 저장
 
-        BoardSearch boardSearch = BoardSearch.builder()
+        BoardListRequest boardListRequest = BoardListRequest.builder()
                 .page(1)
                 .size(10)
                 .build();
 
         // when
-        List<BoardResponse> boardList = boardService.getList(boardSearch);
+        List<BoardResponse> boardList = boardService.getList(boardListRequest);
 
         // then
         assertEquals(10L, boardList.size());
@@ -188,12 +188,12 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         boardRepository.save(board); // 한번에 저장
 
-        BoardEdit boardEdit = BoardEdit.builder()
+        BoardEditRequest boardEditRequest = BoardEditRequest.builder()
                                 .title("제목: 빵국이")
                                 .build();
 
         // when
-        boardService.edit(board.getId(), boardEdit, boardImages, userId);
+        boardService.edit(board.getId(), boardEditRequest, boardImages, userId);
 
         // then
         Board changedBoard = boardRepository.findById(board.getId())
@@ -218,13 +218,13 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
         boardRepository.save(board); // 한번에 저장
 
-        BoardEdit boardEdit = BoardEdit.builder()
+        BoardEditRequest boardEditRequest = BoardEditRequest.builder()
                 .title(null) // null 값 처리 시에는 Builder 클래스를 새로 생성하여 만들면 된다.
                 .content("빵국이 내용")
                 .build();
 
         // when
-        boardService.edit(board.getId(), boardEdit, boardImages, userId);
+        boardService.edit(board.getId(), boardEditRequest, boardImages, userId);
 
         // then
         Board changedBoard = boardRepository.findById(board.getId())
@@ -312,14 +312,14 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
         boardRepository.save(bd);
 
-        BoardEdit boardEdit = BoardEdit.builder()
+        BoardEditRequest boardEditRequest = BoardEditRequest.builder()
                 .title(null)
                 .content("빵국이 내용")
                 .build();
 
         // then
         assertThrows(PostNotFound.class, () -> {
-            boardService.edit(bd.getId() + 1L, boardEdit, boardImages, userId);
+            boardService.edit(bd.getId() + 1L, boardEditRequest, boardImages, userId);
         });
     }
 

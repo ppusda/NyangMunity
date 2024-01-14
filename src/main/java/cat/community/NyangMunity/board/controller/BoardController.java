@@ -3,15 +3,16 @@ package cat.community.NyangMunity.board.controller;
 import cat.community.NyangMunity.global.exception.EmptyInputValueException;
 import cat.community.NyangMunity.global.exception.InvalidRequest;
 import cat.community.NyangMunity.user.request.UserSession;
-import cat.community.NyangMunity.board.request.BoardForm;
+import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.board.entity.BoardImage;
-import cat.community.NyangMunity.board.response.BoardEdit;
-import cat.community.NyangMunity.board.request.BoardSearch;
+import cat.community.NyangMunity.board.request.BoardEditRequest;
+import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.board.response.BoardResponse;
-import cat.community.NyangMunity.board.response.BoardResult;
+import cat.community.NyangMunity.board.response.BoardListResponse;
 import cat.community.NyangMunity.board.response.LikeBoardResponse;
 import cat.community.NyangMunity.board.service.BoardService;
 import cat.community.NyangMunity.board.util.BoardProvider;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -30,19 +31,19 @@ public class BoardController {
     private final BoardProvider boardProvider;
 
     @PostMapping("/write")
-    public void BoardWrite(@ModelAttribute BoardForm boardForm, UserSession userSession) throws IOException {
+    public void writeBoard(@ModelAttribute @Valid BoardFormRequest boardFormRequest, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
-        if(boardForm.getBoardImages() != null){
-            boardImages = boardProvider.getImageList(boardForm.getBoardImages());
+        if(boardFormRequest.boardImages() != null){
+            boardImages = boardProvider.getImageList(boardFormRequest.boardImages());
         }
 
-        if(boardForm.getTitle().isEmpty()){
+        if(boardFormRequest.title().isEmpty()){
             throw new EmptyInputValueException();
         }
 
         try {
-            boardService.write(boardForm, boardImages, userSession.id);
+            boardService.write(boardFormRequest, boardImages, userSession.id);
         } catch (Exception e) {
             throw new InvalidRequest();
         }
@@ -51,34 +52,31 @@ public class BoardController {
 
     @GetMapping("/{boardId}")
     public BoardResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
-        BoardResponse boardResponse = boardService.read(id);
-        if(boardResponse.getUid() == userSession.id) {
-            boardResponse.setWriterCheck(true);
-        }
+        BoardResponse boardResponse = boardService.read(id, userSession.id);
         return boardResponse;
     }
 
     @GetMapping
-    public BoardResult readBoards(@ModelAttribute BoardSearch boardSearch){
-        return BoardResult.builder()
-                .boardList(boardService.getList(boardSearch))
+    public BoardListResponse readBoards(@ModelAttribute BoardListRequest boardListRequest){
+        return BoardListResponse.builder()
+                .boardList(boardService.getList(boardListRequest))
                 .totalCnt(boardService.getCount())
                 .build();
     }
 
     @PatchMapping("/{boardId}")
-    public void editBoard(@PathVariable Long boardId, @ModelAttribute BoardEdit boardEdit, UserSession userSession) throws IOException {
+    public void editBoard(@PathVariable Long boardId, @ModelAttribute @Valid BoardEditRequest boardEditRequest, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
-        if(boardEdit.getBoardImages() != null){
-            boardImages = boardProvider.getImageList(boardEdit.getBoardImages());
+        if(boardEditRequest.boardImages() != null){
+            boardImages = boardProvider.getImageList(boardEditRequest.boardImages());
         }
 
-        boardService.edit(boardId, boardEdit, boardImages, userSession.id);
+        boardService.edit(boardId, boardEditRequest, boardImages, userSession.id);
     }
 
     @DeleteMapping("/{boardId}")
-    public void delete(@PathVariable Long boardId, UserSession userSession) {
+    public void deleteBoard(@PathVariable Long boardId, UserSession userSession) {
         boardService.delete(boardId, userSession.id);
     }
 

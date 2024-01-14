@@ -4,27 +4,27 @@ import cat.community.NyangMunity.board.editor.BoardEditor;
 import cat.community.NyangMunity.board.entity.Board;
 import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.board.entity.BoardLike;
-import cat.community.NyangMunity.domain.*;
+import cat.community.NyangMunity.board.entity.QBoardLike;
 import cat.community.NyangMunity.global.exception.EmptyMaxLikedBoardException;
 import cat.community.NyangMunity.global.exception.Unauthorized;
 import cat.community.NyangMunity.board.repository.BoardImageRepository;
 import cat.community.NyangMunity.board.repository.BoardLikeRepository;
 import cat.community.NyangMunity.user.repository.UserRepository;
-import cat.community.NyangMunity.board.request.BoardForm;
+import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.global.exception.PostNotFound;
 import cat.community.NyangMunity.board.repository.BoardRepository;
-import cat.community.NyangMunity.board.response.BoardEdit;
-import cat.community.NyangMunity.board.request.BoardSearch;
+import cat.community.NyangMunity.board.request.BoardEditRequest;
+import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.board.response.BoardImageResponse;
 import cat.community.NyangMunity.board.response.BoardResponse;
 import cat.community.NyangMunity.board.response.LikeBoardResponse;
 import cat.community.NyangMunity.user.entity.User;
 import com.querydsl.core.Tuple;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,10 +39,10 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final BoardImageRepository boardImageRepository;
 
-    public void write(BoardForm boardForm, ArrayList<BoardImage> boardImages, Long uid){
+    public void write(BoardFormRequest boardFormRequest, ArrayList<BoardImage> boardImages, Long uid){
         Board board = Board.builder()
-                .title(boardForm.getTitle())
-                .content(boardForm.getContent())
+                .title(boardFormRequest.title())
+                .content(boardFormRequest.content())
                 .user(userRepository.findById(uid).get())
                 .boardImages(boardImages)
                 .createDate(LocalDateTime.now())
@@ -56,7 +56,7 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    public BoardResponse read(Long bid) {
+    public BoardResponse read(Long bid, Long uid) {
         // Optional<Board> board = boardRepository.findById(id); // Optional로 Null 체크해도 됨
         Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
@@ -73,6 +73,7 @@ public class BoardService {
                 .createDate(board.getCreateDate())
                 .uid(board.getUser().getId())
                 .writer(board.getUser().getNickname())
+                .writerCheck(isWriter(board.getUser().getId(), uid))
                 .build();
     }
 
@@ -80,8 +81,8 @@ public class BoardService {
         return boardRepository.count();
     }
 
-    public List<BoardResponse> getList(BoardSearch boardSearch) {
-        return boardRepository.getList(boardSearch).stream()
+    public List<BoardResponse> getList(BoardListRequest boardListRequest) {
+        return boardRepository.getList(boardListRequest).stream()
                 .map(BoardResponse::new)
                 .collect(Collectors.toList());
     }
@@ -89,13 +90,13 @@ public class BoardService {
     // 위처럼 설정 시 5개를 자동으로 얻어와준다
 
     @Transactional
-    public void edit(Long bid, BoardEdit boardEdit, ArrayList<BoardImage> boardImages, Long uid) {
+    public void edit(Long bid, BoardEditRequest boardEditRequest, ArrayList<BoardImage> boardImages, Long uid) {
         Board board = boardRepository.findById(bid)
                 .orElseThrow(PostNotFound::new);
 
         if(board.getUser().getId().equals(uid)) {
-            if(boardEdit.getRemoveList() != null && !boardEdit.getRemoveList().isEmpty()) {
-                for (Long id: boardEdit.getRemoveList()) {
+            if(boardEditRequest.removeList() != null && !boardEditRequest.removeList().isEmpty()) {
+                for (Long id: boardEditRequest.removeList()) {
                     boardImageRepository.deleteById(id);
                 }
             }
@@ -107,8 +108,8 @@ public class BoardService {
 
             BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
             BoardEditor boardEditor = boardEditorBuilder
-                    .title(boardEdit.getTitle())
-                    .content(boardEdit.getContent())
+                    .title(boardEditRequest.title())
+                    .content(boardEditRequest.content())
                     .build();
             board.edit(boardEditor); // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
         }else {
@@ -176,6 +177,10 @@ public class BoardService {
         }else {
             throw new EmptyMaxLikedBoardException();
         }
+    }
+
+    private boolean isWriter(Long writerId, Long userId) {
+        return Objects.equals(writerId, userId);
     }
 
 }

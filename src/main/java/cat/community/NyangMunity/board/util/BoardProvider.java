@@ -3,11 +3,11 @@ package cat.community.NyangMunity.board.util;
 import cat.community.NyangMunity.global.config.AppConfig;
 import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.global.exception.InvalidFileTypeException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

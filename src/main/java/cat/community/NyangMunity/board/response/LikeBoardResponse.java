@@ -29,4 +29,3 @@ public class LikeBoardResponse {
         this.nickName = nickName;
     }
 }
-// 서비스 정책에 맞는 클래스

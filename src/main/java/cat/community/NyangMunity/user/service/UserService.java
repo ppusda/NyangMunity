@@ -1,7 +1,6 @@
 package cat.community.NyangMunity.user.service;
 
-;
-import cat.community.NyangMunity.global.config.KakaoAuthProvider;
+import cat.community.NyangMunity.global.provider.KakaoAuthProvider;
 import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.user.editor.UserEditor;
@@ -14,11 +13,11 @@ import cat.community.NyangMunity.user.repository.UserRepository;
 import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.user.response.KakaoTokenResponse;
 import cat.community.NyangMunity.token.util.TokenRefresher;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

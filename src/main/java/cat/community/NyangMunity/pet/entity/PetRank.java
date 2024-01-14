@@ -1,6 +1,5 @@
 package cat.community.NyangMunity.pet.entity;
 
-import javax.persistence.*;
 
 //@Entity @Table(name = "PET_RANK")
 //public class PetRank {
