@@ -20,6 +20,7 @@ public class BoardResponse {
     private final String writer;
     private final Boolean writerCheck;
 
+    @Builder
     public BoardResponse(Board board) {
         this.id = board.getId();
         this.title = board.getTitle();
@@ -32,18 +33,5 @@ public class BoardResponse {
         this.writer = board.getUser().getNickname();
         this.writerCheck = false;
     } // 무한루프로 인한 BoardDTO 내에서 BoardImageDTO 설정
-
-    @Builder
-    public BoardResponse(Long id, String title, String content, List<BoardImageResponse> boardImages,
-            LocalDateTime createDate, Long uid, String writer, Boolean writerCheck) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.boardImages = boardImages;
-        this.createDate = createDate;
-        this.uid = uid;
-        this.writer = writer;
-        this.writerCheck = writerCheck;
-    }
 }
 // 서비스 정책에 맞는 클래스

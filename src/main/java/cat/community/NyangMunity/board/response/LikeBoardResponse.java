@@ -14,6 +14,7 @@ public class LikeBoardResponse {
     private final List<BoardImageResponse> boardImages;
     private final String nickName;
 
+    @Builder
     public LikeBoardResponse(Board board) {
         this.bid = board.getId();
         this.boardImages = board.getBoardImages().stream()
@@ -22,10 +23,4 @@ public class LikeBoardResponse {
         this.nickName = board.getUser().getNickname();
     }
 
-    @Builder
-    public LikeBoardResponse(Long bid, List<BoardImageResponse> boardImages, String nickName) {
-        this.bid = bid;
-        this.boardImages = boardImages;
-        this.nickName = nickName;
-    }
 }
