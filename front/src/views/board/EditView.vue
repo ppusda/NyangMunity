@@ -72,7 +72,7 @@ const imageUpload = () => {
     fileDOM?.addEventListener("change", () => {
       const preview = document.getElementById("previewDiv");
       const extension = fileDOM.value.substring(fileDOM.value.lastIndexOf(".")+1, fileDOM.value.length).toLowerCase();
-      if(extension != "jpg" && extension != "png" &&  extension != "gif" &&  extension != "bmp" && extension != "JPEG") {
+      if(extension != "jpg" && extension != "png" &&  extension != "gif" &&  extension != "bmp" && extension != "jpeg" && extension != "JPEG") {
         preview!.innerHTML = '';
         fileDOM!.value = '';
         alert("지원되지 않는 확장자입니다.");

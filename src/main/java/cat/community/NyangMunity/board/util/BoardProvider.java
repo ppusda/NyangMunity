@@ -22,7 +22,7 @@ import java.util.Locale;
 public class BoardProvider {
 
     private String imagePath;
-    private String[] extensions = {"jpg", "png", "gif", "bmp", "svg", "jfif", "ico"};
+    private String[] extensions = {"jpg", "png", "gif", "bmp", "svg", "jfif", "ico", "jpeg", "JPEG"};
 
     public BoardProvider(AppConfig appConfig) {
         this.imagePath = appConfig.getImagePath();
