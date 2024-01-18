@@ -1,6 +1,6 @@
 package cat.community.NyangMunity.board.repository;
 
-import cat.community.NyangMunity.domain.QBoardLike;
+import cat.community.NyangMunity.board.entity.QBoardLike;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
