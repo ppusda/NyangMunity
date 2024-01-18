@@ -95,9 +95,4 @@ public class BoardController {
         return boardService.maxLikeBoard();
     }
 
-//    @GetMapping("/write/{boardId}/rss")
-//    public Board getRss(@PathVariable(name = "boardId") Long id) {
-//        Board board = boardService.getId();
-//        return board;
-//    }
 }
