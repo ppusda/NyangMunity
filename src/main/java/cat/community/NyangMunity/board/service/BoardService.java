@@ -5,24 +5,28 @@ import cat.community.NyangMunity.board.entity.Board;
 import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.board.entity.BoardLike;
 import cat.community.NyangMunity.board.entity.QBoardLike;
+import cat.community.NyangMunity.board.response.BoardDetailResponse;
 import cat.community.NyangMunity.global.exception.EmptyMaxLikedBoardException;
 import cat.community.NyangMunity.global.exception.Unauthorized;
 import cat.community.NyangMunity.board.repository.BoardImageRepository;
 import cat.community.NyangMunity.board.repository.BoardLikeRepository;
 import cat.community.NyangMunity.user.repository.UserRepository;
 import cat.community.NyangMunity.board.request.BoardFormRequest;
-import cat.community.NyangMunity.global.exception.PostNotFound;
+import cat.community.NyangMunity.global.exception.BoardNotFoundException;
 import cat.community.NyangMunity.board.repository.BoardRepository;
 import cat.community.NyangMunity.board.request.BoardEditRequest;
-import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.board.response.BoardImageResponse;
 import cat.community.NyangMunity.board.response.BoardResponse;
 import cat.community.NyangMunity.board.response.LikeBoardResponse;
 import cat.community.NyangMunity.user.entity.User;
 import com.querydsl.core.Tuple;
+import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,16 +38,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
 
-    private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardImageRepository boardImageRepository;
 
-    public void write(BoardFormRequest boardFormRequest, ArrayList<BoardImage> boardImages, Long uid){
+    public Board getBoard(Long bid) {
+        return boardRepository.findById(bid).orElseThrow(BoardNotFoundException::new);
+    }
+
+    public void write(BoardFormRequest boardFormRequest, ArrayList<BoardImage> boardImages, User user){
         Board board = Board.builder()
                 .title(boardFormRequest.title())
                 .content(boardFormRequest.content())
-                .user(userRepository.findById(uid).get())
+                .user(user)
                 .boardImages(boardImages)
                 .createDate(LocalDateTime.now())
                 .build();
@@ -56,127 +63,99 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    public BoardResponse read(Long bid, Long uid) {
-        // Optional<Board> board = boardRepository.findById(id); // Optional로 Null 체크해도 됨
-        Board board = boardRepository.findById(bid)
-                .orElseThrow(PostNotFound::new);
+    public BoardDetailResponse read(Long bid, Long uid) {
+        Board board = getBoard(bid);
 
-        List<BoardImageResponse> boardImages = board.getBoardImages().stream()
-                                                    .map(BoardImageResponse::new)
-                                                    .collect(Collectors.toList());
-
-        return BoardResponse.builder()
-                .id(board.getId())
-                .title(board.getTitle())
-                .content(board.getContent())
-                .boardImages(boardImages)
-                .createDate(board.getCreateDate())
-                .uid(board.getUser().getId())
-                .writer(board.getUser().getNickname())
-                .writerCheck(isWriter(board.getUser().getId(), uid))
+        return BoardDetailResponse.builder()
+                .boardResponse(BoardResponse.from(board, convertToBoardImageResponse(board)))
+                .isWriter(isWriter(board.getUser().getId(), uid))
                 .build();
     }
 
-    public Long getCount() {
-        return boardRepository.count();
-    }
+    public Page<BoardResponse> getList(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> boards = boardRepository.findAllByOrderByCreateDateDesc(pageable);
 
-    public List<BoardResponse> getList(BoardListRequest boardListRequest) {
-        return boardRepository.getList(boardListRequest).stream()
-                .map(BoardResponse::new)
-                .collect(Collectors.toList());
+        return convertToBoardResponse(boards);
     }
-    // pagable 객체 이용
-    // 위처럼 설정 시 5개를 자동으로 얻어와준다
 
     @Transactional
     public void edit(Long bid, BoardEditRequest boardEditRequest, ArrayList<BoardImage> boardImages, Long uid) {
-        Board board = boardRepository.findById(bid)
-                .orElseThrow(PostNotFound::new);
+        Board board = getBoard(bid);
 
-        if(board.getUser().getId().equals(uid)) {
-            if(boardEditRequest.removeList() != null && !boardEditRequest.removeList().isEmpty()) {
-                for (Long id: boardEditRequest.removeList()) {
-                    boardImageRepository.deleteById(id);
-                }
-            }
-
-            for (BoardImage boardImage: boardImages) {
-                board.setBoardImages(boardImage);
-            }
-            boardRepository.save(board);
-
-            BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
-            BoardEditor boardEditor = boardEditorBuilder
-                    .title(boardEditRequest.title())
-                    .content(boardEditRequest.content())
-                    .build();
-            board.edit(boardEditor); // editor를 이용한 방식 (어렵다면 기존 방식을 사용해도 됨. 그냥 setter 처럼 이용)
-        }else {
-            log.error(">>> 권한이 없습니다.");
+        if (!board.getUser().getId().equals(uid)) {
             throw new Unauthorized();
         }
+
+        if(boardEditRequest.removeList() != null && !boardEditRequest.removeList().isEmpty()) {
+            for (Long id: boardEditRequest.removeList()) {
+                boardImageRepository.deleteById(id);
+            }
+        }
+
+        for (BoardImage boardImage: boardImages) {
+            board.setBoardImages(boardImage);
+        }
+        boardRepository.save(board);
+
+        BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
+        BoardEditor boardEditor = boardEditorBuilder
+                .title(boardEditRequest.title())
+                .content(boardEditRequest.content())
+                .build();
+
+        board.edit(boardEditor);
     }
 
     @Transactional
     public void delete(Long bid, Long uid) {
-        Board board = boardRepository.findById(bid)
-                .orElseThrow(PostNotFound::new);
+        Board board = getBoard(bid);
 
-        if(board.getUser().getId().equals(uid)) {
-            log.error(">>> 권한이 없습니다.");
-            boardRepository.delete(board);
-        }else {
+        if (!board.getUser().getId().equals(uid)) {
             throw new Unauthorized();
         }
+
+        boardRepository.delete(board);
     }
 
-    public void like(Long bid, Long uid) {
-        if(likeCheck(bid, uid)) {
-            boardLikeRepository.deleteByBoardIdAndUserId(bid, uid);
-        }else {
-            Board board = boardRepository.findById(bid)
-                    .orElseThrow(PostNotFound::new);
-
-            User user = userRepository.findById(uid)
-                    .orElseThrow(PostNotFound::new);
-
-            BoardLike boardLike = BoardLike.builder()
-                    .board(board)
-                    .user(user)
-                    .build();
-
-            boardLikeRepository.save(boardLike);
+    public void like(Long bid, User user) {
+        if(likeCheck(bid, user.getId())) {
+            boardLikeRepository.deleteByBoardIdAndUserId(bid, user.getId());
+            return;
         }
+
+        Board board = getBoard(bid);
+
+        BoardLike boardLike = BoardLike.builder()
+                .board(board)
+                .user(user)
+                .build();
+
+        boardLikeRepository.save(boardLike);
     }
 
     public boolean likeCheck(Long bid, Long uid) {
-        if(boardLikeRepository.findByBoardIdAndUserId(bid, uid).isPresent()) {
-            return true;
-        }else {
-            return false;
-        }
+        return boardLikeRepository.findByBoardIdAndUserId(bid, uid).isPresent();
     }
 
     public LikeBoardResponse maxLikeBoard() {
-        List<Tuple> maxBoardLike = boardLikeRepository.getMaxLikeBoard();
+        Board maxLikeBoard = boardLikeRepository.getMaxLikeBoard();
 
-        if(!maxBoardLike.isEmpty()) {
-            Board board = boardRepository.findById((maxBoardLike.get(0).get(QBoardLike.boardLike.board.id)))
-                    .orElseThrow(EmptyMaxLikedBoardException::new);
+        return LikeBoardResponse.builder()
+                .bid(maxLikeBoard.getId())
+                .boardImages(convertToBoardImageResponse(maxLikeBoard))
+                .nickName(maxLikeBoard.getUser().getNickname())
+                .build();
+    }
 
-            List<BoardImageResponse> boardImages = board.getBoardImages().stream()
-                    .map(BoardImageResponse::new)
-                    .collect(Collectors.toList());
+    private Page<BoardResponse> convertToBoardResponse(Page<Board> boardPage) {
+        return boardPage.map(board -> BoardResponse.from(board, convertToBoardImageResponse(board)));
+    }
 
-            return LikeBoardResponse.builder()
-                    .bid(board.getId())
-                    .boardImages(boardImages)
-                    .nickName(board.getUser().getNickname())
-                    .build();
-        }else {
-            throw new EmptyMaxLikedBoardException();
-        }
+    private List<BoardImageResponse> convertToBoardImageResponse(Board board) {
+        return board.getBoardImages().stream()
+                .map(BoardImageResponse::new)
+                .collect(Collectors.toList());
     }
 
     private boolean isWriter(Long writerId, Long userId) {

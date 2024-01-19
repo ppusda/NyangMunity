@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.board.controller;
 
+import cat.community.NyangMunity.board.response.BoardDetailResponse;
 import cat.community.NyangMunity.global.exception.EmptyInputValueException;
 import cat.community.NyangMunity.global.exception.InvalidRequest;
 import cat.community.NyangMunity.user.request.UserSession;
@@ -8,13 +9,14 @@ import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.board.request.BoardEditRequest;
 import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.board.response.BoardResponse;
-import cat.community.NyangMunity.board.response.BoardListResponse;
 import cat.community.NyangMunity.board.response.LikeBoardResponse;
 import cat.community.NyangMunity.board.service.BoardService;
 import cat.community.NyangMunity.board.util.BoardProvider;
+import cat.community.NyangMunity.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class BoardController {
 
+    private final UserService userService;
     private final BoardService boardService;
     private final BoardProvider boardProvider;
 
@@ -38,30 +41,17 @@ public class BoardController {
             boardImages = boardProvider.getImageList(boardFormRequest.boardImages());
         }
 
-        if(boardFormRequest.title().isEmpty()){
-            throw new EmptyInputValueException();
-        }
-
-        try {
-            boardService.write(boardFormRequest, boardImages, userSession.id);
-        } catch (Exception e) {
-            throw new InvalidRequest();
-        }
-
+        boardService.write(boardFormRequest, boardImages, userService.getUser(userSession.id));
     }
 
     @GetMapping("/{boardId}")
-    public BoardResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
-        BoardResponse boardResponse = boardService.read(id, userSession.id);
-        return boardResponse;
+    public BoardDetailResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
+        return boardService.read(id, userSession.id);
     }
 
     @GetMapping
-    public BoardListResponse readBoards(@ModelAttribute BoardListRequest boardListRequest){
-        return BoardListResponse.builder()
-                .boardList(boardService.getList(boardListRequest))
-                .totalCnt(boardService.getCount())
-                .build();
+    public Page<BoardResponse> readBoards(@ModelAttribute BoardListRequest boardListRequest){
+        return boardService.getList(boardListRequest.getPage(), boardListRequest.getSize());
     }
 
     @PatchMapping("/{boardId}")
@@ -82,7 +72,7 @@ public class BoardController {
 
     @PostMapping("/like/{boardId}")
     public void boardLike(@PathVariable(name = "boardId") Long bid, UserSession userSession){
-        boardService.like(bid, userSession.id);
+        boardService.like(bid, userService.getUser(userSession.id));
     }
 
     @PostMapping("/like/check/{boardId}")

@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.user.service;
 
+import cat.community.NyangMunity.global.exception.UserNotFoundException;
 import cat.community.NyangMunity.global.provider.KakaoAuthProvider;
 import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.user.entity.User;
@@ -33,6 +34,10 @@ public class UserService {
     private final TokenRefresher tokenRefresher;
     private final KakaoAuthProvider kakaoAuthProvider;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
+
+    public User getUser(Long uid) {
+        return userRepository.findById(uid).orElseThrow(UserNotFoundException::new);
+    }
 
     @Transactional
     public Long userLogin(UserForm userForm) {
