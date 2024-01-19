@@ -3,14 +3,11 @@ package cat.community.NyangMunity.global.exception;
 import lombok.Getter;
 
 @Getter
-public class PostNotFound extends NyangmunityException{
+public class BoardNotFoundException extends NyangmunityException{
 
     private static final String MESSAGE = "존재하지 않는 글입니다.";
 
-    private String fieldName;
-    private String message;
-
-    public PostNotFound() {
+    public BoardNotFoundException() {
         super(MESSAGE);
     }
 
