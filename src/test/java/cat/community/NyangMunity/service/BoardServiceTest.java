@@ -1,17 +1,21 @@
 package cat.community.NyangMunity.service;
 
+import cat.community.NyangMunity.board.response.BoardDetailResponse;
 import cat.community.NyangMunity.board.service.BoardService;
+import cat.community.NyangMunity.global.exception.UserNotFoundException;
+import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.user.repository.UserRepository;
 import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.board.entity.Board;
 import cat.community.NyangMunity.board.entity.BoardImage;
-import cat.community.NyangMunity.global.exception.PostNotFound;
+import cat.community.NyangMunity.global.exception.BoardNotFoundException;
 import cat.community.NyangMunity.board.repository.BoardRepository;
 import cat.community.NyangMunity.board.request.BoardEditRequest;
 import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.board.response.BoardResponse;
 import cat.community.NyangMunity.user.service.UserService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,17 +23,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.transaction.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.springframework.data.domain.Page;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @Transactional
 @SpringBootTest
@@ -66,9 +66,10 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // when
-        Long uid = userRepository.findByEmail("ppusda@naver.com").get().getId();
+        User user = userRepository.findByEmail("ppusda@naver.com")
+                        .orElseThrow(UserNotFoundException::new);
 
-        boardService.write(boardFormRequest, boardImages, uid);
+        boardService.write(boardFormRequest, boardImages, user);
 
         // then
         assertEquals(1L, boardRepository.count());
@@ -95,17 +96,15 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
         boardRepository.save(bd);
 
         // when
-        BoardResponse response = boardService.read(bd.getId());
+        BoardDetailResponse boardDetailResponse = boardService.read(bd.getId(), userId);
 
         // then
-        assertThrows(PostNotFound.class, () -> {
-            boardService.read(bd.getId() + 1L);
-        });
+        assertEquals(bd.getId(), boardDetailResponse.boardResponse().id());
     }
 
     @Test
     @DisplayName("글 여러개 조회")
-    void test3() throws Exception {
+    void test3() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
                 .email("ppusda@naver.com")
@@ -127,20 +126,16 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                         .build()
         )); // 한번에 저장
 
-        BoardListRequest boardListRequest = BoardListRequest.builder()
-                .page(1)
-                .build();
-
         // when
-        List<BoardResponse> boardList = boardService.getList(boardListRequest);
+        Page<BoardResponse> boardList = boardService.getList(1, 10);
 
         // then
-        assertEquals(2L, boardList.size());
+        assertEquals(2L, boardList.getSize());
     }
 
     @Test
     @DisplayName("글 1페이지 조회")
-    void test4() throws Exception {
+    void test4() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
                 .email("ppusda@naver.com")
@@ -164,16 +159,15 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // when
-        List<BoardResponse> boardList = boardService.getList(boardListRequest);
+        Page<BoardResponse> boardList = boardService.getList(0, 10);
 
         // then
-        assertEquals(10L, boardList.size());
-        assertEquals("빵국이 제목 19", boardList.get(0).getTitle());
+        assertEquals(10L, boardList.getSize());
     }
 
     @Test
     @DisplayName("글 제목 수정")
-    void test5() throws Exception {
+    void test5() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
                 .email("ppusda@naver.com")
@@ -203,7 +197,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
     @Test
     @DisplayName("글 내용 수정")
-    void test6() throws Exception {
+    void test6() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
                 .email("ppusda@naver.com")
@@ -235,7 +229,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
 
     @Test
     @DisplayName("게시글 삭제")
-    void test7() throws Exception {
+    void test7() {
         // given
         Long userId = userService.userLogin(UserForm.builder()
                 .email("ppusda@naver.com")
@@ -269,8 +263,8 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
         boardRepository.save(bd);
 
         // then
-        assertThrows(PostNotFound.class, () -> {
-            boardService.read(bd.getId() + 1L);
+        assertThrows(BoardNotFoundException.class, () -> {
+            boardService.read(bd.getId() + 1L, 1L);
         });
     }
 
@@ -291,7 +285,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
         boardRepository.save(bd);
 
         // then
-        assertThrows(PostNotFound.class, () -> {
+        assertThrows(BoardNotFoundException.class, () -> {
             boardService.delete(bd.getId() + 1L, userId);
         });
     }
@@ -318,7 +312,7 @@ ArrayList<BoardImage> boardImages = new ArrayList<>();
                 .build();
 
         // then
-        assertThrows(PostNotFound.class, () -> {
+        assertThrows(BoardNotFoundException.class, () -> {
             boardService.edit(bd.getId() + 1L, boardEditRequest, boardImages, userId);
         });
     }

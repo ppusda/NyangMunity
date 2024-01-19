@@ -14,6 +14,6 @@ public interface BoardLikeRepository extends JpaRepository<BoardLike, Long>,
     Optional<BoardLike> findByBoardIdAndUserId(Long bid, Long uid);
 
     @Transactional
-    Optional<BoardLike> deleteByBoardIdAndUserId(Long bid, Long uid);
+    void deleteByBoardIdAndUserId(Long bid, Long uid);
 
 }
