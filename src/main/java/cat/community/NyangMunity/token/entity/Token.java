@@ -1,7 +1,6 @@
 package cat.community.NyangMunity.token.entity;
 
 import cat.community.NyangMunity.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +25,6 @@ public class Token {
 
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(unique = true)
     private User user;
 

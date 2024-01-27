@@ -1,6 +1,5 @@
 package cat.community.NyangMunity.board.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,7 +34,6 @@ public class BoardImage {
     private Long size;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name = "board_id")
     private Board board;
 

@@ -5,7 +5,6 @@ import cat.community.NyangMunity.board.entity.BoardLike;
 import cat.community.NyangMunity.user.editor.UserEditor;
 import cat.community.NyangMunity.user.editor.UserEditor.UserEditorBuilder;
 import cat.community.NyangMunity.token.entity.Token;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,15 +54,12 @@ public class User {
     @Column
     private LocalDate birthday;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Board> boards = new ArrayList<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Token> tokens = new ArrayList<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
 

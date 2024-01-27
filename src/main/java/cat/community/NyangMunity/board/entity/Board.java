@@ -3,8 +3,6 @@ package cat.community.NyangMunity.board.entity;
 import cat.community.NyangMunity.board.editor.BoardEditor;
 import cat.community.NyangMunity.board.editor.BoardEditor.BoardEditorBuilder;
 import cat.community.NyangMunity.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,15 +48,12 @@ public class Board {
     private LocalDateTime createDate;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name="user_id")
     private User user;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardImage> boardImages = new ArrayList<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
 
