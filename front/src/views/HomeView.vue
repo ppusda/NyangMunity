@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
-import {defineComponent, reactive, ref} from 'vue';
+import {reactive, ref} from 'vue';
 
 const check = reactive({ value: false });
 const post = ref({
@@ -22,22 +22,24 @@ axios.post("/nm/boards/like", ).then(response => {
 </script>
 
 <template>
-  <div class="container login_page w-100 h-100 text-white text-center">
-    <div class="content_area">
-      <div class="overlay d-flex justify-content-center align-content-center w-100 h-100 cat_page">
-        <template v-if="check.value === true">
-          <img id="main_img" :src="`data:image/jpeg;base64,${post.boardImages[rdNum.value].imageBytes}`"/>
-        </template>
-        <template v-else>
-          <img class="thumbnail" src="/assets/images/cat_loading.gif"/>
-        </template>
+  <div class="h-100">
+    <div class="bg-zinc-800 w-screen rounded-2xl p-5">
+      <div class="flex flex-col items-center justify-center">
+        <div v-if="check.value === true">
+          <img class="rounded" id="main_img" :src="`data:image/jpeg;base64,${post.boardImages[rdNum.value].imageBytes}`"/>
+        </div>
+        <div v-else>
+          <img class="rounded-2xl" src="/assets/images/cat_loading.gif"/>
+        </div>
       </div>
-      <div class="today_cat">
+      <div class="flex flex-col items-center justify-center mt-5">
         <template v-if="check.value === true">
           <router-link :to="{name: 'read', params: {postId: post.bid}}">가장 인기많은 글은 {{ post.nickName }} 님의 글 입니다!</router-link>
         </template>
         <template v-else>
-          <router-link :to="{name: 'boards'}">커뮤니티 바로가기</router-link>
+          <a class="btn btn-outline btn-primary">
+            <router-link :to="{name: 'boards'}">커뮤니티로 바로가기!</router-link>
+          </a>
         </template>
       </div>
     </div>
@@ -46,18 +48,4 @@ axios.post("/nm/boards/like", ).then(response => {
 
 <style scoped>
 
-  #main_img{
-    max-height: 60vh;
-    object-fit: cover;
-  }
-
-  .content_area {
-    top: 1.5%;
-    width: 100%;
-    height: 80%
-  }
-
-  .today_cat {
-    margin: 1vw;
-  }
 </style>
