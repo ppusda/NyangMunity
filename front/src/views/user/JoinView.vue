@@ -28,48 +28,45 @@ const joinConfirm = function () {
 </script>
 
 <template>
-  <div class="join_page">
-    <form class="content_area">
-      <table>
-        <tr>
-          <td class="w-50"><a class="text-white">이메일 : </a></td> <td class="w-auto"><input id="email" v-model="email" name="email" type="text"></td>
-        </tr>
-        <tr>
-          <td class="w-50"><a class="text-white">비밀번호 : </a></td> <td class="w-auto"><input v-model="password" id="password" type="password"></td>
-        </tr>
-        <tr>
-          <td class="w-50"><a class="text-white">비밀번호 확인 : </a></td> <td class="w-auto"><input v-model="passwordChk" id="passwordChk" name="passwordChk" type="password"></td>
-        </tr>
-        <tr>
-          <td class="w-50"><a class="text-white">생일 : </a></td> <td class="w-auto"><input v-model="birthday" id="birthday" name="birthday" type="date"/></td>
-        </tr>
-        <tr>
-          <td class="w-50"><a class="text-white">닉네임 : </a></td> <td class="w-auto"><input v-model="nickname" id="nickname" name="nickname" type="text"></td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <a class="clButton btn btn-secondary text-white" @click="$router.go(-1)">취소</a>
-            <a class="clButton btn btn-primary m-3" @click="joinConfirm">회원가입</a>
-          </td>
-        </tr>
-      </table>
-    </form>
+  <div class="h-100">
+    <div class="bg-zinc-800 w-screen rounded-2xl p-10">
+      <div class="flex flex-col justify-center items-center">
+        <h1 class="text-3xl font-bold text-white mb-12">회원가입</h1>
+        <form class="bg-zinc-700 p-5 rounded-md sm:w-6/12 w-full">
+          <div class="flex flex-col m-3">
+            <label for="email" class="text-white mb-1">아이디</label>
+            <input type="email" name="email" id="email" v-model="email" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="이메일을 입력해주세요.">
+          </div>
+          <div class="flex flex-col m-3">
+            <label for="password" class="text-white mb-1">비밀번호</label>
+            <input type="password" name="password" id="password" v-model="password" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="비밀번호를 입력해주세요.">
+          </div>
+          <div class="flex flex-col m-3">
+            <label for="passwordChk" class="text-white mb-1">비밀번호 확인</label>
+            <input type="password" name="passwordChk" id="passwordChk" v-model="passwordChk" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="비밀번호를 재입력해주세요.">
+          </div>
+          <div class="flex flex-col m-3">
+            <label for="date" class="text-white mb-1">생일</label>
+            <input type="date" name="birthday" id="birthday" v-model="birthday" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="이메일을 입력해주세요.">
+          </div>
+          <div class="flex flex-col m-3">
+            <label for="nickname" class="text-white mb-1">닉네임</label>
+            <input type="text" name="nickname" id="nickname" v-model="nickname" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="닉네임을 입력해주세요.">
+          </div>
+          <div class="flex flex-row justify-center mt-10 m-3 w-full gap-2 pr-5">
+            <div class="flex-1">
+              <a class="btn btn-outline btn-error p-3 rounded-md text-black w-full" @click="$router.go(-1)">취소</a>
+            </div>
+            <div class="flex-1">
+              <a class="btn btn-outline btn-primary p-3 rounded-md text-white w-full" @click="joinConfirm">완료</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-  .content_area {
-    top: 15%;
-  }
 
-  .join_page{
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    font-size: 0.9vw;
-  }
-
-  #birthday{
-    width: 100%;
-  }
 </style>

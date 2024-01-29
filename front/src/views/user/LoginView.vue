@@ -30,51 +30,40 @@ const login = function () {
 <template>
   <input value="true" type="text" name="loginState" id="loginState" hidden="true"/>
 
-  <div class="container login_page w-100 h-100 text-white text-center">
-    <form class="content_area d-flex justify-content-center">
-      <table>
-        <tr>
-          <td class="w-25 me-2">ID :</td> <td class="w-auto"><el-input id="email" v-model="email" type="text"></el-input></td>
-        </tr>
-        <tr>
-          <td class="w-25 me-2">PW :</td> <td class="w-auto"><el-input id="password" v-model="password" type="password"></el-input></td>
-        </tr>
-        <tr>
-          <td colspan="2" class="w-auto pe">
-            <a class="clButton btn btn-primary mt-2" @click="login">커뮤니티 로그인</a>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" class="w-auto">
-            <a class="clButton btn btn-warning pt-1 text-white" :href="`https://kauth.kakao.com/oauth/authorize?client_id=${VITE_APP_KAKAO_CLIENT_KEY}&redirect_uri=${VITE_APP_KAKAO_REDIRECT_URL}&response_type=code`">
+  <div class="h-100">
+    <div class="bg-zinc-800 w-screen rounded-2xl p-16">
+      <div class="flex flex-col justify-center items-center">
+        <h1 class="text-3xl font-bold text-white mb-12">로그인</h1>
+        <form class="bg-zinc-700 p-5 rounded-md sm:w-6/12 w-full">
+          <div class="flex flex-col m-3">
+            <label for="email" class="text-white mb-1">아이디</label>
+            <input type="email" name="email" id="email" v-model="email" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="이메일을 입력해주세요.">
+          </div>
+          <div class="flex flex-col m-3">
+            <label for="password" class="text-white mb-1">비밀번호</label>
+            <input type="password" name="password" id="password" v-model="password" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="비밀번호를 입력해주세요.">
+          </div>
+          <div class="flex flex-col justify-center mt-10 m-3">
+            <a @click="login" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5">로그인</a>
+            <a class="btn btn-outline btn-warning w-full p-3 rounded-md text-black" :href="`https://kauth.kakao.com/oauth/authorize?client_id=${VITE_APP_KAKAO_CLIENT_KEY}&redirect_uri=${VITE_APP_KAKAO_REDIRECT_URL}&response_type=code`">
               카카오 로그인
             </a>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" style="font-size: 1.5vh">--------------- 처음이신가요? ---------------</td>
-        </tr>
-        <tr>
-          <td colspan="2"> <RouterLink to="/user/join">회원가입</RouterLink></td>
-        </tr>
-      </table>
-    </form>
+          </div>
+          <div class="mt-3 mb-3 text-white m-5 text-center">
+            <p>------------- 처음이신가요? -------------</p>
+          </div>
+          <div class="flex flex-col m-3">
+            <a class="btn btn-outline btn-ghost w-full p-3 rounded-md text-white">
+              <router-link to="/user/join">회원가입</router-link>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
 </template>
 
 <style scoped>
-  .content_area {
-    top: 15%;
-  }
-
-  .login_page{
-    font-size: 0.9vw;
-  }
-
-  .clButton {
-    font-size: 0.9vw;
-    width: -webkit-fill-available;
-  }
 
 </style>
