@@ -44,8 +44,9 @@ const login = function () {
             <input type="password" name="password" id="password" v-model="password" class="input input-bordered border-zinc-500 bg-zinc-700 w-full p-3 rounded-md text-white" placeholder="비밀번호를 입력해주세요.">
           </div>
           <div class="flex flex-col justify-center mt-10 m-3">
-            <a @click="login" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5">로그인</a>
+            <a @click="login" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5"><i class="fa-solid fa-door-open"></i> 로그인</a>
             <a class="btn btn-outline btn-warning w-full p-3 rounded-md text-black" :href="`https://kauth.kakao.com/oauth/authorize?client_id=${VITE_APP_KAKAO_CLIENT_KEY}&redirect_uri=${VITE_APP_KAKAO_REDIRECT_URL}&response_type=code`">
+              <i class="fa-solid fa-comment fa-flip-horizontal"></i>
               카카오 로그인
             </a>
           </div>
@@ -54,6 +55,7 @@ const login = function () {
           </div>
           <div class="flex flex-col m-3">
             <a class="btn btn-outline btn-ghost w-full p-3 rounded-md text-white">
+              <i class="fa-solid fa-user-plus"></i>
               <router-link to="/user/join">회원가입</router-link>
             </a>
           </div>

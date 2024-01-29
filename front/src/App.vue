@@ -16,7 +16,7 @@ export default {
 </script>
 
 <template>
-  <div id="app" class="flex flex-col h-screen justify-between">
+  <div id="app" class="flex flex-col h-screen bg-zinc-900 justify-between">
     <Header/>
     <router-view/>
     <Footer/>

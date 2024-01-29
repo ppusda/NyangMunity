@@ -101,8 +101,8 @@ const moveToWrite = () => {
       </ul>
     </div>
 
-    <div class="flex justify-between items-center my-4 w-full md:w-2/3 lg:w-1/2">
-      <div class="justify-center">
+    <div class="flex sm:flex-row flex-col justify-between items-center my-4 w-full md:w-2/3 lg:w-1/2">
+      <div>
         <paginate
             :pageCount="totalPage.value"
             :containerClass="'pagination'"
@@ -110,7 +110,7 @@ const moveToWrite = () => {
         </paginate>
       </div>
       <div>
-        <a class="btn btn-outline btn-primary" @click="moveToWrite()">새로 글 쓰기</a>
+        <a class="btn sm:mt-0 mt-3 btn-outline btn-primary" @click="moveToWrite()">새로 글 쓰기</a>
       </div>
     </div>
   </div>
@@ -136,11 +136,11 @@ const moveToWrite = () => {
   }
 
   .pagination li {
-    margin: 0 5px;
+    margin: 0 1.5px;
   }
 
   .pagination li a {
-    padding: 5px 10px;
+    padding: 5px 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
     text-decoration: none;

@@ -23,7 +23,7 @@ axios.post("/nm/boards/like", ).then(response => {
 
 <template>
   <div class="h-100">
-    <div class="bg-zinc-800 w-screen rounded-2xl p-5">
+    <div class="bg-zinc-800 w-screen rounded-2xl p-8">
       <div class="flex flex-col items-center justify-center">
         <div v-if="check.value === true">
           <img class="rounded" id="main_img" :src="`data:image/jpeg;base64,${post.boardImages[rdNum.value].imageBytes}`"/>
