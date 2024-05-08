@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import axios from "axios";
-import {onMounted, reactive, ref} from "vue";
+import {reactive} from "vue";
 import router from "@/router";
 import paginate from "vuejs-paginate-next";
 
@@ -63,7 +63,7 @@ const moveToWrite = () => {
       router.push({ name: "write" });
   }).catch(error => {
       if (error.response) {
-        router.push({ name: "login" })
+        router.push({ name: "login" });
       }
   });
 }
@@ -105,7 +105,7 @@ const moveToWrite = () => {
       <div>
         <paginate
             :pageCount="totalPage.value"
-            :containerClass="'pagination'"
+            :elementClass="'btn btn-primary'"
             :clickHandler="movePage">
         </paginate>
       </div>

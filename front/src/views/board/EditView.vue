@@ -32,7 +32,7 @@ axios.post("/nm/user/check").then(() => {
 }).catch(error => {
     if (error.response) {
       alert(error.response.data.message);
-      router.replace({name: "home"});
+      router.replace({name: "main"});
     }
 });
 

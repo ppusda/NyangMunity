@@ -14,7 +14,7 @@ const login = function () {
     email: email.value,
     password: password.value
   }).then(() => {
-    router.replace({name: "home"})
+    router.replace({name: "main"})
         .then(() => router.go(0))
   }).catch(error => {
     if(error.response){

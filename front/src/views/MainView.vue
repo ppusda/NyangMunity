@@ -38,6 +38,7 @@ axios.post("/nm/boards/like", ).then(response => {
         </template>
         <template v-else>
           <a class="btn btn-outline btn-primary">
+            <i class="fa-solid fa-arrow-right"></i>
             <router-link :to="{name: 'boards'}">커뮤니티로 바로가기!</router-link>
           </a>
         </template>

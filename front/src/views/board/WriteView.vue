@@ -3,7 +3,6 @@ import {ref} from "vue";
 
 import axios from "axios";
 import {useRouter} from "vue-router";
-import homeView from "@/views/HomeView.vue";
 
 const title = ref("");
 const content = ref("");
@@ -32,7 +31,7 @@ const write = function (e: Event) {
       }else {
         alert("비정상적인 접근입니다.");
       }
-      router.replace({name: "home"});
+      router.replace({name: "main"});
     })
   } else {
     alert("제목은 필수 입력사항입니다.");

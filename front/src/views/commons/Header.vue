@@ -1,18 +1,9 @@
 <script setup lang="ts">
 import {onMounted, reactive} from 'vue';
-import { useCookies } from 'vue3-cookies';
 import axios from "axios";
 
 let nickName = reactive({ value: "" });
-const { cookies } = useCookies();
 
-onMounted(async () => {
-  if(cookies.get('SESSION') && cookies.get('SESSION') !== "") {
-    await axios.post("/nm/user/check", ).then(response => {
-        nickName.value = response.data;
-    })
-  }
-});
 
 </script>
 
@@ -25,23 +16,21 @@ onMounted(async () => {
             <i class="fa-solid fa-bars"></i>
           </label>
           <ul tabindex="0" class="menu menu-md dropdown-content mt-5 z-[1] p-3 shadow rounded-box w-52 bg-zinc-800">
-            <li><a><i class="fa-solid fa-house"></i><router-link :to="{name: 'home'}">메인 페이지</router-link></a></li>
-            <li><a><i class="fa-solid fa-comments"></i><router-link :to="{name: 'boards'}">커뮤니티</router-link></a></li>
-            <li><a><i class="fa-solid fa-image"></i><router-link :to="{name: 'meme'}">고양이 밈</router-link></a></li>
+            <li><router-link :to="{name: 'main'}"><i class="fa-solid fa-house"></i>메인 페이지</router-link></li>
+            <li><router-link :to="{name: 'boards'}"><i class="fa-solid fa-comments"></i>커뮤니티</router-link></li>
+            <li><router-link :to="{name: 'meme'}"><i class="fa-solid fa-image"></i>고양이 밈</router-link></li>
           </ul>
         </div>
       </div>
       <div class="navbar-center">
-        <a class="content-center h-100 btn btn-ghost">
-          <router-link :to="{name: 'home'}"> <img id="logo" class="h-[60px]" src="/src/images/logo.png" alt="logo"> </router-link>
-        </a>
+        <router-link :to="{name: 'main'}" class="content-center h-100 btn btn-ghost"> <img id="logo" class="h-[60px]" src="/src/images/logo.png" alt="logo"> </router-link>
       </div>
       <div class="navbar-end">
         <div v-if="nickName && nickName.value" class="dropdown dropdown-end">
           <div tabindex="0" role="button" class="btn btn-ghost rounded-btn"> 님, 환영합니다!</div>
           <ul tabindex="0" class="menu menu-md dropdown-content mt-5 z-[1] p-3 shadow rounded-box w-52 bg-zinc-800">
-            <li><a><i class="fa-solid fa-address-card"></i>마이페이지</a></li>
-            <li><a><i class="fa-solid fa-door-closed"></i>로그아웃</a></li>
+            <li><router-link :to="{name: 'info'}"><i class="fa-solid fa-address-card"></i>마이페이지</router-link></li>
+            <li><i class="fa-solid fa-door-closed"></i>로그아웃</li>
           </ul>
         </div>
         <div v-else>

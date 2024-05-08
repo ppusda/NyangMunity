@@ -20,7 +20,7 @@ const joinConfirm = function () {
       birthday: birthday.value,
       nickname: nickname.value,
     }).then(() => {
-      router.replace({name: "home"})
+      router.replace({name: "main"})
     })
   }
 }

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import MainView from "../views/MainView.vue";
 import WriteView from "../views/board/WriteView.vue";
 import BoardListView from "../views/board/BoardListView.vue";
 import ReadView from "../views/board/ReadView.vue";
@@ -15,8 +15,8 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "home",
-      component: HomeView,
+      name: "main",
+      component: MainView,
     },
     {
       path: "/boards/write",
