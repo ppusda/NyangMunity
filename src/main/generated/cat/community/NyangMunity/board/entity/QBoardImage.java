@@ -1,12 +1,11 @@
-package cat.community.NyangMunity.domain;
+package cat.community.NyangMunity.board.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import cat.community.NyangMunity.board.entity.BoardImage;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -14,10 +13,10 @@ import com.querydsl.core.types.dsl.PathInits;
 /**
  * QBoardImage is a Querydsl query type for BoardImage
  */
-@Generated("com.querydsl.codegen.EntitySerializer")
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QBoardImage extends EntityPathBase<BoardImage> {
 
-    private static final long serialVersionUID = 1776956971L;
+    private static final long serialVersionUID = 166336420L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

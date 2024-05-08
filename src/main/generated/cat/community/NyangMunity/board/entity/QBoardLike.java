@@ -1,12 +1,11 @@
-package cat.community.NyangMunity.domain;
+package cat.community.NyangMunity.board.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import cat.community.NyangMunity.board.entity.BoardLike;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -14,10 +13,10 @@ import com.querydsl.core.types.dsl.PathInits;
 /**
  * QBoardLike is a Querydsl query type for BoardLike
  */
-@Generated("com.querydsl.codegen.EntitySerializer")
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QBoardLike extends EntityPathBase<BoardLike> {
 
-    private static final long serialVersionUID = 750143687L;
+    private static final long serialVersionUID = 1390924846L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -27,7 +26,7 @@ public class QBoardLike extends EntityPathBase<BoardLike> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final QUser user;
+    public final cat.community.NyangMunity.user.entity.QUser user;
 
     public QBoardLike(String variable) {
         this(BoardLike.class, forVariable(variable), INITS);
@@ -48,7 +47,7 @@ public class QBoardLike extends EntityPathBase<BoardLike> {
     public QBoardLike(Class<? extends BoardLike> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.board = inits.isInitialized("board") ? new QBoard(forProperty("board"), inits.get("board")) : null;
-        this.user = inits.isInitialized("user") ? new QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new cat.community.NyangMunity.user.entity.QUser(forProperty("user")) : null;
     }
 
 }

@@ -1,9 +1,8 @@
 package cat.community.NyangMunity.user.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
 
 @Getter @Setter
 @NoArgsConstructor

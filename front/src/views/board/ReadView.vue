@@ -4,7 +4,6 @@ import {defineProps, onMounted, reactive, ref} from "vue";
 import axios from "axios";
 import router from "@/router";
 
-import { Carousel } from 'bootstrap';
 import {useCookies} from "vue3-cookies";
 
 let isMouseDown = ref(false);

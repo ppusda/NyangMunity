@@ -1,15 +1,19 @@
 package cat.community.NyangMunity.token.entity;
 
 import cat.community.NyangMunity.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-
-@Entity @Getter
+@Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Token {
 
@@ -21,7 +25,6 @@ public class Token {
 
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(unique = true)
     private User user;
 

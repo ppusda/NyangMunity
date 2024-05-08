@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.5.9'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot' version '3.2.1'
+	id 'io.spring.dependency-management' version '1.1.4'
 
 	/**
 	 * AsciiDoctor
@@ -11,7 +11,14 @@ plugins {
 
 group = 'cat.community'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+
+java {
+	sourceCompatibility = '17'
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs << "-parameters"
+}
 
 configurations {
 	compileOnly {
@@ -60,16 +67,17 @@ dependencies {
 	compileOnly 'javax.mail:mail:1.4.7'
 
 	/**
-	 * JPA, MYSQL, QUERYDSL
+	 * MYSQL
 	 **/
-	implementation 'mysql:mysql-connector-java'
-	runtimeOnly 'mysql:mysql-connector-java'
+	implementation 'mysql:mysql-connector-java:8.0.26'
 
-	implementation 'com.querydsl:querydsl-core'
-	implementation 'com.querydsl:querydsl-jpa'
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+	/**
+	 * QueryDSL
+	 **/
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	/**
 	 * AsciiDOC - SpringRESTDOC
@@ -87,7 +95,7 @@ dependencies {
 	/**
 	 * GSON
 	 **/
-	implementation 'com.google.code.gson:gson:2.8.7'
+	implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 ext {

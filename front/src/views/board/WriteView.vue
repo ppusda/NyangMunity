@@ -3,7 +3,6 @@ import {ref} from "vue";
 
 import axios from "axios";
 import {useRouter} from "vue-router";
-import homeView from "@/views/HomeView.vue";
 
 const title = ref("");
 const content = ref("");
@@ -32,7 +31,7 @@ const write = function (e: Event) {
       }else {
         alert("비정상적인 접근입니다.");
       }
-      router.replace({name: "home"});
+      router.replace({name: "main"});
     })
   } else {
     alert("제목은 필수 입력사항입니다.");
@@ -48,7 +47,7 @@ const imageUpload = () => {
     fileDOM?.addEventListener("change", () => {
       const preview = document.getElementById("previewDiv");
       const extension = fileDOM.value.substring(fileDOM.value.lastIndexOf(".")+1, fileDOM.value.length).toLowerCase();
-      if(extension != "jpg" && extension != "png" &&  extension != "gif" &&  extension != "bmp" && extension != "JPEG") {
+      if(extension != "jpg" && extension != "png" &&  extension != "gif" &&  extension != "bmp" && extension != "jpeg" && extension != "JPEG") {
         preview!.innerHTML = '';
         fileDOM!.value = '';
         alert("지원되지 않는 확장자입니다.");

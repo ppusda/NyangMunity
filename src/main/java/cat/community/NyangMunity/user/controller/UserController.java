@@ -1,19 +1,18 @@
 package cat.community.NyangMunity.user.controller;
 
-import cat.community.NyangMunity.global.config.CookieProvider;
-import cat.community.NyangMunity.global.config.JwtTokenProvider;
+import cat.community.NyangMunity.global.provider.CookieProvider;
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.user.request.UserSession;
 import cat.community.NyangMunity.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @Slf4j
 @RestController
@@ -22,8 +21,8 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final CookieProvider cookieProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/join")
     private void userJoin(@RequestBody @Valid UserForm userForm) {

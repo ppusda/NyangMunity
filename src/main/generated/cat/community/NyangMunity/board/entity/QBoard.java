@@ -1,14 +1,11 @@
-package cat.community.NyangMunity.domain;
+package cat.community.NyangMunity.board.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import cat.community.NyangMunity.board.entity.Board;
-import cat.community.NyangMunity.board.entity.BoardImage;
-import cat.community.NyangMunity.board.entity.BoardLike;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -16,10 +13,10 @@ import com.querydsl.core.types.dsl.PathInits;
 /**
  * QBoard is a Querydsl query type for Board
  */
-@Generated("com.querydsl.codegen.EntitySerializer")
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QBoard extends EntityPathBase<Board> {
 
-    private static final long serialVersionUID = -787534576L;
+    private static final long serialVersionUID = 1092912119L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -37,7 +34,7 @@ public class QBoard extends EntityPathBase<Board> {
 
     public final StringPath title = createString("title");
 
-    public final QUser user;
+    public final cat.community.NyangMunity.user.entity.QUser user;
 
     public QBoard(String variable) {
         this(Board.class, forVariable(variable), INITS);
@@ -57,7 +54,7 @@ public class QBoard extends EntityPathBase<Board> {
 
     public QBoard(Class<? extends Board> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new cat.community.NyangMunity.user.entity.QUser(forProperty("user")) : null;
     }
 
 }

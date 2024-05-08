@@ -1,5 +1,6 @@
 package cat.community.NyangMunity.global.config;
 
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.token.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

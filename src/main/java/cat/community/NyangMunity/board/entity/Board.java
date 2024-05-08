@@ -3,17 +3,25 @@ package cat.community.NyangMunity.board.entity;
 import cat.community.NyangMunity.board.editor.BoardEditor;
 import cat.community.NyangMunity.board.editor.BoardEditor.BoardEditorBuilder;
 import cat.community.NyangMunity.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Entity @Table(name = "BOARD")
+@Entity @Table(name = "board")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Board {
 
@@ -40,15 +48,12 @@ public class Board {
     private LocalDateTime createDate;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name="user_id")
     private User user;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardImage> boardImages = new ArrayList<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
 

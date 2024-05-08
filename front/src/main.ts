@@ -9,10 +9,8 @@ import router from "./router";
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 
-import "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import "./assets/main.css";
+import "@fortawesome/fontawesome-free/js/all.js";
 
 const app = createApp(App);
 

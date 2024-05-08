@@ -1,12 +1,11 @@
-package cat.community.NyangMunity.domain;
+package cat.community.NyangMunity.board.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import cat.community.NyangMunity.board.entity.BoardPet;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -14,10 +13,10 @@ import com.querydsl.core.types.dsl.PathInits;
 /**
  * QBoardPet is a Querydsl query type for BoardPet
  */
-@Generated("com.querydsl.codegen.EntitySerializer")
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QBoardPet extends EntityPathBase<BoardPet> {
 
-    private static final long serialVersionUID = 1963864559L;
+    private static final long serialVersionUID = -1202053720L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -25,7 +24,7 @@ public class QBoardPet extends EntityPathBase<BoardPet> {
 
     public final QBoard board;
 
-    public final QPet pet;
+    public final cat.community.NyangMunity.pet.entity.QPet pet;
 
     public QBoardPet(String variable) {
         this(BoardPet.class, forVariable(variable), INITS);
@@ -46,7 +45,7 @@ public class QBoardPet extends EntityPathBase<BoardPet> {
     public QBoardPet(Class<? extends BoardPet> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.board = inits.isInitialized("board") ? new QBoard(forProperty("board"), inits.get("board")) : null;
-        this.pet = inits.isInitialized("pet") ? new QPet(forProperty("pet"), inits.get("pet")) : null;
+        this.pet = inits.isInitialized("pet") ? new cat.community.NyangMunity.pet.entity.QPet(forProperty("pet"), inits.get("pet")) : null;
     }
 
 }

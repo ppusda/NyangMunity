@@ -1,10 +1,14 @@
 package cat.community.NyangMunity.global.config;
 
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.token.entity.Token;
 import cat.community.NyangMunity.user.request.UserSession;
 import cat.community.NyangMunity.global.exception.Unauthorized;
 import cat.community.NyangMunity.token.repository.TokenRepository;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -13,9 +17,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
+
 import java.util.List;
 
 @Slf4j

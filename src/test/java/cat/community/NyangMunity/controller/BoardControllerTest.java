@@ -1,13 +1,13 @@
 package cat.community.NyangMunity.controller;
 
-import cat.community.NyangMunity.global.config.CookieProvider;
-import cat.community.NyangMunity.global.config.JwtTokenProvider;
+import cat.community.NyangMunity.global.provider.CookieProvider;
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.board.entity.Board;
 import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.board.repository.BoardRepository;
 import cat.community.NyangMunity.user.repository.UserRepository;
-import cat.community.NyangMunity.board.response.BoardEdit;
+import cat.community.NyangMunity.board.request.BoardEditRequest;
 import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.board.service.BoardService;
 import cat.community.NyangMunity.user.service.UserService;
@@ -257,7 +257,7 @@ class BoardControllerTest {
 
         boardRepository.save(board); // 한번에 저장
 
-        BoardEdit boardEdit = BoardEdit.builder()
+        BoardEditRequest boardEditRequest = BoardEditRequest.builder()
                 .title("빵국이 제목")
                 .content("빵국입니다")
                 .build();
@@ -267,7 +267,7 @@ class BoardControllerTest {
         // expected
         mockMvc.perform(patch("/nm/boards/{boardId}", board.getId()) // PATCH /nm/boards/{boardId}
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(boardEdit))
+                        .content(objectMapper.writeValueAsString(boardEditRequest))
                         .cookie(new Cookie("SESSION", token))
                 ).andExpect(status().isOk())
                 .andDo(print());
@@ -315,7 +315,7 @@ class BoardControllerTest {
     @DisplayName("존재하지 않는 게시글 수정")
     void test10() throws Exception {
         // given
-        BoardEdit boardEdit = BoardEdit.builder()
+        BoardEditRequest boardEditRequest = BoardEditRequest.builder()
                 .title("빵국이 제목")
                 .content("빵국입니다")
                 .build();
@@ -323,7 +323,7 @@ class BoardControllerTest {
         // expected
         mockMvc.perform(patch("/nm/boards/{boardId}", 1L) // PATCH /nm/boards/{boardId}
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(boardEdit))
+                        .content(objectMapper.writeValueAsString(boardEditRequest))
                 ).andExpect(status().isNotFound())
                 .andDo(print());
     }

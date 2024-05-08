@@ -1,28 +1,29 @@
 package cat.community.NyangMunity.board.response;
 
 import cat.community.NyangMunity.board.entity.BoardImage;
+import java.io.IOException;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@Getter
-public class BoardImageResponse {
-    private Long id;
-    private String name;
-    private Long size;
-    private byte[] imageBytes;
+public record BoardImageResponse(
+        Long id,
+        String name,
+        Long size,
+        byte[] imageBytes
+) {
 
     public BoardImageResponse(BoardImage boardImage) {
-        this.id = boardImage.getId();
-        this.name = boardImage.getName();
-        this.size = boardImage.getSize();
-        try{
-            byte[] imageByte = Files.readAllBytes(Paths.get(boardImage.getPath()));
-            this.imageBytes = imageByte;
-        } catch (Exception e){
-            e.printStackTrace();
+        this(boardImage.getId(), boardImage.getName(), boardImage.getSize(), readImageBytes(boardImage.getPath()));
+    }
+
+    private static byte[] readImageBytes(String path) {
+        try {
+            return Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read image bytes", e);
         }
     }
 }
-// 무한루프로 인한 BoardImageDTO 작성

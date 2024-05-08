@@ -24,7 +24,7 @@ const router = useRouter();
 const userLogout = function () {
   axios.post("/nm/user/logout").then(() => {
     cookies.remove("SESSION");
-    router.replace({ name: "home" }). then(() => router.go(0));
+    router.replace({ name: "main" }). then(() => router.go(0));
   });
 };
 
@@ -43,7 +43,7 @@ const userEdit = function () {
 
         axios.post("/nm/user/edit", formData).then(() => {
           alert("정보 수정이 완료되었습니다.");
-          router.replace({ name: "home" }).then(() => router.go(0));
+          router.replace({ name: "main" }).then(() => router.go(0));
         });
       } else {
         alert("비밀번호가 올바르지 않습니다.");
@@ -58,7 +58,7 @@ const cancelUser = function () {
     if (response.data) {
       alert("냥뮤니티를 이용해주셔서 감사했습니다.");
       axios.post("/nm/user/cancel", ).then(() => {
-        router.replace({ name: "home" }).then(() => router.go(0));
+        router.replace({ name: "main" }).then(() => router.go(0));
       });
     } else {
       alert("비밀번호가 올바르지 않습니다.");
@@ -66,7 +66,7 @@ const cancelUser = function () {
   }).catch(error => {
     if(error.response) {
       alert(error.response.data.message);
-      router.replace({name: "home"});
+      router.replace({name: "main"});
     }
   });
 };
@@ -77,7 +77,7 @@ onMounted(async () => {
     }).catch(error => {
       if(error.response) {
         alert(error.response.data.message);
-        router.replace({name: "home"});
+        router.replace({name: "main"});
       }
     });
 });

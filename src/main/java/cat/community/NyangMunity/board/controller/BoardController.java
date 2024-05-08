@@ -1,19 +1,22 @@
 package cat.community.NyangMunity.board.controller;
 
+import cat.community.NyangMunity.board.response.BoardDetailResponse;
 import cat.community.NyangMunity.global.exception.EmptyInputValueException;
 import cat.community.NyangMunity.global.exception.InvalidRequest;
 import cat.community.NyangMunity.user.request.UserSession;
-import cat.community.NyangMunity.board.request.BoardForm;
+import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.board.entity.BoardImage;
-import cat.community.NyangMunity.board.response.BoardEdit;
-import cat.community.NyangMunity.board.request.BoardSearch;
+import cat.community.NyangMunity.board.request.BoardEditRequest;
+import cat.community.NyangMunity.board.request.BoardListRequest;
 import cat.community.NyangMunity.board.response.BoardResponse;
-import cat.community.NyangMunity.board.response.BoardResult;
 import cat.community.NyangMunity.board.response.LikeBoardResponse;
 import cat.community.NyangMunity.board.service.BoardService;
 import cat.community.NyangMunity.board.util.BoardProvider;
+import cat.community.NyangMunity.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -26,65 +29,50 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class BoardController {
 
+    private final UserService userService;
     private final BoardService boardService;
     private final BoardProvider boardProvider;
 
     @PostMapping("/write")
-    public void BoardWrite(@ModelAttribute BoardForm boardForm, UserSession userSession) throws IOException {
+    public void writeBoard(@ModelAttribute @Valid BoardFormRequest boardFormRequest, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
-        if(boardForm.getBoardImages() != null){
-            boardImages = boardProvider.getImageList(boardForm.getBoardImages());
+        if(boardFormRequest.boardImages() != null){
+            boardImages = boardProvider.getImageList(boardFormRequest.boardImages());
         }
 
-        if(boardForm.getTitle().isEmpty()){
-            throw new EmptyInputValueException();
-        }
-
-        try {
-            boardService.write(boardForm, boardImages, userSession.id);
-        } catch (Exception e) {
-            throw new InvalidRequest();
-        }
-
+        boardService.write(boardFormRequest, boardImages, userService.getUser(userSession.id));
     }
 
     @GetMapping("/{boardId}")
-    public BoardResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
-        BoardResponse boardResponse = boardService.read(id);
-        if(boardResponse.getUid() == userSession.id) {
-            boardResponse.setWriterCheck(true);
-        }
-        return boardResponse;
+    public BoardDetailResponse readBoard(@PathVariable(name = "boardId") Long id, UserSession userSession) {
+        return boardService.read(id, userSession.id);
     }
 
     @GetMapping
-    public BoardResult readBoards(@ModelAttribute BoardSearch boardSearch){
-        return BoardResult.builder()
-                .boardList(boardService.getList(boardSearch))
-                .totalCnt(boardService.getCount())
-                .build();
+    public Page<BoardResponse> readBoards(@ModelAttribute BoardListRequest boardListRequest){
+        return boardService.getList(boardListRequest.getPage(), boardListRequest.getSize());
     }
 
     @PatchMapping("/{boardId}")
-    public void editBoard(@PathVariable Long boardId, @ModelAttribute BoardEdit boardEdit, UserSession userSession) throws IOException {
+    public void editBoard(@PathVariable Long boardId, @ModelAttribute @Valid BoardEditRequest boardEditRequest, UserSession userSession) throws IOException {
         ArrayList<BoardImage> boardImages = new ArrayList<>();
 
-        if(boardEdit.getBoardImages() != null){
-            boardImages = boardProvider.getImageList(boardEdit.getBoardImages());
+        if(boardEditRequest.boardImages() != null){
+            boardImages = boardProvider.getImageList(boardEditRequest.boardImages());
         }
 
-        boardService.edit(boardId, boardEdit, boardImages, userSession.id);
+        boardService.edit(boardId, boardEditRequest, boardImages, userSession.id);
     }
 
     @DeleteMapping("/{boardId}")
-    public void delete(@PathVariable Long boardId, UserSession userSession) {
+    public void deleteBoard(@PathVariable Long boardId, UserSession userSession) {
         boardService.delete(boardId, userSession.id);
     }
 
     @PostMapping("/like/{boardId}")
     public void boardLike(@PathVariable(name = "boardId") Long bid, UserSession userSession){
-        boardService.like(bid, userSession.id);
+        boardService.like(bid, userService.getUser(userSession.id));
     }
 
     @PostMapping("/like/check/{boardId}")
@@ -97,9 +85,4 @@ public class BoardController {
         return boardService.maxLikeBoard();
     }
 
-//    @GetMapping("/write/{boardId}/rss")
-//    public Board getRss(@PathVariable(name = "boardId") Long id) {
-//        Board board = boardService.getId();
-//        return board;
-//    }
 }

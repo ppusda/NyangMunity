@@ -1,13 +1,17 @@
 package cat.community.NyangMunity.board.entity;
 
-import cat.community.NyangMunity.board.entity.Board;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.*;
 
-import javax.persistence.*;
-
-@Entity @Table
-@Getter @Setter
+@Entity
+@Getter @Table(name="board_image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardImage {
 
@@ -30,7 +34,6 @@ public class BoardImage {
     private Long size;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name = "board_id")
     private Board board;
 
