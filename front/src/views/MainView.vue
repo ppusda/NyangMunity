@@ -29,10 +29,7 @@ axios.post("/nm/boards/like", ).then(response => {
           <div class="flex-row">
             <h1 class="text-7xl font-bold">Nyangmunity</h1>
             <p class="py-6">당신이 가진 가장 귀여운 고양이 사진을 공유해보세요!</p>
-            <a class="btn btn-outline btn-ghost">
-              <i class="fa-solid fa-arrow-right"></i>
-              <router-link :to="{name: 'boards'}">커뮤니티로 바로가기!</router-link>
-            </a>
+            <router-link :to="{name: 'boards'}" class="btn btn-outline btn-ghost"><i class="fa-solid fa-arrow-right"></i>커뮤니티로 바로가기!</router-link>
           </div>
         </div>
       </div>

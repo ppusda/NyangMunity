@@ -71,8 +71,8 @@ const moveToWrite = () => {
 </script>
 
 <template>
-  <div class="bg-zinc-800 w-screen rounded-2xl p-8 flex flex-col items-center">
-    <div class="bg-zinc-700 rounded-md sm:w-6/12 w-full h-[35rem] p-12 overflow-auto boardList">
+  <div class="w-screen p-8 flex flex-col items-center">
+    <div class="bg-zinc-800 rounded-md sm:w-8/12 w-full h-[35rem] p-12 overflow-auto boardList">
       <ul class="w-full">
         <li class="mb-4 p-8 bg-white rounded-md shadow" v-for="post in posts" :key="post.id">
           <div>
@@ -100,18 +100,13 @@ const moveToWrite = () => {
         </li>
       </ul>
     </div>
+    <div class="bg-zinc-800 rounded-md sm:w-8/12 w-full p-4 pt-1 overflow-auto boardList mt-3 flex flex-col">
+      <div class="flex flex-row mb-1">
+        <a class="btn btn-ghost"><i class="fa-solid fa-image"></i></a>
+        <a class="btn btn-ghost"><i class="fa-solid fa-cat"></i></a>
 
-    <div class="flex sm:flex-row flex-col justify-between items-center my-4 w-full md:w-2/3 lg:w-1/2">
-      <div>
-        <paginate
-            :pageCount="totalPage.value"
-            :elementClass="'btn btn-primary'"
-            :clickHandler="movePage">
-        </paginate>
       </div>
-      <div>
-        <a class="btn sm:mt-0 mt-3 btn-outline btn-primary" @click="moveToWrite()">새로 글 쓰기</a>
-      </div>
+      <textarea placeholder="고양이 사진과 간단한 설명을 입력해주세요." class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem]" ></textarea>
     </div>
   </div>
 
