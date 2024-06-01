@@ -15,16 +15,33 @@ public class CookieProvider {
         this.domain = appConfig.getDomain();
     }
 
-    public ResponseCookie createCookie(String accessToken) {
-        ResponseCookie cookie = ResponseCookie.from("SESSION", accessToken)
-                .domain(domain) // todo 향후 서버 환경에 따른 분리 필요
-                .path("/")
-                .httpOnly(false) // javascript가 cookie 값에 접근하지 못하게 하는 설정.
-                .secure(false)
-                .maxAge(Duration.ofHours(3))
-                .sameSite("Strict")
-                .build();
+    public ResponseCookie createAccessTokenCookie(String accessToken) {
 
-        return cookie;
+        return ResponseCookie.from("accessToken", accessToken)
+                .domain(domain)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(Duration.ofMinutes(30))
+                .build();
+    }
+
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .domain(domain)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(Duration.ofDays(1))
+                .build();
+    }
+
+    public ResponseCookie removeToken(String cookieName) {
+        return ResponseCookie.from(cookieName, null)
+                .domain(domain)
+                .path("/")
+                .maxAge(0)
+                .build();
     }
 }

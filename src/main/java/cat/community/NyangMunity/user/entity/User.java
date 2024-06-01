@@ -58,9 +58,6 @@ public class User {
     private List<Board> boards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Token> tokens = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
 
     public UserEditorBuilder toEditor() {
@@ -74,14 +71,5 @@ public class User {
         nickname = userEditor.getNickname();
         password = userEditor.getPassword();
         birthday = userEditor.getBirthday();
-    }
-
-    public Token addToken(String refreshToken) {
-        Token token = Token.builder()
-                .user(this)
-                .refreshToken(refreshToken)
-                .build();
-        tokens.add(token);
-        return token;
     }
 }
