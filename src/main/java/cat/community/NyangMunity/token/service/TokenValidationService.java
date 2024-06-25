@@ -51,9 +51,13 @@ public class TokenValidationService {
         return new String[] {accessToken, refreshToken};
     }
 
-    private void updateRefreshToken(Long memberId, String refreshToken) {
-        tokenService.deleteToken(memberId);
-        tokenService.register(refreshToken, memberId);
+    /***
+     * @param userId // 토큰 업데이트를 위한 메서드, 기존 토큰 교체 작업 진행
+     * @param refreshToken
+     */
+    private void updateRefreshToken(Long userId, String refreshToken) {
+        tokenService.deleteToken(userId);
+        tokenService.register(refreshToken, userId);
     }
 
 }
