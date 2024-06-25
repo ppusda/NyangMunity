@@ -1,10 +1,10 @@
 package cat.community.NyangMunity.global.exception;
 
-public class InvalidSigninInformation extends NyangmunityException{
+public class InvalidLoginInformationException extends NyangmunityException{
 
     private static final String MESSAGE = "아이디/비밀번호가 올바르지 않습니다.";
 
-    public InvalidSigninInformation() {
+    public InvalidLoginInformationException() {
         super(MESSAGE);
     }
 
