@@ -6,14 +6,12 @@ import router from "@/router";
 const email = ref("");
 const password = ref("");
 
-const { VITE_APP_KAKAO_CLIENT_KEY } = import.meta.env;
-const { VITE_APP_KAKAO_REDIRECT_URL } = import.meta.env;
-
 const login = function () {
-  axios.post("/nm/user/login", {
+  axios.post("http://localhost:8080/user/login", {
     email: email.value,
     password: password.value
-  }).then(() => {
+  }, { withCredentials: true })
+  .then(() => {
     router.replace({name: "main"})
         .then(() => router.go(0))
   }).catch(error => {

@@ -20,8 +20,8 @@ public class CookieProvider {
         return ResponseCookie.from("accessToken", accessToken)
                 .domain(domain)
                 .path("/")
-                .httpOnly(true)
-                .secure(true)
+                .httpOnly(false)
+                .secure(false)
                 .maxAge(Duration.ofMinutes(30))
                 .build();
     }
@@ -31,8 +31,8 @@ public class CookieProvider {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .domain(domain)
                 .path("/")
-                .httpOnly(true)
-                .secure(true)
+                .httpOnly(false)
+                .secure(false)
                 .maxAge(Duration.ofDays(1))
                 .build();
     }
