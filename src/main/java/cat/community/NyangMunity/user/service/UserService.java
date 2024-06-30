@@ -1,20 +1,21 @@
 package cat.community.NyangMunity.user.service;
 
+import cat.community.NyangMunity.global.exception.AlreadyExistsNicknameException;
+import cat.community.NyangMunity.global.exception.InvalidPasswordException;
 import cat.community.NyangMunity.global.exception.UserNotFoundException;
-import cat.community.NyangMunity.global.provider.KakaoAuthProvider;
+import cat.community.NyangMunity.global.provider.JwtTokenProvider;
 import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
+import cat.community.NyangMunity.token.service.TokenService;
 import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.user.editor.UserEditor;
 import cat.community.NyangMunity.global.exception.AlreadyExistsEmailException;
-import cat.community.NyangMunity.global.exception.InvalidRequest;
-import cat.community.NyangMunity.global.exception.InvalidSigninInformation;
-import cat.community.NyangMunity.global.exception.Unauthorized;
-import cat.community.NyangMunity.token.repository.TokenRepository;
+import cat.community.NyangMunity.global.exception.InvalidLoginInformationException;
 import cat.community.NyangMunity.user.repository.UserRepository;
+import cat.community.NyangMunity.user.request.UserEditForm;
 import cat.community.NyangMunity.user.request.UserForm;
-import cat.community.NyangMunity.user.response.KakaoTokenResponse;
-import cat.community.NyangMunity.token.util.TokenRefresher;
-import jakarta.transaction.Transactional;
+import cat.community.NyangMunity.user.request.UserJoinForm;
+import cat.community.NyangMunity.user.request.UserLoginForm;
+import cat.community.NyangMunity.user.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -30,105 +32,102 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
-    private final TokenRefresher tokenRefresher;
-    private final KakaoAuthProvider kakaoAuthProvider;
+    private final TokenService tokenService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
-    public User getUser(Long uid) {
-        return userRepository.findById(uid).orElseThrow(UserNotFoundException::new);
+    @Transactional(readOnly = true)
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Transactional
-    public Long userLogin(UserForm userForm) {
-        User user = userRepository.findByEmail(userForm.getEmail())
-                .orElseThrow(InvalidSigninInformation::new);
+    public UserTokenResponse userLogin(UserLoginForm userLoginForm) {
+        User user = getUserByEmail(userLoginForm.email())
+                .orElseThrow(InvalidLoginInformationException::new);
 
-        if(!scryptPasswordEncoder.matches(userForm.getPassword(), user.getPassword())) {
-            throw new InvalidSigninInformation();
+        if(!isPasswordMatches(userLoginForm.password(), user)) {
+            throw new InvalidLoginInformationException();
         }
 
-        if(!user.getTokens().isEmpty()) {
-            tokenRefresher.removeRefreshToken(user);
-        }
-
-        tokenRefresher.addRefreshToken(user);
-
-        return user.getId();
+        return createTokens(user.getId());
     }
 
-    public void register(UserForm userForm) {
-        Optional<User> userCheck = userRepository.findByEmail(userForm.getEmail());
-        if(userCheck.isPresent()){
-            throw new AlreadyExistsEmailException();
-        } else {
-            User user = User.builder()
-                    .email(userForm.getEmail())
-                    .password(scryptPasswordEncoder.encrypt(userForm.getPassword()))
-                    .nickname(userForm.getNickname())
-                    .birthday(userForm.getBirthday() != null && !userForm.getBirthday().isEmpty()
-                            ? LocalDate.parse(userForm.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
-                    .createDate(LocalDateTime.now())
-                    .build();
-            userRepository.save(user);
-        }
+    private UserTokenResponse createTokens(Long userId) {
+        String accessToken = jwtTokenProvider.createAccessToken(userId);
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+        tokenService.register(refreshToken, userId);
+
+        return UserTokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
-    public boolean userCheck(String nowPassword, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(Unauthorized::new);
+    @Transactional
+    public void register(UserJoinForm userJoinForm) {
+        checkDuplicateEmail(userJoinForm.email());
+        checkDuplicateNickname(userJoinForm.nickname());
 
-        return scryptPasswordEncoder.matches(nowPassword, user.getPassword());
+        User user = User.builder()
+                .email(userJoinForm.email())
+                .password(scryptPasswordEncoder.encrypt(userJoinForm.password()))
+                .nickname(userJoinForm.nickname())
+                .createDate(LocalDateTime.now())
+                .build();
+
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public void checkDuplicateEmail(String email) {
+        getUserByEmail(email).orElseThrow(AlreadyExistsEmailException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public void checkDuplicateNickname(String nickname) {
+        userRepository.findByNickname(nickname).orElseThrow(AlreadyExistsNicknameException::new);
     }
 
     @Transactional
     public void userLogout(Long userId) {
-        tokenRepository.deleteByUserId(userId);
-    }
-
-    public User userInfo(Long userId) {
-        if(!userId.equals(0L)){
-            User user = userRepository.findById(userId)
-                    .orElseThrow(Unauthorized::new);
-            return user;
-        } else{
-            throw new InvalidRequest();
-        }
+        tokenService.deleteToken(userId);
     }
 
     @Transactional
-    public void userEdit(UserForm userForm, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(Unauthorized::new);
+    public void userEdit(UserEditForm userEditForm, Long userId) {
+        User user = getUserById(userId);
+
+        if(!isPasswordMatches(userEditForm.password(), user)) {
+            throw new InvalidPasswordException();
+        }
 
         UserEditor.UserEditorBuilder userEditorBuilder = user.toEditor();
 
         UserEditor userEditor = userEditorBuilder
-                .nickname(userForm.getNickname() != null && !userForm.getNickname().isEmpty()
-                        ? userForm.getNickname() : user.getNickname())
-                .password(userForm.getPassword() != null && !userForm.getPassword().isEmpty()
-                        ? scryptPasswordEncoder.encrypt(userForm.getPassword()) : user.getPassword())
-                .birthday(userForm.getBirthday() != null && !userForm.getBirthday().isEmpty() && !userForm.getBirthday().equals("null")
-                        ? LocalDate.parse(userForm.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
+                .nickname(userEditForm.nickname() != null && !userEditForm.nickname().isEmpty()
+                        ? userEditForm.nickname() : user.getNickname())
+                .password(userEditForm.password() != null && !userEditForm.password().isEmpty()
+                        ? scryptPasswordEncoder.encrypt(userEditForm.password()) : user.getPassword())
+                .birthday(userEditForm.birthday() != null && !userEditForm.birthday().isEmpty() && !userEditForm.birthday().equals("null")
+                        ? LocalDate.parse(userEditForm.birthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
                 .build();
 
         user.edit(userEditor);
     }
 
+    @Transactional
     public void userCancel(Long userId) {
-        if(!userId.equals(0L)){
-            userRepository.deleteById(userId);
-        } else{
-            throw new InvalidRequest();
-        }
+        userRepository.deleteById(userId);
     }
 
-    public void kakaoLogin(String code) {
-        KakaoTokenResponse tokenResponse = kakaoAuthProvider.getToken(code);
-        log.info(tokenResponse.getAccess_token());
-        log.info(tokenResponse.getRefresh_token());
-
-        log.info(kakaoAuthProvider.getUserInfo(tokenResponse.getAccess_token()).getKakaoAccount().toString());
+    private boolean isPasswordMatches(String password, User user) {
+        return scryptPasswordEncoder.matches(password, user.getPassword());
     }
 }
 

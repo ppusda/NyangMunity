@@ -16,10 +16,6 @@ java {
 	sourceCompatibility = '17'
 }
 
-tasks.withType(JavaCompile) {
-	options.compilerArgs << "-parameters"
-}
-
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -45,6 +41,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-mustache'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	implementation'org.springframework.boot:spring-boot-starter-quartz'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
@@ -67,9 +66,10 @@ dependencies {
 	compileOnly 'javax.mail:mail:1.4.7'
 
 	/**
-	 * MYSQL
+	 * MySQL, Redis
 	 **/
 	implementation 'mysql:mysql-connector-java:8.0.26'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
 	/**
 	 * QueryDSL

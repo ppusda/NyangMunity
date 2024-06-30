@@ -3,7 +3,7 @@ package cat.community.NyangMunity.service;
 import cat.community.NyangMunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.global.exception.AlreadyExistsEmailException;
-import cat.community.NyangMunity.global.exception.InvalidSigninInformation;
+import cat.community.NyangMunity.global.exception.InvalidLoginInformationException;
 import cat.community.NyangMunity.user.repository.UserRepository;
 import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.user.service.UserService;
@@ -113,7 +113,7 @@ class UserServiceTest {
                 .build();
 
         // when
-        assertThrows(InvalidSigninInformation.class, () -> userService.userLogin(loginForm));
+        assertThrows(InvalidLoginInformationException.class, () -> userService.userLogin(loginForm));
 
     }
 }

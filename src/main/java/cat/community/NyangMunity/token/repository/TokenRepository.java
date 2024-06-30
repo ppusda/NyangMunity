@@ -1,14 +1,15 @@
 package cat.community.NyangMunity.token.repository;
 
 import cat.community.NyangMunity.token.entity.Token;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface TokenRepository extends JpaRepository<Token, Long> {
+@Repository
+public interface TokenRepository extends CrudRepository<Token, Long> {
 
-    List<Token> findByUserId(Long userId);
+    Optional<Token> findByUserId(Long memberId);
+    void deleteByUserId(Long memberId);
 
-    Optional<Token> deleteByUserId(Long userId);
 }

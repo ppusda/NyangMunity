@@ -1,36 +1,26 @@
 package cat.community.NyangMunity.token.entity;
 
-import cat.community.NyangMunity.user.entity.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
-@Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@RedisHash(value = "token", timeToLive = 60*60*24*7)
 public class Token {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String refreshToken;
 
-
-    @ManyToOne
-    @JoinColumn(unique = true)
-    private User user;
+    @Indexed
+    private Long userId;
 
     @Builder
-    public Token(String refreshToken, User user) {
+    public Token(String refreshToken, Long userId) {
         this.refreshToken = refreshToken;
-        this.user = user;
+        this.userId = userId;
     }
 }

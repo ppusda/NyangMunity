@@ -27,11 +27,10 @@ import java.util.List;
 public class User {
 
     @Builder
-    public User(String email, String password, String nickname, LocalDate birthday, LocalDateTime createDate) {
+    public User(String email, String password, String nickname, LocalDateTime createDate) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.birthday = birthday;
         this.createDate = createDate;
     }
 
@@ -51,14 +50,8 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createDate;
 
-    @Column
-    private LocalDate birthday;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Board> boards = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Token> tokens = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardLike> boardLikes = new ArrayList<>();
@@ -66,22 +59,11 @@ public class User {
     public UserEditorBuilder toEditor() {
         return UserEditor.builder()
                 .nickname(nickname)
-                .password(password)
-                .birthday(birthday);
+                .password(password);
     }
 
     public void edit(UserEditor userEditor) {
         nickname = userEditor.getNickname();
         password = userEditor.getPassword();
-        birthday = userEditor.getBirthday();
-    }
-
-    public Token addToken(String refreshToken) {
-        Token token = Token.builder()
-                .user(this)
-                .refreshToken(refreshToken)
-                .build();
-        tokens.add(token);
-        return token;
     }
 }

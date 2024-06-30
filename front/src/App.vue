@@ -1,27 +1,14 @@
-<script lang="ts">
-  import Header from "./views/commons/Header.vue";
-  import MainView from "./views/MainView.vue";
-  import Footer from "./views/commons/Footer.vue";
-
-import "./assets/main.css";
-
-export default {
-  name: 'App',
-  components: {
-    Header,
-    MainView,
-    Footer
-  }
-}
-</script>
-
 <template>
-  <div id="app" class="flex flex-col h-screen bg-zinc-900 justify-between">
+  <div id="app" class="flex flex-col h-screen bg-zinc-900">
     <Header />
     <router-view />
-    <Footer />
   </div>
 </template>
+
+<script setup lang="ts">
+  import Header from "@/components/Header.vue";
+  import "./assets/main.css";
+</script>
 
 <style>
 
