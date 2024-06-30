@@ -4,13 +4,10 @@ import cat.community.NyangMunity.board.editor.BoardEditor;
 import cat.community.NyangMunity.board.entity.Board;
 import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.board.entity.BoardLike;
-import cat.community.NyangMunity.board.entity.QBoardLike;
 import cat.community.NyangMunity.board.response.BoardDetailResponse;
-import cat.community.NyangMunity.global.exception.EmptyMaxLikedBoardException;
-import cat.community.NyangMunity.global.exception.Unauthorized;
+import cat.community.NyangMunity.global.exception.UnauthorizedUserException;
 import cat.community.NyangMunity.board.repository.BoardImageRepository;
 import cat.community.NyangMunity.board.repository.BoardLikeRepository;
-import cat.community.NyangMunity.user.repository.UserRepository;
 import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.global.exception.BoardNotFoundException;
 import cat.community.NyangMunity.board.repository.BoardRepository;
@@ -19,15 +16,12 @@ import cat.community.NyangMunity.board.response.BoardImageResponse;
 import cat.community.NyangMunity.board.response.BoardResponse;
 import cat.community.NyangMunity.board.response.LikeBoardResponse;
 import cat.community.NyangMunity.user.entity.User;
-import com.querydsl.core.Tuple;
-import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -64,13 +58,9 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    public BoardDetailResponse read(Long bid, Long uid) {
+    public BoardResponse read(Long bid) {
         Board board = getBoard(bid);
-
-        return BoardDetailResponse.builder()
-                .boardResponse(BoardResponse.from(board, convertToBoardImageResponse(board)))
-                .isWriter(isWriter(board.getUser().getId(), uid))
-                .build();
+        return BoardResponse.from(board, convertToBoardImageResponse(board));
     }
 
     public Page<BoardResponse> getList(Integer page, Integer size) {
@@ -85,7 +75,7 @@ public class BoardService {
         Board board = getBoard(bid);
 
         if (!board.getUser().getId().equals(uid)) {
-            throw new Unauthorized();
+            throw new UnauthorizedUserException();
         }
 
         if(boardEditRequest.removeList() != null && !boardEditRequest.removeList().isEmpty()) {
@@ -113,7 +103,7 @@ public class BoardService {
         Board board = getBoard(bid);
 
         if (!board.getUser().getId().equals(uid)) {
-            throw new Unauthorized();
+            throw new UnauthorizedUserException();
         }
 
         boardRepository.delete(board);
