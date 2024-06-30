@@ -11,8 +11,10 @@ import cat.community.NyangMunity.user.editor.UserEditor;
 import cat.community.NyangMunity.global.exception.AlreadyExistsEmailException;
 import cat.community.NyangMunity.global.exception.InvalidLoginInformationException;
 import cat.community.NyangMunity.user.repository.UserRepository;
+import cat.community.NyangMunity.user.request.UserEditForm;
 import cat.community.NyangMunity.user.request.UserForm;
-import cat.community.NyangMunity.user.response.UserResponse;
+import cat.community.NyangMunity.user.request.UserJoinForm;
+import cat.community.NyangMunity.user.request.UserLoginForm;
 import cat.community.NyangMunity.user.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,11 +47,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserTokenResponse userLogin(UserForm userForm) {
-        User user = getUserByEmail(userForm.getEmail())
+    public UserTokenResponse userLogin(UserLoginForm userLoginForm) {
+        User user = getUserByEmail(userLoginForm.email())
                 .orElseThrow(InvalidLoginInformationException::new);
 
-        if(!isPasswordMatches(userForm.getPassword(), user)) {
+        if(!isPasswordMatches(userLoginForm.password(), user)) {
             throw new InvalidLoginInformationException();
         }
 
@@ -68,14 +70,14 @@ public class UserService {
     }
 
     @Transactional
-    public void register(UserForm userForm) {
-        checkDuplicateEmail(userForm.getEmail());
-        checkDuplicateNickname(userForm.getNickname());
+    public void register(UserJoinForm userJoinForm) {
+        checkDuplicateEmail(userJoinForm.email());
+        checkDuplicateNickname(userJoinForm.nickname());
 
         User user = User.builder()
-                .email(userForm.getEmail())
-                .password(scryptPasswordEncoder.encrypt(userForm.getPassword()))
-                .nickname(userForm.getNickname())
+                .email(userJoinForm.email())
+                .password(scryptPasswordEncoder.encrypt(userJoinForm.password()))
+                .nickname(userJoinForm.nickname())
                 .createDate(LocalDateTime.now())
                 .build();
 
@@ -98,22 +100,22 @@ public class UserService {
     }
 
     @Transactional
-    public void userEdit(UserForm userForm, Long userId) {
+    public void userEdit(UserEditForm userEditForm, Long userId) {
         User user = getUserById(userId);
 
-        if(!isPasswordMatches(userForm.getPassword(), user)) {
+        if(!isPasswordMatches(userEditForm.password(), user)) {
             throw new InvalidPasswordException();
         }
 
         UserEditor.UserEditorBuilder userEditorBuilder = user.toEditor();
 
         UserEditor userEditor = userEditorBuilder
-                .nickname(userForm.getNickname() != null && !userForm.getNickname().isEmpty()
-                        ? userForm.getNickname() : user.getNickname())
-                .password(userForm.getPassword() != null && !userForm.getPassword().isEmpty()
-                        ? scryptPasswordEncoder.encrypt(userForm.getPassword()) : user.getPassword())
-                .birthday(userForm.getBirthday() != null && !userForm.getBirthday().isEmpty() && !userForm.getBirthday().equals("null")
-                        ? LocalDate.parse(userForm.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
+                .nickname(userEditForm.nickname() != null && !userEditForm.nickname().isEmpty()
+                        ? userEditForm.nickname() : user.getNickname())
+                .password(userEditForm.password() != null && !userEditForm.password().isEmpty()
+                        ? scryptPasswordEncoder.encrypt(userEditForm.password()) : user.getPassword())
+                .birthday(userEditForm.birthday() != null && !userEditForm.birthday().isEmpty() && !userEditForm.birthday().equals("null")
+                        ? LocalDate.parse(userEditForm.birthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
                 .build();
 
         user.edit(userEditor);

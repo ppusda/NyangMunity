@@ -2,7 +2,10 @@ package cat.community.NyangMunity.user.controller;
 
 import cat.community.NyangMunity.global.provider.CookieProvider;
 import cat.community.NyangMunity.user.entity.User;
+import cat.community.NyangMunity.user.request.UserEditForm;
 import cat.community.NyangMunity.user.request.UserForm;
+import cat.community.NyangMunity.user.request.UserJoinForm;
+import cat.community.NyangMunity.user.request.UserLoginForm;
 import cat.community.NyangMunity.user.response.UserCheckResponse;
 import cat.community.NyangMunity.user.response.UserTokenResponse;
 import cat.community.NyangMunity.user.response.UserResponse;
@@ -26,13 +29,13 @@ public class UserController {
     private final CookieProvider cookieProvider;
 
     @PostMapping("/join")
-    private void userJoin(@RequestBody @Valid UserForm userForm) {
-        userService.register(userForm);
+    private void userJoin(@RequestBody @Valid UserJoinForm userJoinForm) {
+        userService.register(userJoinForm);
     }
 
     @PostMapping("/login")
-    private ResponseEntity<?> userLogin(@RequestBody @Valid UserForm userForm) {
-        UserTokenResponse userTokenResponse = userService.userLogin(userForm);
+    private ResponseEntity<?> userLogin(@RequestBody @Valid UserLoginForm userLoginForm) {
+        UserTokenResponse userTokenResponse = userService.userLogin(userLoginForm);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(
@@ -70,8 +73,8 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/profile")
-    private void userEdit(@RequestBody @Valid UserForm userForm, Principal principal) {
-        userService.userEdit(userForm, Long.parseLong(principal.getName()));
+    private void userEdit(@RequestBody @Valid UserEditForm userEditForm, Principal principal) {
+        userService.userEdit(userEditForm, Long.parseLong(principal.getName()));
     }
 
     @PreAuthorize("isAuthenticated()")
