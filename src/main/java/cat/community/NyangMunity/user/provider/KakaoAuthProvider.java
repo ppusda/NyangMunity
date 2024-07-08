@@ -1,29 +1,28 @@
-package cat.community.NyangMunity.global.provider;
+package cat.community.NyangMunity.user.provider;
 
 import cat.community.NyangMunity.user.response.KakaoTokenResponse;
 import cat.community.NyangMunity.user.response.KakaoUserResponse;
 import com.google.gson.Gson;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-@Getter @Setter
-@ConfigurationProperties(prefix = "kakao")
+@Getter
+@RequiredArgsConstructor
+@ConfigurationProperties("kakao")
 public class KakaoAuthProvider {
 
-    public String clientKey;
-    public String secretKey;
-    public String grantType;
-    public String redirectUri;
+    private final String clientKey;
+    private final String secretKey;
+    private final String grantType;
+    private final String redirectUri;
 
     String TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token";
     String USER_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";

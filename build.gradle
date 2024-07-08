@@ -35,7 +35,6 @@ dependencies {
 	 * Spring Framework
 	 **/
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
@@ -43,9 +42,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mustache'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
-	implementation'org.springframework.boot:spring-boot-starter-quartz'
+	implementation 'org.springframework.boot:spring-boot-starter-quartz'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+	/**
+	 * Lombok
+	 **/
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
 	/**
 	 * scrypt
@@ -57,13 +62,6 @@ dependencies {
 	 * File Upload
 	 **/
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
-
-	/**
-	 * Lombok
-	 **/
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	compileOnly 'javax.mail:mail:1.4.7'
 
 	/**
 	 * MySQL, Redis
