@@ -26,17 +26,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
       file-size-threshold: 0
-  mustache:
-    suffix: .html
-    prefix: classpath:/static/
 
 logging:
   level:
     org.springframework.web: DEBUG
-nyangmunity:
-  jwt-key: ${custom.jwt-secret-key}
-
-kakao:
-  client-key: ${custom.kakao-client-key}
-  secret-key: ${custom.kakao-secret-key}
-  grant-type: ${custom.kakao-grant-type}
