@@ -42,7 +42,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mustache'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
-	implementation 'org.springframework.boot:spring-boot-starter-quartz'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
@@ -94,6 +93,11 @@ dependencies {
 	 * GSON
 	 **/
 	implementation 'com.google.code.gson:gson:2.8.9'
+
+	/**
+	 * Webflux
+	 **/
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 ext {

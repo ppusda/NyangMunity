@@ -3,7 +3,6 @@ package cat.community.NyangMunity.user.provider;
 import cat.community.NyangMunity.user.response.KakaoTokenResponse;
 import cat.community.NyangMunity.user.response.KakaoUserResponse;
 import com.google.gson.Gson;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpEntity;
@@ -14,7 +13,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-@Getter
 @RequiredArgsConstructor
 @ConfigurationProperties("kakao")
 public class KakaoAuthProvider {

@@ -19,7 +19,7 @@ spring:
         default-page-size: 5
   batch:
     job:
-      enabled: true
+      enabled: false
   servlet:
     multipart:
       enabled: true
