@@ -10,6 +10,9 @@ const page = reactive({ value: 1 });
 const pageCount = 5;
 const totalPage = reactive({ value: 0 });
 
+// 업로드 이미지
+const uploadImage = ref<string | null>(null);
+
 // 갤러리 이미지 리스트
 const images = reactive<string[]>([]);
 
@@ -70,14 +73,13 @@ const moveToWrite = () => {
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
   const files = event.dataTransfer?.files;
-  if (files) {
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        images.push(e.target.result);
-      };
-      reader.readAsDataURL(files[i]);
-    }
+  if (files && files.length > 0) {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      uploadImage.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 };
 
@@ -93,20 +95,27 @@ const copyLink = (link: string) => {
   <div class="w-screen h-screen flex p-2">
     <!-- 왼쪽 사이드바 -->
     <div class="flex flex-col w-1/5 bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
-      <div class="h-3/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
-        <p class="text-gray-400">Nyangmunity Image</p>
+      <div class="h-3/5 text-white p-4 mb-8">
+        <p>냥뮤니티 이미지</p>
+        <p class="text-xs text-gray-400">냥뮤니티 인기 이미지를 살펴보세요!</p>
       </div>
       <div class="h-2/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
-        <p class="text-gray-400">Image Upload</p>
-        <div class="upload-area border border-dashed border-gray-500 mt-2 p-4" @drop="handleDrop" @dragover.prevent>
-          <p class="text-center text-gray-400">여기로 이미지를 드래그 앤 드롭 하세요.</p>
+        <p>이미지 업로드</p>
+        <p class="text-xs text-gray-400">당신만의 이미지를 업로드해보세요!</p>
+        <div class="upload-area border border-dashed border-gray-500 mt-4 p-4" @drop="handleDrop" @dragover.prevent>
+          <div v-if="uploadImage" class="mr-2">
+            <img :src="uploadImage" class="w-full h-32 object-cover rounded-md" />
+          </div>
+          <div v-else>
+            <p class="text-center text-gray-400">Drag & Drop</p>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 메인 게시판 섹션 -->
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
-      <div class="flex-1 rounded-md overflow-auto mb-2 p-2 boardList">
+      <div class="flex-1 border border-gray-400 rounded-md overflow-auto p-4 m-4 boardList h-5/6">
         <ul class="w-full">
           <li class="mb-4 p-4 bg-gray-100 rounded-md shadow" v-for="post in posts" :key="post.id">
             <div>
@@ -136,15 +145,23 @@ const copyLink = (link: string) => {
       </div>
 
       <!-- 입력창 영역 -->
-      <div class="bg-zinc-800 rounded-md p-2">
-        <textarea placeholder="고양이 사진과 설명을 입력해주세요." class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
+      <div class="flex flex-row h-1/6">
+        <div class="bg-zinc-800 rounded-md p-2 w-11/12">
+          <textarea placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
+        </div>
+        <div class="h-full p-2 w-1/12">
+          <button class="btn btn-ghost h-full border border-gray-400">전송</button>
+        </div>
       </div>
     </div>
 
     <!-- 오른쪽 사이드바 -->
     <div class="bg-zinc-800 w-1/5 rounded-md text-white p-4 ml-2 transition-all duration-300">
+      <div class="text-white p-4">
+        <p>고양이 짤</p>
+        <p class="text-xs text-gray-400">고양이가 없는 분들을 위해 준비했습니다!</p>
+      </div>
       <div class="gallery p-4 grid grid-cols-1 gap-2">
-        <p class="text-gray-400">Cat Meme</p>
         <div v-for="(img, index) in images" :key="index" class="relative group">
           <img :src="img" class="w-full h-full object-cover rounded-md" @click="copyLink(img)" />
           <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
