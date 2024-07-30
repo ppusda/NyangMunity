@@ -1,78 +1,76 @@
 <script setup lang="ts">
-import axios from "axios";
-import { reactive, ref } from "vue";
-import router from "@/router";
-import paginate from "vuejs-paginate-next";
+import { ref, reactive } from 'vue';
 import { useClipboard } from '@vueuse/core';
+import axios from 'axios';
+import router from '@/router';
 
+// 게시물 및 페이지네이션 상태
 const posts = reactive<any[]>([]);
 const page = reactive({ value: 1 });
 const pageCount = 5;
 const totalPage = reactive({ value: 0 });
 
-const getWriteTime = (time: any) => {
-  let answer = "";
+// 사이드바 표시 상태
+const showUploadArea = ref(false);
+const showGallery = ref(false);
 
-  let now = new Date();
-  let writeTime = new Date(time);
+// 갤러리 이미지 리스트
+const images = reactive<string[]>([]);
+
+// 게시물 작성 시간 계산 함수
+const getWriteTime = (time: any) => {
+  let answer = '';
+  const now = new Date();
+  const writeTime = new Date(time);
   let calc = Math.floor((now.getTime() - writeTime.getTime()) / 1000);
 
-  answer = calc + "초 전";
+  answer = `${calc}초 전`;
   if (calc >= 60) {
     calc = Math.floor(calc / 60);
-    answer = calc + "분 전";
+    answer = `${calc}분 전`;
     if (calc >= 60) {
       calc = Math.floor(calc / 60);
-      answer = calc + "시간 전";
+      answer = `${calc}시간 전`;
       if (calc >= 24) {
         calc = Math.floor(calc / 24);
-        answer = calc + "일 전";
+        answer = `${calc}일 전`;
         if (calc >= 30) {
           calc = Math.floor(calc / 30);
-          answer = calc + "달 전";
+          answer = `${calc}달 전`;
           if (calc >= 12) {
-            Math.floor(calc / 12);
-            answer = calc + "년 전";
+            calc = Math.floor(calc / 12);
+            answer = `${calc}년 전`;
           }
         }
       }
     }
   }
-
   return answer;
-}
+};
 
+// 특정 페이지의 게시물 가져오기
 const movePage = (pageValue: any) => {
   const springPageValue = pageValue - 1;
   axios.get(`/nm/boards?page=${springPageValue}&size=${pageCount}`).then(response => {
     totalPage.value = response.data.totalPages;
-    posts.splice(0, posts.length);
-    response.data.content.forEach((res: any) => {
-      posts.push(res);
-    });
+    posts.splice(0, posts.length, ...response.data.content);
   });
-}
+};
 
 movePage(page.value);
 
+// 게시물 작성 페이지로 이동
 const moveToWrite = () => {
-  axios.post("/nm/user/check").then(() => {
-    router.push({ name: "write" });
+  axios.post('/nm/user/check').then(() => {
+    router.push({ name: 'write' });
   }).catch(error => {
     if (error.response) {
-      router.push({ name: "login" });
+      router.push({ name: 'login' });
     }
   });
-}
+};
 
-// 드래그 앤 드롭 영역 토글 상태
-const showUploadArea = ref(false);
-// 이미지 갤러리 토글 상태
-const showGallery = ref(false);
-// 이미지 리스트
-const images = reactive<string[]>([]);
-
-// 이미지 업로드 핸들러
+// 이미지 드래그 앤 드롭 업로드 핸들러
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
   const files = event.dataTransfer?.files;
@@ -85,27 +83,32 @@ const handleDrop = (event: DragEvent) => {
       reader.readAsDataURL(files[i]);
     }
   }
-}
+};
 
-// 이미지 링크 복사 핸들러
+// 클립보드에 링크 복사
 const { copy } = useClipboard();
 const copyLink = (link: string) => {
   copy(link);
-  alert("링크가 복사되었습니다: " + link);
-}
-
+  alert(`링크가 복사되었습니다: ${link}`);
+};
 </script>
 
 <template>
   <div class="w-screen h-screen flex p-2">
-    <!-- 이미지 업로드 공간 -->
-    <div class="w-1/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
-      <div v-if="showUploadArea" class="upload-area border border-dashed border-gray-500 mt-2 p-4" @drop="handleDrop" @dragover.prevent>
-        <p class="text-center text-gray-400">여기로 이미지를 드래그 앤 드롭 하세요.</p>
+    <!-- 왼쪽 사이드바 -->
+    <div :class="{ hidden: !showUploadArea, 'w-1/5': showUploadArea }" class="flex flex-col bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
+      <div class="h-3/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
+        <p class="text-gray-400">Nyangmunity Image</p>
+      </div>
+      <div class="h-2/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
+        <p class="text-gray-400">Image Upload</p>
+        <div v-if="showUploadArea" class="upload-area border border-dashed border-gray-500 mt-2 p-4" @drop="handleDrop" @dragover.prevent>
+          <p class="text-center text-gray-400">여기로 이미지를 드래그 앤 드롭 하세요.</p>
+        </div>
       </div>
     </div>
 
-    <!-- 채팅창 형식 게시판과 입력창 -->
+    <!-- 메인 게시판 섹션 -->
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
       <div class="flex-1 rounded-md overflow-auto mb-2 p-2 boardList">
         <ul class="w-full">
@@ -142,13 +145,14 @@ const copyLink = (link: string) => {
           <button class="btn btn-ghost" @click="showUploadArea = !showUploadArea"><i class="fa-solid fa-image"></i></button>
           <button class="btn btn-ghost" @click="showGallery = !showGallery"><i class="fa-solid fa-cat"></i></button>
         </div>
-        <textarea placeholder="고양이 사진과 간단한 설명을 입력해주세요." class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem]"></textarea>
+        <textarea placeholder="고양이 사진과 설명을 입력해주세요." class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
       </div>
     </div>
 
-    <!-- Masonry 형식 이미지 제공 공간 -->
-    <div class="w-1/5 bg-zinc-800 rounded-md text-white p-4 ml-2">
-      <div v-if="showGallery" class="gallery mt-2 grid grid-cols-1 gap-2">
+    <!-- 오른쪽 사이드바 -->
+    <div :class="{ hidden: !showGallery, 'w-1/5': showGallery }" class="bg-zinc-800 rounded-md text-white p-4 ml-2 transition-all duration-300">
+      <div v-if="showGallery" class="gallery p-4 grid grid-cols-1 gap-2">
+        <p class="text-gray-400">Cat Meme</p>
         <div v-for="(img, index) in images" :key="index" class="relative group">
           <img :src="img" class="w-full h-full object-cover rounded-md" @click="copyLink(img)" />
           <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -160,7 +164,7 @@ const copyLink = (link: string) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .upload-area {
   height: 200px;
   display: flex;
