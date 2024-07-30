@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import {reactive, ref} from 'vue';
 import { useClipboard } from '@vueuse/core';
 import axios from 'axios';
 import router from '@/router';
@@ -9,10 +9,6 @@ const posts = reactive<any[]>([]);
 const page = reactive({ value: 1 });
 const pageCount = 5;
 const totalPage = reactive({ value: 0 });
-
-// 사이드바 표시 상태
-const showUploadArea = ref(false);
-const showGallery = ref(false);
 
 // 갤러리 이미지 리스트
 const images = reactive<string[]>([]);
@@ -96,13 +92,13 @@ const copyLink = (link: string) => {
 <template>
   <div class="w-screen h-screen flex p-2">
     <!-- 왼쪽 사이드바 -->
-    <div :class="{ hidden: !showUploadArea, 'w-1/5': showUploadArea }" class="flex flex-col bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
+    <div class="flex flex-col w-1/5 bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
       <div class="h-3/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
         <p class="text-gray-400">Nyangmunity Image</p>
       </div>
       <div class="h-2/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
         <p class="text-gray-400">Image Upload</p>
-        <div v-if="showUploadArea" class="upload-area border border-dashed border-gray-500 mt-2 p-4" @drop="handleDrop" @dragover.prevent>
+        <div class="upload-area border border-dashed border-gray-500 mt-2 p-4" @drop="handleDrop" @dragover.prevent>
           <p class="text-center text-gray-400">여기로 이미지를 드래그 앤 드롭 하세요.</p>
         </div>
       </div>
@@ -141,17 +137,13 @@ const copyLink = (link: string) => {
 
       <!-- 입력창 영역 -->
       <div class="bg-zinc-800 rounded-md p-2">
-        <div class="flex flex-row mb-1">
-          <button class="btn btn-ghost" @click="showUploadArea = !showUploadArea"><i class="fa-solid fa-image"></i></button>
-          <button class="btn btn-ghost" @click="showGallery = !showGallery"><i class="fa-solid fa-cat"></i></button>
-        </div>
         <textarea placeholder="고양이 사진과 설명을 입력해주세요." class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
       </div>
     </div>
 
     <!-- 오른쪽 사이드바 -->
-    <div :class="{ hidden: !showGallery, 'w-1/5': showGallery }" class="bg-zinc-800 rounded-md text-white p-4 ml-2 transition-all duration-300">
-      <div v-if="showGallery" class="gallery p-4 grid grid-cols-1 gap-2">
+    <div class="bg-zinc-800 w-1/5 rounded-md text-white p-4 ml-2 transition-all duration-300">
+      <div class="gallery p-4 grid grid-cols-1 gap-2">
         <p class="text-gray-400">Cat Meme</p>
         <div v-for="(img, index) in images" :key="index" class="relative group">
           <img :src="img" class="w-full h-full object-cover rounded-md" @click="copyLink(img)" />
