@@ -16,15 +16,16 @@ public class MemeConfig {
     private final String clientKey;
 
     private static final String REQUEST_URL = "https://tenor.googleapis.com/v2/search";
-    private static final String SEARCH_TERM = "catmeme";
+    private static final String FILTER = "gif";
     private static final Integer LIMIT = 50;
 
-    public URI generateRequestUri() {
+    public URI generateRequestUri(String searchTerm) {
         return UriComponentsBuilder.fromUriString(REQUEST_URL)
-                .queryParam("q", SEARCH_TERM)
+                .queryParam("q", searchTerm)
                 .queryParam("key", secretKey)
                 .queryParam("client_key", clientKey)
                 .queryParam("limit", LIMIT)
+                .queryParam("media_filter", FILTER)
                 .build(true)
                 .toUri();
     }
