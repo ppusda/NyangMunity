@@ -10,14 +10,10 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
@@ -51,7 +47,18 @@ public class MemeService {
                 });
     }
 
-    public void saveMemes(List<Meme> memeList) {
-        memeRepository.saveAll(memeList);
+    @Transactional(readOnly = true)
+    public List<Meme> getAllMemes() {
+        return memeRepository.findAll();
+    }
+
+    @Transactional
+    public void saveMemes(List<Meme> saveMemeList) {
+        memeRepository.saveAll(saveMemeList);
+    }
+
+    @Transactional
+    public void deleteMemes(List<Meme> deleteMemeList) {
+        memeRepository.deleteAll(deleteMemeList);
     }
 }
