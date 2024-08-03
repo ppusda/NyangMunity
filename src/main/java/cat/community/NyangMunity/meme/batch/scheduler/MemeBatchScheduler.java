@@ -15,9 +15,8 @@ public class MemeBatchScheduler {
 
     private final MemeBatchService memeBatchService;
 
-    @Scheduled(cron = "0 5 19 * * ?") // 매 자정마다 Job 실행, cron 표현식 (초 분 시 일 월 요일)
+    @Scheduled(cron = "0 0 4 * * ?") // 매 새벽마다 Job 실행, cron 표현식 (초 분 시 일 월 요일)
     public void memeBatchUpdateSchedule() {
         memeBatchService.runMemeBatchJob();
-        log.info("TEST: MemeBatchJob 실행 !!!");
     }
 }
