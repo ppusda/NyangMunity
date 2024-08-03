@@ -29,8 +29,8 @@ public class MemeService {
     private final MemeConfig memeConfig;
     private final MemeRepository memeRepository;
 
-    public Mono<List<TenorResponse>> getCatMeme() {
-        URI requestUri = memeConfig.generateRequestUri();
+    public Mono<List<TenorResponse>> getCatMeme(String searchTerm) {
+        URI requestUri = memeConfig.generateRequestUri(searchTerm);
 
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
