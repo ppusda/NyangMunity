@@ -9,19 +9,13 @@ import java.util.Base64;
 @ConfigurationProperties(prefix = "nyangmunity")
 public class AppConfig {
 
-    public byte[] jwtKey;
-    public String imagePath;
-    public String domain;
+    private final byte[] jwtKey;
+    private final String imagePath;
+    private final String domain;
 
-    public void setJwtKey(String jwtKey) {
+    public AppConfig(String jwtKey, String imagePath, String domain) {
         this.jwtKey = Base64.getDecoder().decode(jwtKey);
-    }
-
-    public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
-    }
-
-    public void setDomain(String domain) {
         this.domain = domain;
     }
 }

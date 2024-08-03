@@ -16,51 +16,7 @@ interface Gif {
 const gifs = ref<Gif[]>([]);
 const memeList = ref();
 
-const { VITE_APP_TENOR_SECRET_KEY } = import.meta.env;
-const { VITE_APP_TENOR_CLIENT_KEY } = import.meta.env;
-const limit = 36;
-
-let posKey: string[] = [];
 let currentPage = -1;
-
-
-function getData(searchTerm: string, page: number): Promise<Gif[]> {
-  const search_url = `https://tenor.googleapis.com/v2/search?q=${searchTerm}&key=${VITE_APP_TENOR_SECRET_KEY}&client_key=${VITE_APP_TENOR_CLIENT_KEY}&limit=${limit}&pos=${posKey[page]}`;
-
-  return new Promise((resolve, reject) =>{
-    const xmlHttp = new XMLHttpRequest();
-
-    xmlHttp.onreadystatechange = function () {
-      if (xmlHttp.readyState === 4) {
-        if (xmlHttp.status === 200) {
-          const response_objects = JSON.parse(xmlHttp.responseText);
-          const gifs = response_objects["results"];
-          posKey.push(response_objects["next"]);
-          resolve(gifs);
-        }else{
-          reject(xmlHttp.statusText);
-        }
-      }
-    };
-
-    xmlHttp.open("GET", search_url, true);
-    xmlHttp.send(null)
-  });
-}
-
-async function searchGifs(searchTerm: string, page:number): Promise<void> {
-  try {
-    const searchResults = await getData(searchTerm, page);
-    gifs.value = gifs.value.concat(searchResults);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function nextPage(): Promise<void> {
-  currentPage++;
-  await searchGifs("cat meme", currentPage);
-}
 
 function copyImageUrl(url: string): void {
   navigator.clipboard.writeText(url).then(() => {

@@ -3,8 +3,8 @@ spring:
     import: classpath:application-secret.yml
   datasource:
     url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${custom.dev-mysql-username}
-    password: ${custom.dev-mysql-password}
+    username: ${nyangmunity.dev-mysql-username}
+    password: ${nyangmunity.dev-mysql-password}
   jpa:
     hibernate:
       ddl-auto: update
