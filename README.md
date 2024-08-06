@@ -18,4 +18,4 @@
 - Library & Framework : Spring Boot
 - Database : MySQL
 - ORM : JPA
-- Deploy: AWS(EC2, S3)
+- Deploy: AWS(EC2)
