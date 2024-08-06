@@ -43,7 +43,6 @@ public class BoardService {
 
     public void write(BoardFormRequest boardFormRequest, ArrayList<BoardImage> boardImages, User user){
         Board board = Board.builder()
-                .title(boardFormRequest.title())
                 .content(boardFormRequest.content())
                 .user(user)
                 .boardImages(boardImages)
@@ -91,7 +90,6 @@ public class BoardService {
 
         BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
         BoardEditor boardEditor = boardEditorBuilder
-                .title(boardEditRequest.title())
                 .content(boardEditRequest.content())
                 .build();
 

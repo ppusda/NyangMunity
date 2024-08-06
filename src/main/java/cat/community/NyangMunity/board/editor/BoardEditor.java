@@ -4,11 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class BoardEditor {
-    private final String title;
     private final String content;
 
-    public BoardEditor(String title, String content) {
-        this.title = title;
+    public BoardEditor(String content) {
         this.content = content;
     }
 
@@ -17,17 +15,9 @@ public class BoardEditor {
     }
 
     public static class BoardEditorBuilder {
-        private String title;
         private String content;
 
         BoardEditorBuilder() {
-        }
-
-        public BoardEditor.BoardEditorBuilder title(final String title) {
-            if(title != null){
-                this.title = title;
-            }
-            return this;
         }
 
         public BoardEditor.BoardEditorBuilder content(final String content) {
@@ -38,11 +28,11 @@ public class BoardEditor {
         }
 
         public BoardEditor build() {
-            return new BoardEditor(this.title, this.content);
+            return new BoardEditor(this.content);
         }
 
         public String toString() {
-            return "BoardEditor.BoardEditorBuilder(title=" + this.title + ", content=" + this.content + ")";
+            return "BoardEditor.BoardEditorBuilder(content=" + this.content + ")";
         }
     }
 }

@@ -26,8 +26,7 @@ import java.util.List;
 public class Board {
 
     @Builder
-    public Board(String title, String content, User user, ArrayList<BoardImage> boardImages, LocalDateTime createDate) {
-        this.title = title;
+    public Board(String content, User user, ArrayList<BoardImage> boardImages, LocalDateTime createDate) {
         this.content = content;
         this.user = user;
         this.boardImages = boardImages;
@@ -37,9 +36,6 @@ public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column
-    private String title;
 
     @Column(columnDefinition = "text")
     private String content;
@@ -59,12 +55,10 @@ public class Board {
 
     public BoardEditorBuilder toEditor() {
         return BoardEditor.builder()
-                .title(title)
                 .content(content);
     }
 
     public void edit(BoardEditor boardEditor){
-        title = boardEditor.getTitle();
         content = boardEditor.getContent();
     }
 
