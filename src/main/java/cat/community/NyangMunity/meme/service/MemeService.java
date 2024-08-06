@@ -3,6 +3,7 @@ package cat.community.NyangMunity.meme.service;
 import cat.community.NyangMunity.meme.config.MemeConfig;
 import cat.community.NyangMunity.meme.entity.Meme;
 import cat.community.NyangMunity.meme.repository.MemeRepository;
+import cat.community.NyangMunity.meme.response.MemeResponse;
 import cat.community.NyangMunity.meme.response.TenorApiResponse;
 import cat.community.NyangMunity.meme.response.TenorResponse;
 import io.netty.channel.ChannelOption;
@@ -10,6 +11,9 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,5 +64,18 @@ public class MemeService {
     @Transactional
     public void deleteMemes(List<Meme> deleteMemeList) {
         memeRepository.deleteAll(deleteMemeList);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MemeResponse> getMemeList(int page) {
+        Pageable pageable = PageRequest.of(page, 30);
+        return convertToMemeResponse(memeRepository.findAll(pageable));
+    }
+
+    private Page<MemeResponse> convertToMemeResponse(Page<Meme> memes) {
+        return memes.map(meme -> MemeResponse.builder()
+                .id(meme.getId())
+                .url(meme.getUrl())
+                .build());
     }
 }
