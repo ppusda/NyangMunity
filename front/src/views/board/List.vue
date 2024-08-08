@@ -52,7 +52,6 @@ const handleScroll = (event: Event) => {
   const element = event.target as HTMLElement;
   if (element.scrollHeight - element.scrollTop === element.clientHeight) {
     // 스크롤이 맨 아래에 도달했을 때 다음 페이지 로드
-    console.log("test")
     getMemeImages(memePage.value++);
   }
 };
