@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive, ref} from 'vue';
+import {reactive, ref, onMounted} from 'vue';
 import { useClipboard } from '@vueuse/core';
 import axios from 'axios';
 import {toast} from "vue3-toastify";
@@ -20,43 +20,13 @@ const postTotalPage = reactive({ value: 0 });
 const memes = reactive<Gif[]>([]);
 const memePage = reactive({ value: 1 });
 const memeTotalPage = reactive({ value: 0 });
+const loading = ref(false); // 중복 요청 방지
 
 // 밈 이미지 리스트
 const memeImages = reactive<string[]>([]);
 
 // 갤러리 이미지 리스트
 let uploadImages = reactive<string[]>([]);
-
-// 게시물 작성 시간 계산 함수
-const getWriteTime = (time: any) => {
-  let answer = '';
-  const now = new Date();
-  const writeTime = new Date(time);
-  let calc = Math.floor((now.getTime() - writeTime.getTime()) / 1000);
-
-  answer = `${calc}초 전`;
-  if (calc >= 60) {
-    calc = Math.floor(calc / 60);
-    answer = `${calc}분 전`;
-    if (calc >= 60) {
-      calc = Math.floor(calc / 60);
-      answer = `${calc}시간 전`;
-      if (calc >= 24) {
-        calc = Math.floor(calc / 24);
-        answer = `${calc}일 전`;
-        if (calc >= 30) {
-          calc = Math.floor(calc / 30);
-          answer = `${calc}달 전`;
-          if (calc >= 12) {
-            calc = Math.floor(calc / 12);
-            answer = `${calc}년 전`;
-          }
-        }
-      }
-    }
-  }
-  return answer;
-};
 
 // 특정 페이지의 게시물 가져오기
 const movePage = (pageValue: any) => {
@@ -67,17 +37,25 @@ const movePage = (pageValue: any) => {
   });
 };
 
-
 // 밈 이미지 가져오기
 const getMemeImages = (pageValue: any) => {
-  const memePageValue = pageValue - 1;
-  axios.get(`/nm/meme?page=${memePageValue}`).then(response => {
+  if (memeTotalPage.value != 0 && pageValue >= memeTotalPage.value) return;
+
+  axios.get(`/nm/meme?page=${pageValue}`).then(response => {
     memeTotalPage.value = response.data.totalPages;
-    memes.splice(0, posts.length, ...response.data.content);
+    const newMemes = response.data.content.filter((newMeme: Gif) => !memes.some(meme => meme.id === newMeme.id));
+    memes.push(...newMemes);
   });
 };
-
-getMemeImages(1);
+// 스크롤 이벤트 핸들러
+const handleScroll = (event: Event) => {
+  const element = event.target as HTMLElement;
+  if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+    // 스크롤이 맨 아래에 도달했을 때 다음 페이지 로드
+    console.log("test")
+    getMemeImages(memePage.value++);
+  }
+};
 
 // 이미지 드래그 앤 드롭 업로드 핸들러
 const handleDrop = (event: DragEvent) => {
@@ -113,11 +91,20 @@ const handleFileSelect = (event: Event) => {
 const { copy } = useClipboard();
 const copyLink = (link: string) => {
   copy(link);
-  toast("Image Copied!", {
+  toast("이미지 복사 완료!", {
     autoClose: 2000, theme: "dark"
   })
 };
+
+// Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
+onMounted(() => {
+  const memeListElement = document.querySelector('.memeList');
+  memeListElement?.addEventListener('scroll', handleScroll);
+  getMemeImages(0); // 첫 페이지 로드
+});
+
 </script>
+
 
 <template>
   <div class="w-screen h-screen flex p-2">
@@ -204,8 +191,8 @@ const copyLink = (link: string) => {
         <p>고양이 짤</p>
         <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
       </div>
-      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-8 overflow-y-auto scroll-hidden">
-        <div class="memeList masonry h-full overflow-y-auto">
+      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-8 memeList overflow-y-auto scroll-hidden">
+        <div class="masonry h-full">
           <div v-for="meme in memes" class="masonry-item group relative" @click="copyLink(meme.url)">
             <img :src="meme.url" :id="`cmg_${meme.id}`" class="w-full h-full object-cover rounded-md" />
             <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
