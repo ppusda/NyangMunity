@@ -25,10 +25,10 @@ const loading = ref(false); // 중복 요청 방지
 // 밈 이미지 리스트
 const memeImages = reactive<string[]>([]);
 
-// 갤러리 이미지 리스트
-let uploadImages = reactive<string[]>([]);
+// 업로드 이미지
+const uploadImage = ref<string | null>(null);
 
-// 특정 페이지의 게시물 가져오기
+// 게시물 가져오기
 const movePage = (pageValue: any) => {
   const springPageValue = pageValue - 1;
   axios.get(`/nm/boards?page=${springPageValue}&size=${pageCount}`).then(response => {
@@ -60,14 +60,13 @@ const handleScroll = (event: Event) => {
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
   const files = event.dataTransfer?.files;
-  if (files) {
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        uploadImages.push(e.target.result);
-      };
-      reader.readAsDataURL(files[i]);
-    }
+  if (files && files.length > 0) {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      uploadImage.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 };
 
@@ -75,14 +74,12 @@ const handleDrop = (event: DragEvent) => {
 const handleFileSelect = (event: Event) => {
   const files = (event.target as HTMLInputElement).files;
   if (files) {
-    uploadImages.splice(0, uploadImages.length); // 기존 이미지 배열 비우기
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        uploadImages.push(e.target.result);
-      };
-      reader.readAsDataURL(files[i]);
-    }
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      uploadImage.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 };
 
@@ -112,7 +109,7 @@ onMounted(() => {
         <p>냥뮤니티 이미지</p>
         <p class="text-xs text-gray-400">냥뮤니티 인기 이미지를 살펴보세요!</p>
       </div>
-      <div class="h-2/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
+      <div class="h-3/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
         <p>이미지 업로드</p>
         <p class="text-xs text-gray-400">당신만의 고양이 이미지를 업로드해보세요!</p>
         <div
@@ -128,17 +125,20 @@ onMounted(() => {
               multiple
               @change="handleFileSelect"
           />
-          <div v-if="uploadImages.length > 0">
-            <img :src="uploadImages[0]" class="w-full h-32 object-cover rounded-md" />
-            <div v-if="uploadImages.length > 1" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-md text-white">
-              +{{ uploadImages.length - 1 }}
-            </div>
+          <div v-if="uploadImage">
+            <img :src="uploadImage" class="w-full h-32 object-cover rounded-md" />
           </div>
           <div v-else>
             <p class="text-center text-gray-400">Drag & Drop<br>or<br>Click to Upload</p>
           </div>
         </div>
-        <p class="text-xs text-gray-400 mt-2">* 클릭 후 업로드 시 이전까지 업로드 된 이미지를 대체할 수 있습니다.</p>
+        <button class="btn btn-ghost w-full border border-gray-400 mt-2">변환</button>
+        <hr class="my-3 border-gray-500">
+        <div class="flex flex-row text-center justify-center items-center">
+          <p class="text-sm text-white mr-3 flex items-center">URL</p>
+          <input class="input h-[2rem] w-full bg-zinc-800 rounded-md border border-gray-400" readonly>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">* 게시글 작성에 이용하지 않을 시 이미지는 자동 삭제됩니다.</p>
       </div>
     </div>
 
