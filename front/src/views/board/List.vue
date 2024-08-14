@@ -22,65 +22,55 @@ interface Gif {
 const posts = reactive<Post[]>([]);
 const postPage = reactive({ value: 1 });
 const postTotalPage = reactive({ value: 0 });
-const loadingPosts = ref(false); // 중복 요청 방지
 const postContainerRef = ref<HTMLElement | null>(null);
-const isFetchingPosts = ref(false)
 
 // 밈 및 페이지네이션 상태
 const memes = reactive<Gif[]>([]);
 const memePage = reactive({ value: 1 });
 const memeTotalPage = reactive({ value: 0 });
-const loading = ref(false); // 중복 요청 방지
-
-// 밈 이미지 리스트
-const memeImages = reactive<string[]>([]);
 
 // 업로드 이미지
 const uploadImage = ref<string | null>(null);
 
-// 게시물 가져오기 (기존 or 이전 페이지 추가)
-const getPosts = async (page: number, append = false) => {
-  if (loadingPosts.value || (page > postTotalPage.value && postTotalPage.value !== 0)) return;
+// 게시물 가져오기
+const getPosts = async (page: number, init: boolean) => {
+  if (postTotalPage.value != 0 && page >= postTotalPage.value) return;
 
-  loadingPosts.value = true;
   try {
     const response = await axios.get(`/nm/boards?page=${page - 1}&size=10`);
     postTotalPage.value = response.data.totalPages;
 
-    // 기존 게시물에 추가할 경우 (위로 스크롤)
-    if (append) {
+    if (init) {
+      posts.splice(0, posts.length, ...response.data.content);
+      await nextTick();
+      postContainerRef.value?.scrollTo(0, postContainerRef.value.scrollHeight); // 초기 로드 시 맨 아래로 스크롤
+    } else {
       const prevScrollHeight = postContainerRef.value?.scrollHeight || 0;
-      posts.unshift(...response.data.content);
-      await nextTick(); // 다음 DOM 업데이트 후 스크롤 복구
+      posts.push(...response.data.content);
+      await nextTick();
       const currentScrollHeight = postContainerRef.value?.scrollHeight || 0;
       postContainerRef.value?.scrollTo(0, currentScrollHeight - prevScrollHeight);
-    } else {
-      posts.splice(0, posts.length, ...response.data.content);
     }
+    console.log(posts);
   } catch (error) {
     console.error(error);
-  } finally {
-    loadingPosts.value = false;
   }
 };
 
 // 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
 const handlePostScroll = (event: Event) => {
   const element = event.target as HTMLElement;
-  if (element.scrollTop === 0 && postPage.value > 1 && !isFetchingPosts.value) {
-    isFetchingPosts.value = true;
-    postPage.value -= 1;
-    getPosts(postPage.value, true).finally(() => {
-      isFetchingPosts.value = false;
-    });
+  if (element.scrollTop === 0) {
+    postPage.value += 1;
+    getPosts(postPage.value, false);
   }
 };
 
-const getWriteTime = (time: any) => {
-  let answer = '';
+const getWriteTime = (time) => {
   const now = new Date();
   const writeTime = new Date(time);
 
+  // 로컬 시간대 기준으로 날짜 비교
   const nowDate = now.toLocaleDateString();
   const writeDate = writeTime.toLocaleDateString();
 
@@ -90,33 +80,29 @@ const getWriteTime = (time: any) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (writeDate === nowDate) {
-    // 오늘인 경우
-    const hour = writeTime.getHours();
-    const minute = writeTime.getMinutes();
-    const period = hour >= 12 ? '오후' : '오전';
-    const formattedHour = hour % 12 || 12; // 12시간제 표현
-    answer = `오늘 ${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
-  } else if (days === 1) {
-    // 어제인 경우
-    const hour = writeTime.getHours();
-    const minute = writeTime.getMinutes();
+  const formatTime = (date) => {
+    const hour = date.getHours();
+    const minute = date.getMinutes();
     const period = hour >= 12 ? '오후' : '오전';
     const formattedHour = hour % 12 || 12;
-    answer = `어제 ${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
-  } else {
-    // 그 외 날짜 표시 (YYYY.MM.DD. 오후 HH:MM)
-    const year = writeTime.getFullYear();
-    const month = writeTime.getMonth() + 1; // 0부터 시작하므로 +1
-    const date = writeTime.getDate();
-    const hour = writeTime.getHours();
-    const minute = writeTime.getMinutes();
-    const period = hour >= 12 ? '오후' : '오전';
-    const formattedHour = hour % 12 || 12;
-    answer = `${year}.${month < 10 ? '0' + month : month}.${date < 10 ? '0' + date : date}. ${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
-  }
+    return `${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
+  };
 
-  return answer;
+  // 작성 날짜가 오늘인 경우
+  if (writeDate === nowDate) {
+    return `오늘 ${formatTime(writeTime)}`;
+  }
+  // 작성 날짜가 어제인 경우
+  else if (writeDate === new Date(now.getTime() - 86400000).toLocaleDateString()) {
+    return `어제 ${formatTime(writeTime)}`;
+  }
+  // 그 외 날짜 표시
+  else {
+    const year = writeTime.getFullYear();
+    const month = String(writeTime.getMonth() + 1).padStart(2, '0');
+    const date = String(writeTime.getDate()).padStart(2, '0');
+    return `${year}.${month}.${date}. ${formatTime(writeTime)}`;
+  }
 };
 
 
@@ -182,7 +168,7 @@ onMounted(() => {
   const memeListElement = document.querySelector('.memeList');
   memeListElement?.addEventListener('scroll', handleMemeScroll);
 
-  getPosts(postPage.value);
+  getPosts(postPage.value, true);
   postContainerRef.value?.addEventListener('scroll', handlePostScroll);
 });
 </script>
@@ -230,7 +216,11 @@ onMounted(() => {
 
     <!-- 메인 게시판 섹션 -->
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
-      <div ref="postContainerRef" class="border border-gray-400 rounded-md overflow-auto p-4 m-4 scroll-hidden h-[38rem]" @scroll="handlePostScroll">
+      <div
+          ref="postContainerRef"
+          class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[38rem]"
+          @scroll="handlePostScroll"
+      >
         <ul class="w-full flex flex-col-reverse">
           <li class="p-4 bg-zinc-800 rounded-md" v-for="post in posts" :key="post.id">
             <div class="flex flex-row text-center items-center">
@@ -243,7 +233,6 @@ onMounted(() => {
           </li>
         </ul>
       </div>
-
       <!-- 입력창 영역 -->
       <div class="flex flex-row h-1/6">
         <div class="bg-zinc-800 rounded-md p-2 w-11/12">
@@ -328,4 +317,10 @@ onMounted(() => {
   opacity: 0;
   transition: opacity 0.3s;
 }
+
+.scroll-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #52525b #27272a; /* 스크롤바 색상과 트랙 색상 */
+}
+
 </style>
