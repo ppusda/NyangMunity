@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import {reactive, ref, onMounted} from 'vue';
+import {reactive, ref, onMounted, nextTick} from 'vue';
 import { useClipboard } from '@vueuse/core';
 import axios from 'axios';
 import {toast} from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
+
+interface Post {
+  id: string;
+  content: string;
+  createDate: string;
+  uid: number;
+  writer: string;
+}
 
 interface Gif {
   id: string;
@@ -11,10 +19,12 @@ interface Gif {
 }
 
 // 게시물 및 페이지네이션 상태
-const posts = reactive<any[]>([]);
+const posts = reactive<Post[]>([]);
 const postPage = reactive({ value: 1 });
-const pageCount = 5;
 const postTotalPage = reactive({ value: 0 });
+const loadingPosts = ref(false); // 중복 요청 방지
+const postContainerRef = ref<HTMLElement | null>(null);
+const isFetchingPosts = ref(false)
 
 // 밈 및 페이지네이션 상태
 const memes = reactive<Gif[]>([]);
@@ -28,14 +38,87 @@ const memeImages = reactive<string[]>([]);
 // 업로드 이미지
 const uploadImage = ref<string | null>(null);
 
-// 게시물 가져오기
-const movePage = (pageValue: any) => {
-  const springPageValue = pageValue - 1;
-  axios.get(`/nm/boards?page=${springPageValue}&size=${pageCount}`).then(response => {
-    totalPage.value = response.data.totalPages;
-    posts.splice(0, posts.length, ...response.data.content);
-  });
+// 게시물 가져오기 (기존 or 이전 페이지 추가)
+const getPosts = async (page: number, append = false) => {
+  if (loadingPosts.value || (page > postTotalPage.value && postTotalPage.value !== 0)) return;
+
+  loadingPosts.value = true;
+  try {
+    const response = await axios.get(`/nm/boards?page=${page - 1}&size=10`);
+    postTotalPage.value = response.data.totalPages;
+
+    // 기존 게시물에 추가할 경우 (위로 스크롤)
+    if (append) {
+      const prevScrollHeight = postContainerRef.value?.scrollHeight || 0;
+      posts.unshift(...response.data.content);
+      await nextTick(); // 다음 DOM 업데이트 후 스크롤 복구
+      const currentScrollHeight = postContainerRef.value?.scrollHeight || 0;
+      postContainerRef.value?.scrollTo(0, currentScrollHeight - prevScrollHeight);
+    } else {
+      posts.splice(0, posts.length, ...response.data.content);
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loadingPosts.value = false;
+  }
 };
+
+// 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
+const handlePostScroll = (event: Event) => {
+  const element = event.target as HTMLElement;
+  if (element.scrollTop === 0 && postPage.value > 1 && !isFetchingPosts.value) {
+    isFetchingPosts.value = true;
+    postPage.value -= 1;
+    getPosts(postPage.value, true).finally(() => {
+      isFetchingPosts.value = false;
+    });
+  }
+};
+
+const getWriteTime = (time: any) => {
+  let answer = '';
+  const now = new Date();
+  const writeTime = new Date(time);
+
+  const nowDate = now.toLocaleDateString();
+  const writeDate = writeTime.toLocaleDateString();
+
+  const timeDifference = now.getTime() - writeTime.getTime();
+  const seconds = Math.floor(timeDifference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (writeDate === nowDate) {
+    // 오늘인 경우
+    const hour = writeTime.getHours();
+    const minute = writeTime.getMinutes();
+    const period = hour >= 12 ? '오후' : '오전';
+    const formattedHour = hour % 12 || 12; // 12시간제 표현
+    answer = `오늘 ${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
+  } else if (days === 1) {
+    // 어제인 경우
+    const hour = writeTime.getHours();
+    const minute = writeTime.getMinutes();
+    const period = hour >= 12 ? '오후' : '오전';
+    const formattedHour = hour % 12 || 12;
+    answer = `어제 ${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
+  } else {
+    // 그 외 날짜 표시 (YYYY.MM.DD. 오후 HH:MM)
+    const year = writeTime.getFullYear();
+    const month = writeTime.getMonth() + 1; // 0부터 시작하므로 +1
+    const date = writeTime.getDate();
+    const hour = writeTime.getHours();
+    const minute = writeTime.getMinutes();
+    const period = hour >= 12 ? '오후' : '오전';
+    const formattedHour = hour % 12 || 12;
+    answer = `${year}.${month < 10 ? '0' + month : month}.${date < 10 ? '0' + date : date}. ${period} ${formattedHour}:${minute < 10 ? '0' + minute : minute}`;
+  }
+
+  return answer;
+};
+
 
 // 밈 이미지 가져오기
 const getMemeImages = (pageValue: any) => {
@@ -47,8 +130,9 @@ const getMemeImages = (pageValue: any) => {
     memes.push(...newMemes);
   });
 };
+
 // 스크롤 이벤트 핸들러
-const handleScroll = (event: Event) => {
+const handleMemeScroll = (event: Event) => {
   const element = event.target as HTMLElement;
   if (element.scrollHeight - element.scrollTop === element.clientHeight) {
     // 스크롤이 맨 아래에 도달했을 때 다음 페이지 로드
@@ -94,11 +178,13 @@ const copyLink = (link: string) => {
 
 // Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
 onMounted(() => {
-  const memeListElement = document.querySelector('.memeList');
-  memeListElement?.addEventListener('scroll', handleScroll);
   getMemeImages(0); // 첫 페이지 로드
-});
+  const memeListElement = document.querySelector('.memeList');
+  memeListElement?.addEventListener('scroll', handleMemeScroll);
 
+  getPosts(postPage.value);
+  postContainerRef.value?.addEventListener('scroll', handlePostScroll);
+});
 </script>
 
 
@@ -144,30 +230,15 @@ onMounted(() => {
 
     <!-- 메인 게시판 섹션 -->
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
-      <div class="flex-1 border border-gray-400 rounded-md overflow-auto p-4 m-4 scroll-hidden h-5/6">
-        <ul class="w-full">
-          <li class="mb-4 p-4 bg-gray-100 rounded-md shadow" v-for="post in posts" :key="post.id">
-            <div>
-              <h3 class="font-bold text-xl mb-2">
-                <router-link class="text-blue-500 hover:text-blue-800" :to="{ name: 'read', params: { postId: post.id } }">{{ post.title }}</router-link>
-              </h3>
-              <p class="badge badge-primary badge-outline mr-1.5">{{ post.writer }}</p>
-              <p class="badge badge-primary badge-outline">{{ getWriteTime(post.createDate) }}</p>
+      <div ref="postContainerRef" class="border border-gray-400 rounded-md overflow-auto p-4 m-4 scroll-hidden h-[38rem]" @scroll="handlePostScroll">
+        <ul class="w-full flex flex-col-reverse">
+          <li class="p-4 bg-zinc-800 rounded-md" v-for="post in posts" :key="post.id">
+            <div class="flex flex-row text-center items-center">
+              <p class="text-xl text-white mr-3">{{ post.writer }}</p>
+              <p class="text-xs">{{ getWriteTime(post.createDate) }}</p>
             </div>
-            <div class="mt-2 flex flex-wrap w-full h-full">
-              <router-link class="w-full h-full" :to="{ name: 'read', params: { postId: post.id } }">
-                <div class="w-full h-full" v-if="post.boardImages && post.boardImages.length > 0" v-for="(boardImage, index) in post.boardImages.slice(0, Math.min(3, post.boardImages.length))">
-                  <div v-if="index <= 1">
-                    <img class="w-full h-full object-contain rounded-md" :src="`data:image/jpeg;base64,${boardImage.imageBytes}`" />
-                  </div>
-                  <div class="w-full h-24 flex items-center justify-center text-white bg-gray-400 rounded-md" v-else>
-                    +{{ post.boardImages.length - 2 }}
-                  </div>
-                </div>
-                <div class="flex flex-row justify-center w-full h-80 border" v-else>
-                  <img class="w-full h-full object-contain rounded-md" src="/assets/images/cat_loading.gif" />
-                </div>
-              </router-link>
+            <div class="mt-3">
+              <p class="text-white mr-3">{{ post.content }}</p>
             </div>
           </li>
         </ul>
