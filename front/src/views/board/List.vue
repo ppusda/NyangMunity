@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {reactive, ref, onMounted, nextTick} from 'vue';
+import { reactive, ref, onMounted, nextTick } from 'vue';
 import { useClipboard } from '@vueuse/core';
 import axios from 'axios';
-import {toast} from "vue3-toastify";
+import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 
 interface Post {
@@ -34,7 +34,7 @@ const uploadImage = ref<string | null>(null);
 
 // 게시물 가져오기
 const getPosts = async (page: number, init: boolean) => {
-  if (postTotalPage.value != 0 && page >= postTotalPage.value) return;
+  if (postTotalPage.value !== 0 && page >= postTotalPage.value) return;
 
   try {
     const response = await axios.get(`/nm/boards?page=${page - 1}&size=10`);
@@ -66,7 +66,8 @@ const handlePostScroll = (event: Event) => {
   }
 };
 
-const getWriteTime = (time) => {
+// 작성 시간 표시
+const getWriteTime = (time: string) => {
   const now = new Date();
   const writeTime = new Date(time);
 
@@ -80,7 +81,7 @@ const getWriteTime = (time) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  const formatTime = (date) => {
+  const formatTime = (date: Date) => {
     const hour = date.getHours();
     const minute = date.getMinutes();
     const period = hour >= 12 ? '오후' : '오전';
@@ -105,10 +106,9 @@ const getWriteTime = (time) => {
   }
 };
 
-
 // 밈 이미지 가져오기
-const getMemeImages = (pageValue: any) => {
-  if (memeTotalPage.value != 0 && pageValue >= memeTotalPage.value) return;
+const getMemeImages = (pageValue: number) => {
+  if (memeTotalPage.value !== 0 && pageValue >= memeTotalPage.value) return;
 
   axios.get(`/nm/meme?page=${pageValue}`).then(response => {
     memeTotalPage.value = response.data.totalPages;
@@ -133,8 +133,8 @@ const handleDrop = (event: DragEvent) => {
   if (files && files.length > 0) {
     const file = files[0];
     const reader = new FileReader();
-    reader.onload = (e: any) => {
-      uploadImage.value = e.target.result;
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      uploadImage.value = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   }
@@ -146,8 +146,8 @@ const handleFileSelect = (event: Event) => {
   if (files) {
     const file = files[0];
     const reader = new FileReader();
-    reader.onload = (e: any) => {
-      uploadImage.value = e.target.result;
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      uploadImage.value = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   }
@@ -159,7 +159,7 @@ const copyLink = (link: string) => {
   copy(link);
   toast("이미지 복사 완료!", {
     autoClose: 2000, theme: "dark"
-  })
+  });
 };
 
 // Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
