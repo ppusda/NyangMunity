@@ -31,6 +31,7 @@ const memeTotalPage = reactive({ value: 0 });
 
 // 업로드 이미지
 const uploadImage = ref<string | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
 // 게시물 가져오기
 const getPosts = async (page: number, init: boolean) => {
@@ -140,6 +141,10 @@ const handleDrop = (event: DragEvent) => {
   }
 };
 
+const handleClick = () => {
+  (fileInput.value as HTMLInputElement).click();
+};
+
 // 이미지 파일 선택 핸들러
 const handleFileSelect = (event: Event) => {
   const files = (event.target as HTMLInputElement).files;
@@ -188,13 +193,12 @@ onMounted(() => {
             class="upload-area border border-dashed border-gray-500 mt-4 p-4 relative"
             @drop="handleDrop"
             @dragover.prevent
-            @click="$refs.fileInput.click()"
+            @click="handleClick"
         >
           <input
               type="file"
               ref="fileInput"
               class="hidden"
-              multiple
               @change="handleFileSelect"
           />
           <div v-if="uploadImage">
