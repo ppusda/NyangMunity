@@ -15,7 +15,7 @@
 **Backend**
 
 - Language : Java
-- Library & Framework : Spring Boot
+- Library & Framework : Spring Boot, Spring Batch, Spring Security
 - Database : MySQL
 - ORM : JPA
-- Deploy: AWS(EC2)
+- Deploy: AWS(EC2, S3)
