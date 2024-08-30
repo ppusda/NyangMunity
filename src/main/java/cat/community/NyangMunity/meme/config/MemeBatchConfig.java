@@ -16,8 +16,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
@@ -25,7 +23,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 public class MemeBatchConfig {
 
-    private final static int CHUNK_SIZE = 1;
+    // TODO: 향후 이미지 개수 늘려 수집 진행하면 CHUNK 범위 조정하며 적정 값 잧기
+    private final static int CHUNK_SIZE = 50;
 
     @Bean(name = "memeBatchJob")
     public Job memeJob(JobRepository jobRepository, Step step) {
