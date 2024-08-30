@@ -2,6 +2,7 @@ package cat.community.NyangMunity.board.entity;
 
 import cat.community.NyangMunity.board.editor.BoardEditor;
 import cat.community.NyangMunity.board.editor.BoardEditor.BoardEditorBuilder;
+import cat.community.NyangMunity.image.entity.Image;
 import cat.community.NyangMunity.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -26,10 +27,10 @@ import java.util.List;
 public class Board {
 
     @Builder
-    public Board(String content, User user, ArrayList<BoardImage> boardImages, LocalDateTime createDate) {
+    public Board(String content, User user, ArrayList<Image> images, LocalDateTime createDate) {
         this.content = content;
         this.user = user;
-        this.boardImages = boardImages;
+        this.images = images;
         this.createDate = createDate;
     }
 
@@ -48,10 +49,10 @@ public class Board {
     private User user;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<BoardImage> boardImages = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<BoardLike> boardLikes = new ArrayList<>();
+    private List<BoardLike> likes = new ArrayList<>();
 
     public BoardEditorBuilder toEditor() {
         return BoardEditor.builder()
@@ -62,15 +63,15 @@ public class Board {
         content = boardEditor.getContent();
     }
 
-    public void setUser(User user) { // 연관관계 편의 메서드
+    public void setUser(User user) {
         this.user = user;
         if(!user.getBoards().contains(this)){
             user.getBoards().add(this);
         }
     }
 
-    public void setBoardImages(BoardImage boardImage) { // 연관관계 편의 메서드
-        boardImages.add(boardImage);
-        boardImage.setBoard(this);
+    public void setBoardImages(Image image) {
+        images.add(image);
+        image.addBoard(this);
     }
 }
