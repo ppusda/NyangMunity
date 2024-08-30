@@ -2,11 +2,8 @@ package cat.community.NyangMunity.board.service;
 
 import cat.community.NyangMunity.board.editor.BoardEditor;
 import cat.community.NyangMunity.board.entity.Board;
-import cat.community.NyangMunity.board.entity.BoardImage;
 import cat.community.NyangMunity.board.entity.BoardLike;
-import cat.community.NyangMunity.board.response.BoardDetailResponse;
 import cat.community.NyangMunity.global.exception.UnauthorizedUserException;
-import cat.community.NyangMunity.board.repository.BoardImageRepository;
 import cat.community.NyangMunity.board.repository.BoardLikeRepository;
 import cat.community.NyangMunity.board.request.BoardFormRequest;
 import cat.community.NyangMunity.global.exception.BoardNotFoundException;
@@ -35,24 +32,17 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
-    private final BoardImageRepository boardImageRepository;
 
     public Board getBoard(Long bid) {
         return boardRepository.findById(bid).orElseThrow(BoardNotFoundException::new);
     }
 
-    public void write(BoardFormRequest boardFormRequest, ArrayList<BoardImage> boardImages, User user){
+    public void write(BoardFormRequest boardFormRequest, User user){
         Board board = Board.builder()
                 .content(boardFormRequest.content())
                 .user(user)
-                .boardImages(boardImages)
                 .createDate(LocalDateTime.now())
                 .build();
-
-        List<BoardImage> newBoardImages = new ArrayList<>(boardImages);
-        for (BoardImage boardImage: newBoardImages) {
-            board.setBoardImages(boardImage);
-        }
 
         boardRepository.save(board);
     }
@@ -70,22 +60,13 @@ public class BoardService {
     }
 
     @Transactional
-    public void edit(Long bid, BoardEditRequest boardEditRequest, ArrayList<BoardImage> boardImages, Long uid) {
+    public void edit(Long bid, BoardEditRequest boardEditRequest, Long uid) {
         Board board = getBoard(bid);
 
         if (!board.getUser().getId().equals(uid)) {
             throw new UnauthorizedUserException();
         }
 
-        if(boardEditRequest.removeList() != null && !boardEditRequest.removeList().isEmpty()) {
-            for (Long id: boardEditRequest.removeList()) {
-                boardImageRepository.deleteById(id);
-            }
-        }
-
-        for (BoardImage boardImage: boardImages) {
-            board.setBoardImages(boardImage);
-        }
         boardRepository.save(board);
 
         BoardEditor.BoardEditorBuilder boardEditorBuilder = board.toEditor();
@@ -142,8 +123,8 @@ public class BoardService {
     }
 
     private List<BoardImageResponse> convertToBoardImageResponse(Board board) {
-        return board.getBoardImages().stream()
-                .map(BoardImageResponse::new)
+        return board.getImages().stream()
+                .map(BoardImageResponse::from)
                 .collect(Collectors.toList());
     }
 

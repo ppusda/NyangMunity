@@ -12,7 +12,7 @@ public record BoardEditRequest(
         @Size(message = "내용은 최대 100자 까지 입력이 가능합니다.")
         @NotBlank(message = "간단한 설명을 입력해주세요.")
         String content,
-        List<MultipartFile> boardImages,
+        List<String> boardImages,
         List<Long> removeList
 ) {
 

@@ -13,18 +13,17 @@ public record BoardFormRequest(
         @NotBlank(message = "간단한 설명을 입력해주세요.")
         String content,
 
-        List<MultipartFile> boardImages
+        List<String> boardImages // url 형식
 ) {
-    private final static String[] validList = new String[] {};
 
     @Builder
-    public BoardFormRequest(String content, List<MultipartFile> boardImages) {
+    public BoardFormRequest(String content, List<String> boardImages) {
         validate();
         this.content = content;
         this.boardImages = boardImages;
     }
 
-    // TODO: 특정 키워드 Valid 옵션 추가 예정
+    // TODO: 특정 키워드 Valid 옵션 추가 고려
    public void validate() {
         if (content.contains("바보")) {
             throw new InvalidRequest();
