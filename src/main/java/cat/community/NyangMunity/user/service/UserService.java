@@ -12,10 +12,11 @@ import cat.community.NyangMunity.global.exception.AlreadyExistsEmailException;
 import cat.community.NyangMunity.global.exception.InvalidLoginInformationException;
 import cat.community.NyangMunity.user.repository.UserRepository;
 import cat.community.NyangMunity.user.request.UserEditForm;
-import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.user.request.UserJoinForm;
 import cat.community.NyangMunity.user.request.UserLoginForm;
-import cat.community.NyangMunity.user.response.UserTokenResponse;
+import cat.community.NyangMunity.user.response.UserInfos;
+import cat.community.NyangMunity.user.response.UserTokens;
+import cat.community.NyangMunity.user.response.UserLoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserTokenResponse userLogin(UserLoginForm userLoginForm) {
+    public UserLoginResponse userLogin(UserLoginForm userLoginForm) {
         User user = getUserByEmail(userLoginForm.email())
                 .orElseThrow(InvalidLoginInformationException::new);
 
@@ -55,15 +56,18 @@ public class UserService {
             throw new InvalidLoginInformationException();
         }
 
-        return createTokens(user.getId());
+        return UserLoginResponse.builder()
+                .userInfos(UserInfos.from(user.getId(), user.getNickname()))
+                .userTokens(createTokens(user.getId()))
+                .build();
     }
 
-    private UserTokenResponse createTokens(Long userId) {
+    private UserTokens createTokens(Long userId) {
         String accessToken = jwtTokenProvider.createAccessToken(userId);
         String refreshToken = jwtTokenProvider.createRefreshToken(userId);
         tokenService.register(refreshToken, userId);
 
-        return UserTokenResponse.builder()
+        return UserTokens.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

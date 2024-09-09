@@ -3,11 +3,11 @@ package cat.community.NyangMunity.user.controller;
 import cat.community.NyangMunity.global.provider.CookieProvider;
 import cat.community.NyangMunity.user.entity.User;
 import cat.community.NyangMunity.user.request.UserEditForm;
-import cat.community.NyangMunity.user.request.UserForm;
 import cat.community.NyangMunity.user.request.UserJoinForm;
 import cat.community.NyangMunity.user.request.UserLoginForm;
 import cat.community.NyangMunity.user.response.UserCheckResponse;
-import cat.community.NyangMunity.user.response.UserTokenResponse;
+import cat.community.NyangMunity.user.response.UserInfos;
+import cat.community.NyangMunity.user.response.UserLoginResponse;
 import cat.community.NyangMunity.user.response.UserResponse;
 import cat.community.NyangMunity.user.service.UserService;
 import jakarta.validation.Valid;
@@ -34,17 +34,19 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    private ResponseEntity<?> userLogin(@RequestBody @Valid UserLoginForm userLoginForm) {
-        UserTokenResponse userTokenResponse = userService.userLogin(userLoginForm);
+    private ResponseEntity<UserInfos> userLogin(@RequestBody @Valid UserLoginForm userLoginForm) {
+        UserLoginResponse userLoginResponse = userService.userLogin(userLoginForm);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(
-                        cookieProvider.createAccessTokenCookie(userTokenResponse.accessToken())
+                        cookieProvider.createAccessTokenCookie(userLoginResponse.userTokens()
+                                .accessToken())
                 ))
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(
-                        cookieProvider.createRefreshTokenCookie(userTokenResponse.refreshToken())
+                        cookieProvider.createRefreshTokenCookie(userLoginResponse.userTokens()
+                                .refreshToken())
                 ))
-                .build();
+                .body(userLoginResponse.userInfos());
     }
 
     @PostMapping("/check")
