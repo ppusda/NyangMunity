@@ -28,7 +28,7 @@ public class BoardLikeRepositoryImpl implements BoardLikeRepositoryCustom{
         try {
             maxLikeBoard = jpaQueryFactory
                     .selectFrom(board)
-                    .leftJoin(board.boardLikes, boardLike)
+                    .leftJoin(board.likes, boardLike)
                     .where(board.createDate.between(week, LocalDateTime.now()),
                             board.createDate.after(week))
                     .groupBy(board.id)
