@@ -24,17 +24,21 @@ const postPage = reactive({ value: 1 });
 const postTotalPage = reactive({ value: 0 });
 const postContainerRef = ref<HTMLElement | null>(null);
 
+// 게시물 작성
+const content = ref<string>("");
+
 // 밈 및 페이지네이션 상태
 const memes = reactive<Gif[]>([]);
 const memePage = reactive({ value: 1 });
 const memeTotalPage = reactive({ value: 0 });
 
 // 업로드 이미지
+const uploadImageList = ref<string[]>([]);
 const uploadImage = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 // 게시물 가져오기
-const getPosts = async (page: number, init: boolean) => {
+const getBoards = async (page: number, init: boolean) => {
   if (postTotalPage.value !== 0 && page >= postTotalPage.value) return;
 
   try {
@@ -59,11 +63,11 @@ const getPosts = async (page: number, init: boolean) => {
 };
 
 // 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
-const handlePostScroll = (event: Event) => {
+const handleBoardScroll = (event: Event) => {
   const element = event.target as HTMLElement;
   if (element.scrollTop === 0) {
     postPage.value += 1;
-    getPosts(postPage.value, false);
+    getBoards(postPage.value, false);
   }
 };
 
@@ -106,6 +110,14 @@ const getWriteTime = (time: string) => {
     return `${year}.${month}.${date}. ${formatTime(writeTime)}`;
   }
 };
+
+// 게시물 업로드
+const writeBoard = () => {
+  axios.post('/nm/board/write', {
+    "content": content.value,
+    "boardImages": uploadImageList.value
+  });
+}
 
 // 밈 이미지 가져오기
 const getMemeImages = (pageValue: number) => {
@@ -158,6 +170,16 @@ const handleFileSelect = (event: Event) => {
   }
 };
 
+// 이미지 업로드
+const postImageUpload = () => {
+  uploadImageList.value.push();
+  axios.get(`/nm/image`, {
+
+  }).then(response => {
+
+  });
+};
+
 // 클립보드에 링크 복사
 const { copy } = useClipboard();
 const copyLink = (link: string) => {
@@ -173,8 +195,8 @@ onMounted(() => {
   const memeListElement = document.querySelector('.memeList');
   memeListElement?.addEventListener('scroll', handleMemeScroll);
 
-  getPosts(postPage.value, true);
-  postContainerRef.value?.addEventListener('scroll', handlePostScroll);
+  getBoards(postPage.value, true);
+  postContainerRef.value?.addEventListener('scroll', handleBoardScroll);
 });
 </script>
 
@@ -208,10 +230,10 @@ onMounted(() => {
             <p class="text-center text-gray-400">Drag & Drop<br>or<br>Click to Upload</p>
           </div>
         </div>
-        <button class="btn btn-ghost w-full border border-gray-400 mt-2">변환</button>
+        <button @click="imageUpload" class="btn btn-ghost w-full border border-gray-400 mt-2">업로드</button>
         <hr class="my-3 border-gray-500">
         <div class="flex flex-row text-center justify-center items-center">
-          <p class="text-sm text-white mr-3 flex items-center">URL</p>
+          <p class="text-xs text-white mr-3 flex items-center">이미지 URL</p>
           <input class="input h-[2rem] w-full bg-zinc-800 rounded-md border border-gray-400" readonly>
         </div>
         <p class="text-xs text-gray-400 mt-2">* 게시글 작성에 이용하지 않을 시 이미지는 자동 삭제됩니다.</p>
@@ -223,7 +245,7 @@ onMounted(() => {
       <div
           ref="postContainerRef"
           class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[38rem]"
-          @scroll="handlePostScroll"
+          @scroll="handleBoardScroll"
       >
         <ul class="w-full flex flex-col-reverse">
           <li class="p-4 bg-zinc-800 rounded-md" v-for="post in posts" :key="post.id">
@@ -240,10 +262,10 @@ onMounted(() => {
       <!-- 입력창 영역 -->
       <div class="flex flex-row h-1/6">
         <div class="bg-zinc-800 rounded-md p-2 w-11/12">
-          <textarea placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
+          <textarea v-model:="content" placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
         </div>
         <div class="h-full p-2 w-1/12">
-          <button class="btn btn-ghost h-full border border-gray-400">전송</button>
+          <button @click="writeBoard" class="btn btn-ghost h-full border border-gray-400">작성</button>
         </div>
       </div>
     </div>

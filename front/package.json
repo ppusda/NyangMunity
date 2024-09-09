@@ -22,7 +22,8 @@
     "vue3-cookies": "^1.0.6",
     "vue3-toastify": "^0.2.1",
     "vuejs-paginate": "^2.1.0",
-    "vuejs-paginate-next": "^1.0.2"
+    "vuejs-paginate-next": "^1.0.2",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",

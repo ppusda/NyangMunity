@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import {onMounted, reactive} from 'vue';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
-let nickName = reactive({ value: "" });
+const store = useStore();
 
+const userNickname = computed(() => store.state.userNickname);
+console.log(userNickname);
+
+const logout = () => {
+  store.dispatch('logout');
+};
 
 </script>
 
@@ -15,11 +22,11 @@ let nickName = reactive({ value: "" });
       <div class="navbar-center">
       </div>
       <div class="navbar-end">
-        <div v-if="nickName && nickName.value" class="dropdown dropdown-end">
-          <div tabindex="0" role="button" class="btn btn-ghost rounded-btn"> 님, 환영합니다!</div>
+        <div v-if="userNickname" class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost rounded-btn"> {{userNickname}}님, 환영합니다!</div>
           <ul tabindex="0" class="menu menu-md dropdown-content mt-5 z-[1] p-3 shadow rounded-box w-52 bg-zinc-800">
             <li><router-link :to="{name: 'info'}"><i class="fa-solid fa-address-card" />마이페이지</router-link></li>
-            <li><i class="fa-solid fa-door-closed" />로그아웃</li>
+            <li><a @click="logout"><i class="fa-solid fa-door-closed" />로그아웃</a></li>
           </ul>
         </div>
         <div v-else>

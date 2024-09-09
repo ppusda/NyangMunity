@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import axios from "axios";
+import store from "@/stores/store";
 import router from "@/router";
 
 const email = ref("");
@@ -11,11 +12,16 @@ const login = function () {
     email: email.value,
     password: password.value
   }, { withCredentials: true })
-  .then(() => {
-    router.replace({name: "main"})
-        .then(() => router.go(0))
-  }).catch(error => {
-    if(error.response){
+  .then(response => {
+    store.dispatch('login', {
+      id: response.data.id,
+      nickname: response.data.nickname
+    });
+
+    router.replace({ name: "main" });
+  })
+  .catch(error => {
+    if (error.response) {
       alert(error.response.data.message);
     } else {
       alert("계정이 올바르지 않습니다.");
