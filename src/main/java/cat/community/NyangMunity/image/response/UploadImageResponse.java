@@ -11,10 +11,11 @@ public record UploadImageResponse(
 
 ) {
 
-    public static UploadImageResponse from(URL url, String filePath) {
+    public static UploadImageResponse from(URL url, String filePath, Long imgId) {
         return UploadImageResponse.builder()
                 .uploadUrl(url)
                 .filePath(filePath)
+                .imgId(imgId)
                 .build();
     }
 
