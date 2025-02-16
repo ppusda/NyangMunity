@@ -8,7 +8,7 @@ const email = ref("");
 const password = ref("");
 
 const login = function () {
-  axios.post("http://localhost:8080/user/login", {
+  axios.post("http://localhost:8080/member/login", {
     email: email.value,
     password: password.value
   }, { withCredentials: true })
@@ -59,7 +59,7 @@ const login = function () {
       <div class="bg-zinc-800 px-5 py-3 rounded-md sm:w-[25rem] w-[26rem]">
         <div class="flex flex-col m-1.5 text-center">
           <h6 class="text-md font-bold text-white mb-3">처음 이용하시나요?</h6>
-          <router-link to="/user/join" class="btn btn-outline btn-ghost w-full p-3 rounded-md text-white"><i class="fa-solid fa-user-plus"></i>회원가입</router-link>
+          <router-link to="/member/join" class="btn btn-outline btn-ghost w-full p-3 rounded-md text-white"><i class="fa-solid fa-member-plus"></i>회원가입</router-link>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.board.entity;
+package cat.community.nyangmunity.post.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -22,7 +22,7 @@ public class QBoard extends EntityPathBase<Board> {
 
     public static final QBoard board = new QBoard("board");
 
-    public final ListPath<BoardImage, QBoardImage> boardImages = this.<BoardImage, QBoardImage>createList("boardImages", BoardImage.class, QBoardImage.class, PathInits.DIRECT2);
+    public final ListPath<BoardImage, QBoardImage> boardImages = this.<BoardImage, QBoardImage>createList("imageUrls", BoardImage.class, QBoardImage.class, PathInits.DIRECT2);
 
     public final ListPath<BoardLike, QBoardLike> boardLikes = this.<BoardLike, QBoardLike>createList("boardLikes", BoardLike.class, QBoardLike.class, PathInits.DIRECT2);
 
@@ -34,7 +34,7 @@ public class QBoard extends EntityPathBase<Board> {
 
     public final StringPath title = createString("title");
 
-    public final cat.community.NyangMunity.user.entity.QUser user;
+    public final cat.community.nyangmunity.member.entity.QUser user;
 
     public QBoard(String variable) {
         this(Board.class, forVariable(variable), INITS);
@@ -54,7 +54,7 @@ public class QBoard extends EntityPathBase<Board> {
 
     public QBoard(Class<? extends Board> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new cat.community.NyangMunity.user.entity.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new cat.community.nyangmunity.member.entity.QUser(forProperty("user")) : null;
     }
 
 }

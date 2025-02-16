@@ -1,6 +1,6 @@
 ### 로그인 요청
 
-POST http://localhost:8080/nm/user/login
+POST http://localhost:8080/nm/member/login
 Content-Type: application/json
 
 {

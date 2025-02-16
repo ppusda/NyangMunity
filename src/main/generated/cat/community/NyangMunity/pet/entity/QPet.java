@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.pet.entity;
+package cat.community.nyangmunity.pet.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -30,7 +30,7 @@ public class QPet extends EntityPathBase<Pet> {
 
     public final StringPath name = createString("name");
 
-    public final cat.community.NyangMunity.user.entity.QUser user;
+    public final cat.community.nyangmunity.member.entity.QUser user;
 
     public QPet(String variable) {
         this(Pet.class, forVariable(variable), INITS);
@@ -50,7 +50,7 @@ public class QPet extends EntityPathBase<Pet> {
 
     public QPet(Class<? extends Pet> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new cat.community.NyangMunity.user.entity.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new cat.community.nyangmunity.member.entity.QUser(forProperty("user")) : null;
     }
 
 }

@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.board.entity;
+package cat.community.nyangmunity.post.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 

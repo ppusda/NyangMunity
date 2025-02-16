@@ -25,7 +25,7 @@ const props = defineProps({
 let removeList :any[] = reactive([]);
 
 
-axios.post("/nm/user/check").then(() => {
+axios.post("/nm/member/check").then(() => {
     axios.get(`/nm/boards/${props.postId}`).then((response) => {
       post.value = response.data;
     });

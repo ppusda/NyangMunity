@@ -15,7 +15,7 @@
     <input value="true" th:value="${loginState}" type="text" name="loginState" id="loginState" hidden="true"/>
 
     <div class="login_div">
-        <form th:method="post" th:action="@{/user/login}" th:id="loginForm">
+        <form th:method="post" th:action="@{/member/login}" th:id="loginForm">
             <table>
                 <tr>
                     <td><a>ID : </a></td> <td><input id="email" name="email" type="text"></td>
@@ -24,7 +24,7 @@
                     <td><a>PW : </a></td> <td><input id="password" name="password" type="password"></td>
                 </tr>
                 <tr>
-                    <td> <input id="loginBtn" type="button" onclick="chkValue()" value="커뮤니티 로그인"> </td> <td> <a th:onclick="|location.href='@{/user/join}'|"> 회원가입 </a></td>
+                    <td> <input id="loginBtn" type="button" onclick="chkValue()" value="커뮤니티 로그인"> </td> <td> <a th:onclick="|location.href='@{/member/join}'|"> 회원가입 </a></td>
                 </tr>
                 <tr>
                     <td colspan="2">

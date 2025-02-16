@@ -17,14 +17,14 @@
         <tr>
             <th>번호</th><th>제목</th><th>글쓴이</th><th>고양이</th><th>작성일</th>
         </tr>
-        <tr th:each="board : ${boards}">
-            <td><a href="board.html" th:href="@{/basic/boards/{itemId}(itemId=${item.id})}"
-                   th:text="${board.id}">글ID</a></td>
-            <td><a href="board.html" th:href="@{|/basic/boards/${item.id}|}"
-                   th:text="${board.itemName}">제목</a></td>
-            <td th:text="${board.price}">글쓴이</td>
-            <td th:text="${board.quantity}">고양이</td>
-            <td th:text="${board.quantity}">작성일</td>
+        <tr th:each="post : ${boards}">
+            <td><a href="post.html" th:href="@{/basic/boards/{itemId}(itemId=${item.id})}"
+                   th:text="${post.id}">글ID</a></td>
+            <td><a href="post.html" th:href="@{|/basic/boards/${item.id}|}"
+                   th:text="${post.itemName}">제목</a></td>
+            <td th:text="${post.price}">글쓴이</td>
+            <td th:text="${post.quantity}">고양이</td>
+            <td th:text="${post.quantity}">작성일</td>
         </tr>
     </table>
 </div>

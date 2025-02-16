@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.token.entity;
+package cat.community.nyangmunity.token.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -26,7 +26,7 @@ public class QToken extends EntityPathBase<Token> {
 
     public final StringPath refreshToken = createString("refreshToken");
 
-    public final cat.community.NyangMunity.user.entity.QUser user;
+    public final cat.community.nyangmunity.member.entity.QUser user;
 
     public QToken(String variable) {
         this(Token.class, forVariable(variable), INITS);
@@ -46,7 +46,7 @@ public class QToken extends EntityPathBase<Token> {
 
     public QToken(Class<? extends Token> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new cat.community.NyangMunity.user.entity.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new cat.community.nyangmunity.member.entity.QUser(forProperty("user")) : null;
     }
 
 }

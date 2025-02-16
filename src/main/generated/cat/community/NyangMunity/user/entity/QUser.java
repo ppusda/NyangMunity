@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.user.entity;
+package cat.community.nyangmunity.member.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -22,9 +22,9 @@ public class QUser extends EntityPathBase<User> {
 
     public final DatePath<java.time.LocalDate> birthday = createDate("birthday", java.time.LocalDate.class);
 
-    public final ListPath<cat.community.NyangMunity.board.entity.BoardLike, cat.community.NyangMunity.board.entity.QBoardLike> boardLikes = this.<cat.community.NyangMunity.board.entity.BoardLike, cat.community.NyangMunity.board.entity.QBoardLike>createList("boardLikes", cat.community.NyangMunity.board.entity.BoardLike.class, cat.community.NyangMunity.board.entity.QBoardLike.class, PathInits.DIRECT2);
+    public final ListPath<cat.community.nyangmunity.post.entity.BoardLike, cat.community.nyangmunity.post.entity.QBoardLike> boardLikes = this.<cat.community.nyangmunity.post.entity.BoardLike, cat.community.nyangmunity.post.entity.QBoardLike>createList("boardLikes", cat.community.nyangmunity.post.entity.BoardLike.class, cat.community.nyangmunity.post.entity.QBoardLike.class, PathInits.DIRECT2);
 
-    public final ListPath<cat.community.NyangMunity.board.entity.Board, cat.community.NyangMunity.board.entity.QBoard> boards = this.<cat.community.NyangMunity.board.entity.Board, cat.community.NyangMunity.board.entity.QBoard>createList("boards", cat.community.NyangMunity.board.entity.Board.class, cat.community.NyangMunity.board.entity.QBoard.class, PathInits.DIRECT2);
+    public final ListPath<cat.community.nyangmunity.post.entity.Board, cat.community.nyangmunity.post.entity.QBoard> boards = this.<cat.community.nyangmunity.post.entity.Board, cat.community.nyangmunity.post.entity.QBoard>createList("boards", cat.community.nyangmunity.post.entity.Board.class, cat.community.nyangmunity.post.entity.QBoard.class, PathInits.DIRECT2);
 
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);
 
@@ -36,7 +36,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath password = createString("password");
 
-    public final ListPath<cat.community.NyangMunity.token.entity.Token, cat.community.NyangMunity.token.entity.QToken> tokens = this.<cat.community.NyangMunity.token.entity.Token, cat.community.NyangMunity.token.entity.QToken>createList("tokens", cat.community.NyangMunity.token.entity.Token.class, cat.community.NyangMunity.token.entity.QToken.class, PathInits.DIRECT2);
+    public final ListPath<cat.community.nyangmunity.token.entity.Token, cat.community.nyangmunity.token.entity.QToken> tokens = this.<cat.community.nyangmunity.token.entity.Token, cat.community.nyangmunity.token.entity.QToken>createList("tokens", cat.community.nyangmunity.token.entity.Token.class, cat.community.nyangmunity.token.entity.QToken.class, PathInits.DIRECT2);
 
     public QUser(String variable) {
         super(User.class, forVariable(variable));

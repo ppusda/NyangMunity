@@ -244,7 +244,7 @@ onMounted(() => {
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
       <div
           ref="postContainerRef"
-          class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[38rem]"
+          class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[33rem]"
           @scroll="handleBoardScroll"
       >
         <ul class="w-full flex flex-col-reverse">
@@ -259,13 +259,19 @@ onMounted(() => {
           </li>
         </ul>
       </div>
+
       <!-- 입력창 영역 -->
-      <div class="flex flex-row h-1/6">
-        <div class="bg-zinc-800 rounded-md p-2 w-11/12">
-          <textarea v-model:="content" placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
+      <div class="flex flex-col">
+        <div class="flex flex-row w-10/12 p-2">
+          <div class="card bg-zinc-900 rounded-box grid h-[3rem] place-items-center"><div class="divider divider-horizontal">content</div></div>
         </div>
-        <div class="h-full p-2 w-1/12">
-          <button @click="writeBoard" class="btn btn-ghost h-full border border-gray-400">작성</button>
+        <div class="flex flex-row h-1/6">
+          <div class="bg-zinc-800 rounded-md p-2 w-11/12">
+            <textarea v-model:="content" placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
+          </div>
+          <div class="h-full p-2 w-1/12">
+            <button @click="writeBoard" class="btn btn-ghost h-full border border-gray-400">작성</button>
+          </div>
         </div>
       </div>
     </div>

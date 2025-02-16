@@ -1,4 +1,4 @@
-package cat.community.NyangMunity.board.entity;
+package cat.community.nyangmunity.post.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -24,7 +24,7 @@ public class QBoardPet extends EntityPathBase<BoardPet> {
 
     public final QBoard board;
 
-    public final cat.community.NyangMunity.pet.entity.QPet pet;
+    public final cat.community.nyangmunity.pet.entity.QPet pet;
 
     public QBoardPet(String variable) {
         this(BoardPet.class, forVariable(variable), INITS);
@@ -45,7 +45,7 @@ public class QBoardPet extends EntityPathBase<BoardPet> {
     public QBoardPet(Class<? extends BoardPet> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.board = inits.isInitialized("board") ? new QBoard(forProperty("board"), inits.get("board")) : null;
-        this.pet = inits.isInitialized("pet") ? new cat.community.NyangMunity.pet.entity.QPet(forProperty("pet"), inits.get("pet")) : null;
+        this.pet = inits.isInitialized("pet") ? new cat.community.nyangmunity.pet.entity.QPet(forProperty("pet"), inits.get("pet")) : null;
     }
 
 }

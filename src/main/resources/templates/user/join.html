@@ -13,7 +13,7 @@
 <div th:replace="fragments/header :: header"/>
 
     <div class="join_div">
-        <form th:method="post" th:action="@{/user/join}" th:id="loginForm">
+        <form th:method="post" th:action="@{/member/join}" th:id="loginForm">
             <table>
                 <tr>
                     <td><a>이메일 : </a></td> <td><input id="email" name="email" type="text"></td>
@@ -31,7 +31,7 @@
                     <td><a>닉네임 : </a></td> <td><input id="nickname" name="nickname" type="text"></td>
                 </tr>
                 <tr>
-                    <td> <input type="submit" value="회원가입"> </td> <td> <a th:onclick="|location.href='@{/user/login}'|"> 취소 </a></td>
+                    <td> <input type="submit" value="회원가입"> </td> <td> <a th:onclick="|location.href='@{/member/login}'|"> 취소 </a></td>
                 </tr>
             </table>
         </form>
