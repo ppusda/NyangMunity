@@ -204,39 +204,19 @@ onMounted(() => {
 <template>
   <div class="w-screen h-screen flex p-2">
     <div class="flex flex-col w-1/5 bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
-      <div class="h-3/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
-        <p>냥뮤니티 이미지</p>
-        <p class="text-xs text-gray-400">냥뮤니티 인기 이미지를 살펴보세요!</p>
+      <div class="text-white p-4">
+        <p>고양이 짤</p>
+        <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
       </div>
-      <div class="h-3/5 bg-zinc-800 rounded-md text-white p-4 mr-2">
-        <p>이미지 업로드</p>
-        <p class="text-xs text-gray-400">당신만의 고양이 이미지를 업로드해보세요!</p>
-        <div
-            class="upload-area border border-dashed border-gray-500 mt-4 p-4 relative"
-            @drop="handleDrop"
-            @dragover.prevent
-            @click="handleClick"
-        >
-          <input
-              type="file"
-              ref="fileInput"
-              class="hidden"
-              @change="handleFileSelect"
-          />
-          <div v-if="uploadImage">
-            <img :src="uploadImage" class="w-full h-32 object-cover rounded-md" />
-          </div>
-          <div v-else>
-            <p class="text-center text-gray-400">Drag & Drop<br>or<br>Click to Upload</p>
+      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-8 memeList overflow-y-auto scroll-hidden">
+        <div class="masonry h-full">
+          <div v-for="meme in memes" class="masonry-item group relative" @click="copyLink(meme.url)">
+            <img :src="meme.url" :id="`cmg_${meme.id}`" class="w-full h-full object-cover rounded-md" />
+            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <p class="text-xs text-white">클릭하여 링크 복사</p>
+            </div>
           </div>
         </div>
-        <button @click="imageUpload" class="btn btn-ghost w-full border border-gray-400 mt-2">업로드</button>
-        <hr class="my-3 border-gray-500">
-        <div class="flex flex-row text-center justify-center items-center">
-          <p class="text-xs text-white mr-3 flex items-center">이미지 URL</p>
-          <input class="input h-[2rem] w-full bg-zinc-800 rounded-md border border-gray-400" readonly>
-        </div>
-        <p class="text-xs text-gray-400 mt-2">* 게시글 작성에 이용하지 않을 시 이미지는 자동 삭제됩니다.</p>
       </div>
     </div>
 
@@ -244,7 +224,7 @@ onMounted(() => {
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
       <div
           ref="postContainerRef"
-          class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[33rem]"
+          class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[36rem]"
           @scroll="handleBoardScroll"
       >
         <ul class="w-full flex flex-col-reverse">
@@ -260,35 +240,17 @@ onMounted(() => {
         </ul>
       </div>
 
-      <!-- 입력창 영역 -->
-      <div class="flex flex-col">
-        <div class="flex flex-row w-10/12 p-2">
-          <div class="card bg-zinc-900 rounded-box grid h-[3rem] place-items-center"><div class="divider divider-horizontal">content</div></div>
-        </div>
-        <div class="flex flex-row h-1/6">
-          <div class="bg-zinc-800 rounded-md p-2 w-11/12">
+
+      <div class="flex flex-col p-2">
+        <!-- 업로드 영역 -->
+        <div class="border border-gray-400 rounded-md h-full p-4 mx-2"></div>
+        <div class="flex flex-row mt-3">
+          <!-- 입력창 영역 -->
+          <div class="bg-zinc-800 rounded-md w-full p-2">
             <textarea v-model:="content" placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
           </div>
-          <div class="h-full p-2 w-1/12">
-            <button @click="writeBoard" class="btn btn-ghost h-full border border-gray-400">작성</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 오른쪽 사이드바 -->
-    <div class="bg-zinc-800 w-1/5 rounded-md text-white p-4 ml-2 transition-all duration-300 h-full">
-      <div class="text-white p-4">
-        <p>고양이 짤</p>
-        <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
-      </div>
-      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-8 memeList overflow-y-auto scroll-hidden">
-        <div class="masonry h-full">
-          <div v-for="meme in memes" class="masonry-item group relative" @click="copyLink(meme.url)">
-            <img :src="meme.url" :id="`cmg_${meme.id}`" class="w-full h-full object-cover rounded-md" />
-            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <p class="text-xs text-white">클릭하여 링크 복사</p>
-            </div>
+          <div class="h-full p-2">
+            <button @click="writeBoard" class="btn btn-ghost h-full border border-gray-400">↵</button>
           </div>
         </div>
       </div>

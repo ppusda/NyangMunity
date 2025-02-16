@@ -6,7 +6,7 @@ import axios from "axios";
 
 let cookieValue = ref("");
 
-const user = ref({
+const member = ref({
   id: 0,
   email: "",
   password: "",
@@ -22,7 +22,7 @@ const { cookies } = useCookies();
 const router = useRouter();
 
 const userLogout = function () {
-  axios.post("/nm/user/logout").then(() => {
+  axios.post("/nm/member/logout").then(() => {
     cookies.remove("SESSION");
     router.replace({ name: "main" }). then(() => router.go(0));
   });
@@ -33,15 +33,15 @@ const userEdit = function () {
     alert("비밀번호가 다릅니다.")
   } else {
     formData.append("pwdCheck", pwdCheck.value);
-    axios.post("/nm/user/pwdCheck", formData).then(response => {
+    axios.post("/nm/member/pwdCheck", formData).then(response => {
       if (response.data) {
-        user.value.password = newPassword.value;
+        member.value.password = newPassword.value;
 
-        formData.append("nickname", user.value.nickname);
-        formData.append("password",  user.value.password);
-        formData.append("birthday", user.value.birthday);
+        formData.append("nickname", member.value.nickname);
+        formData.append("password",  member.value.password);
+        formData.append("birthday", member.value.birthday);
 
-        axios.post("/nm/user/edit", formData).then(() => {
+        axios.post("/nm/member/edit", formData).then(() => {
           alert("정보 수정이 완료되었습니다.");
           router.replace({ name: "main" }).then(() => router.go(0));
         });
@@ -54,10 +54,10 @@ const userEdit = function () {
 
 const cancelUser = function () {
   formData.append("pwdCheck", pwdCheck.value);
-  axios.post("/nm/user/pwdCheck", formData).then(response => {
+  axios.post("/nm/member/pwdCheck", formData).then(response => {
     if (response.data) {
       alert("냥뮤니티를 이용해주셔서 감사했습니다.");
-      axios.post("/nm/user/cancel", ).then(() => {
+      axios.post("/nm/member/cancel", ).then(() => {
         router.replace({ name: "main" }).then(() => router.go(0));
       });
     } else {
@@ -72,8 +72,8 @@ const cancelUser = function () {
 };
 
 onMounted(async () => {
-    await axios.post("/nm/user/info", ).then(response => {
-      user.value = response.data;
+    await axios.post("/nm/member/info", ).then(response => {
+      member.value = response.data;
     }).catch(error => {
       if(error.response) {
         alert(error.response.data.message);
@@ -89,7 +89,7 @@ onMounted(async () => {
     <div class="content_area">
       <h3>User info</h3>
       <hr />
-      <div class="user-info">
+      <div class="member-info">
         <table>
           <tr>
             <td rowspan="6">
@@ -100,13 +100,13 @@ onMounted(async () => {
           <tr>
             <td class="w-25"><a class="text-white">이메일 : </a></td>
             <td class="w-50">
-              <a class="w-100" id="email">{{user.email}}</a>
+              <a class="w-100" id="email">{{member.email}}</a>
             </td>
           </tr>
           <tr>
             <td class="w-25"><a class="text-white">닉네임 : </a></td>
             <td class="w-50">
-              <input class="w-100" id="nickname" name="nickname" type="text" v-model="user.nickname"/>
+              <input class="w-100" id="nickname" name="nickname" type="text" v-model="member.nickname"/>
             </td>
           </tr>
           <tr>
@@ -124,7 +124,7 @@ onMounted(async () => {
           <tr>
             <td class="w-25"><a class="text-white">생일 : </a></td>
             <td class="w-50">
-              <input class="w-100" id="birthday" name="birthday" type="date" v-model="user.birthday"/>
+              <input class="w-100" id="birthday" name="birthday" type="date" v-model="member.birthday"/>
             </td>
           </tr>
           <tr>
@@ -163,7 +163,7 @@ onMounted(async () => {
 <!--<div class="alert alert-info alert-dismissable">-->
 <!--<a class="panel-close close" data-dismiss="alert">×</a>-->
 <!--<i class="fa fa-coffee"></i>-->
-<!--This is an <strong>.alert</strong>. Use this to show important messages to the user.-->
+<!--This is an <strong>.alert</strong>. Use this to show important messages to the member.-->
 <!--</div>-->
 
 <style scoped>
@@ -181,7 +181,7 @@ onMounted(async () => {
   justify-content: center;
 }
 
-.user-info {
+.member-info {
   display: flex;
 }
 </style>
