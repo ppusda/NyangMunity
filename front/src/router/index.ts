@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainView from "../views/MainView.vue";
-import WriteView from "../views/board/Write.vue";
 import BoardListView from "../views/board/List.vue";
-import EditView from "../views/board/Edit.vue";
 import LoginView from "../views/user/Login.vue";
 import JoinView from "../views/user/Join.vue";
 import UserView from "../views/user/User.vue";
@@ -14,17 +12,6 @@ const router = createRouter({
       path: "/",
       name: "main",
       component: MainView,
-    },
-    {
-      path: "/boards/write",
-      name: "write",
-      component: WriteView,
-    },
-    {
-      path: "/edit/:postId",
-      name: "edit",
-      component: EditView,
-      props: true,
     },
     {
       path: "/boards",
