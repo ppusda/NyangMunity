@@ -243,14 +243,34 @@ onMounted(() => {
 
       <div class="flex flex-col p-2">
         <!-- 업로드 영역 -->
-        <div class="border border-gray-400 rounded-md h-full p-4 mx-2"></div>
-        <div class="flex flex-row mt-3">
+        <div class="h-full mx-2">
+          <div
+              class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative"
+              @drop="handleDrop"
+              @dragover.prevent
+              @click="handleClick"
+          >
+            <input
+                type="file"
+                ref="fileInput"
+                class="hidden"
+                @change="handleFileSelect"
+            />
+            <div v-if="uploadImage">
+              <img :src="uploadImage" class="w-full h-16 object-cover rounded-md" />
+            </div>
+            <div v-else class="p-4">
+              <p class="text-center text-gray-400">왼쪽에서 이미지를 선택하거나 첨부하세요!</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-row mt-2">
           <!-- 입력창 영역 -->
-          <div class="bg-zinc-800 rounded-md w-full p-2">
-            <textarea v-model:="content" placeholder="고양이 사진과 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-[7.5rem] resize-none"></textarea>
+          <div class="bg-zinc-800 rounded-md w-full h-full p-2">
+            <textarea v-model:="content" placeholder="간단한 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-full resize-none"></textarea>
           </div>
           <div class="h-full p-2">
-            <button @click="writeBoard" class="btn btn-ghost h-full border border-gray-400">↵</button>
+            <button @click="writeBoard" class="btn btn-ghost border h-full border-gray-400"> ↵ </button>
           </div>
         </div>
       </div>
@@ -260,7 +280,6 @@ onMounted(() => {
 
 <style scoped>
 .upload-area {
-  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
