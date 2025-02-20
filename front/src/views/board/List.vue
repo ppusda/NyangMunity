@@ -204,11 +204,15 @@ onMounted(() => {
 <template>
   <div class="w-screen h-screen flex p-2">
     <div class="flex flex-col w-1/5 bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
-      <div class="text-white p-4">
+      <div class="text-white px-4 py-2">
         <p>고양이 짤</p>
         <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
       </div>
-      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-8 memeList overflow-y-auto scroll-hidden">
+      <div class="flex flex-row py-2">
+        <button class="btn btn-ghost mr-2">Nyangmunity</button>
+        <button class="btn btn-ghost mr-2">Tenor</button>
+      </div>
+      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-4 memeList overflow-y-auto scroll-hidden">
         <div class="masonry h-full">
           <div v-for="meme in memes" class="masonry-item group relative" @click="copyLink(meme.url)">
             <img :src="meme.url" :id="`cmg_${meme.id}`" class="w-full h-full object-cover rounded-md" />
