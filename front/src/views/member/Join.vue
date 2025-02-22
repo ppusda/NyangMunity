@@ -14,7 +14,7 @@ const joinConfirm = function () {
   if(password.value != passwordChk.value){
     alert("비밀번호가 다릅니다.")
   }else{
-    axios.post("/nm/user/join", {
+    axios.post("/nm/member/join", {
       email: email.value,
       password: password.value,
       birthday: birthday.value,

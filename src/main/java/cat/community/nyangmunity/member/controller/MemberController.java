@@ -3,8 +3,8 @@ package cat.community.nyangmunity.member.controller;
 import cat.community.nyangmunity.global.provider.CookieProvider;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.member.request.MemberEditForm;
-import cat.community.nyangmunity.member.request.MemberJoinForm;
-import cat.community.nyangmunity.member.request.MemberLoginForm;
+import cat.community.nyangmunity.member.request.JoinRequest;
+import cat.community.nyangmunity.member.request.LoginRequest;
 import cat.community.nyangmunity.member.response.MemberCheckResponse;
 import cat.community.nyangmunity.member.response.MemberInfos;
 import cat.community.nyangmunity.member.response.MemberLoginResponse;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -29,13 +29,13 @@ public class MemberController {
     private final CookieProvider cookieProvider;
 
     @PostMapping("/join")
-    private void userJoin(@RequestBody @Valid MemberJoinForm memberJoinForm) {
-        memberService.register(memberJoinForm);
+    private void memberJoin(@RequestBody @Valid JoinRequest joinRequest) {
+        memberService.joinMember(joinRequest);
     }
 
     @PostMapping("/login")
-    private ResponseEntity<MemberInfos> userLogin(@RequestBody @Valid MemberLoginForm memberLoginForm) {
-        MemberLoginResponse memberLoginResponse = memberService.userLogin(memberLoginForm);
+    private ResponseEntity<MemberInfos> userLogin(@RequestBody @Valid LoginRequest loginRequest) {
+        MemberLoginResponse memberLoginResponse = memberService.userLogin(loginRequest);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(

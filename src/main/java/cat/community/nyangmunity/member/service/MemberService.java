@@ -12,8 +12,8 @@ import cat.community.nyangmunity.global.exception.AlreadyExistsEmailException;
 import cat.community.nyangmunity.global.exception.InvalidLoginInformationException;
 import cat.community.nyangmunity.member.repository.MemberRepository;
 import cat.community.nyangmunity.member.request.MemberEditForm;
-import cat.community.nyangmunity.member.request.MemberJoinForm;
-import cat.community.nyangmunity.member.request.MemberLoginForm;
+import cat.community.nyangmunity.member.request.JoinRequest;
+import cat.community.nyangmunity.member.request.LoginRequest;
 import cat.community.nyangmunity.member.response.MemberInfos;
 import cat.community.nyangmunity.member.response.MemberTokens;
 import cat.community.nyangmunity.member.response.MemberLoginResponse;
@@ -43,16 +43,15 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Member> getUserByEmail(String email) {
+    public Optional<Member> findMemberByEmail(String email) {
         return memberRepository.findByEmail(email);
     }
 
     @Transactional
-    public MemberLoginResponse userLogin(MemberLoginForm memberLoginForm) {
-        Member member = getUserByEmail(memberLoginForm.email())
-                .orElseThrow(InvalidLoginInformationException::new);
+    public MemberLoginResponse userLogin(LoginRequest loginRequest) {
+        Member member = findMemberByEmail(loginRequest.email()).orElseThrow(InvalidLoginInformationException::new);
 
-        if(!isPasswordMatches(memberLoginForm.password(), member)) {
+        if(!isPasswordMatches(loginRequest.password(), member)) {
             throw new InvalidLoginInformationException();
         }
 
@@ -74,14 +73,14 @@ public class MemberService {
     }
 
     @Transactional
-    public void register(MemberJoinForm memberJoinForm) {
-        checkDuplicateEmail(memberJoinForm.email());
-        checkDuplicateNickname(memberJoinForm.nickname());
+    public void joinMember(JoinRequest joinRequest) {
+        checkDuplicateEmail(joinRequest.email());
+        checkDuplicateNickname(joinRequest.nickname());
 
         Member member = Member.builder()
-                .email(memberJoinForm.email())
-                .password(scryptPasswordEncoder.encrypt(memberJoinForm.password()))
-                .nickname(memberJoinForm.nickname())
+                .email(joinRequest.email())
+                .password(scryptPasswordEncoder.encrypt(joinRequest.password()))
+                .nickname(joinRequest.nickname())
                 .createDate(LocalDateTime.now())
                 .build();
 
@@ -90,12 +89,12 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public void checkDuplicateEmail(String email) {
-        getUserByEmail(email).orElseThrow(AlreadyExistsEmailException::new);
+        if (findMemberByEmail(email).isPresent()) throw new AlreadyExistsEmailException();
     }
 
     @Transactional(readOnly = true)
     public void checkDuplicateNickname(String nickname) {
-        memberRepository.findByNickname(nickname).orElseThrow(AlreadyExistsNicknameException::new);
+        if (memberRepository.findByNickname(nickname).isPresent()) throw new AlreadyExistsNicknameException();
     }
 
     @Transactional

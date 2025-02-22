@@ -19,8 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Getter @Table(name = "user")
+@Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Member {
 
