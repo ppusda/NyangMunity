@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted, nextTick } from 'vue';
-import { useClipboard } from '@vueuse/core';
+import {nextTick, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
-import { toast } from "vue3-toastify";
+import MasonryGrid from "@/components/MasonryGrid.vue";
 import 'vue3-toastify/dist/index.css';
 
 interface Post {
@@ -13,7 +12,7 @@ interface Post {
   writer: string;
 }
 
-interface Gif {
+interface Image {
   id: string;
   url: string;
 }
@@ -28,9 +27,9 @@ const postContainerRef = ref<HTMLElement | null>(null);
 const content = ref<string>("");
 
 // 밈 및 페이지네이션 상태
-const memes = reactive<Gif[]>([]);
-const memePage = reactive({ value: 1 });
-const memeTotalPage = reactive({ value: 0 });
+const images = reactive<Image[]>([]);
+const imagePage = reactive({ value: 0 });
+const imageTotalPage = reactive({ value: 0 });
 
 // 업로드 이미지
 const uploadImageList = ref<string[]>([]);
@@ -38,11 +37,11 @@ const uploadImage = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 // 게시물 가져오기
-const getBoards = async (page: number, init: boolean) => {
+const getPosts = async (page: number, init: boolean) => {
   if (postTotalPage.value !== 0 && page >= postTotalPage.value) return;
 
   try {
-    const response = await axios.get(`/nm/boards?page=${page - 1}&size=10`);
+    const response = await axios.get(`/nm/post?page=${page - 1}&size=10`);
     postTotalPage.value = response.data.totalPages;
 
     if (init) {
@@ -56,18 +55,17 @@ const getBoards = async (page: number, init: boolean) => {
       const currentScrollHeight = postContainerRef.value?.scrollHeight || 0;
       postContainerRef.value?.scrollTo(0, currentScrollHeight - prevScrollHeight);
     }
-    console.log(posts);
   } catch (error) {
     console.error(error);
   }
 };
 
 // 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
-const handleBoardScroll = (event: Event) => {
+const handlePostScroll = (event: Event) => {
   const element = event.target as HTMLElement;
   if (element.scrollTop === 0) {
     postPage.value += 1;
-    getBoards(postPage.value, false);
+    getPosts(postPage.value, false);
   }
 };
 
@@ -112,30 +110,32 @@ const getWriteTime = (time: string) => {
 };
 
 // 게시물 업로드
-const writeBoard = () => {
-  axios.post('/nm/board/write', {
+const writePost = () => {
+  axios.post('/nm/post', {
     "content": content.value,
-    "boardImages": uploadImageList.value
+    "postImages": uploadImageList.value
   });
+  getPosts(postPage.value, true);
 }
 
-// 밈 이미지 가져오기
-const getMemeImages = (pageValue: number) => {
-  if (memeTotalPage.value !== 0 && pageValue >= memeTotalPage.value) return;
+// 이미지 가져오기
+const getImages = async (pageValue: number) => {
+  if (imageTotalPage.value !== 0 && pageValue >= imageTotalPage.value) return;
 
-  axios.get(`/nm/meme?page=${pageValue}`).then(response => {
-    memeTotalPage.value = response.data.totalPages;
-    const newMemes = response.data.content.filter((newMeme: Gif) => !memes.some(meme => meme.id === newMeme.id));
-    memes.push(...newMemes);
-  });
+  const response = await axios.get(`/nm/image/?page=${pageValue}`);
+  imageTotalPage.value = response.data.totalPages;
+
+  const newImages = response.data.content.filter((newImage: Image) => !images.some(image => image.id === newImage.id));
+
+  // Vue의 반응형 객체는 배열 메서드로 직접 수정해야 함
+  images.push(...newImages);
 };
 
-// 스크롤 이벤트 핸들러
-const handleMemeScroll = (event: Event) => {
+// 스크롤 이벤트 감지 후 다음 페이지 로드
+const handleImageScroll = (event: Event) => {
   const element = event.target as HTMLElement;
   if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-    // 스크롤이 맨 아래에 도달했을 때 다음 페이지 로드
-    getMemeImages(memePage.value++);
+    getImages(imagePage.value++);
   }
 };
 
@@ -180,23 +180,14 @@ const postImageUpload = () => {
   });
 };
 
-// 클립보드에 링크 복사
-const { copy } = useClipboard();
-const copyLink = (link: string) => {
-  copy(link);
-  toast("이미지 복사 완료!", {
-    autoClose: 2000, theme: "dark"
-  });
-};
-
 // Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
 onMounted(() => {
-  getMemeImages(0); // 첫 페이지 로드
-  const memeListElement = document.querySelector('.memeList');
-  memeListElement?.addEventListener('scroll', handleMemeScroll);
+  getImages(imagePage.value);
+  const imageListElement = document.querySelector('.imageList');
+  imageListElement?.addEventListener('scroll', handleImageScroll);
 
-  getBoards(postPage.value, true);
-  postContainerRef.value?.addEventListener('scroll', handleBoardScroll);
+  getPosts(postPage.value, true);
+  postContainerRef.value?.addEventListener('scroll', handlePostScroll);
 });
 </script>
 
@@ -212,15 +203,8 @@ onMounted(() => {
         <button class="btn btn-ghost mr-2">Nyangmunity</button>
         <button class="btn btn-ghost mr-2">Tenor</button>
       </div>
-      <div class="border border-gray-400 rounded-md w-full h-[43rem] p-4 memeList overflow-y-auto scroll-hidden">
-        <div class="masonry h-full">
-          <div v-for="meme in memes" class="masonry-item group relative" @click="copyLink(meme.url)">
-            <img :src="meme.url" :id="`cmg_${meme.id}`" class="w-full h-full object-cover rounded-md" />
-            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <p class="text-xs text-white">클릭하여 링크 복사</p>
-            </div>
-          </div>
-        </div>
+      <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom" @scroll="handleImageScroll">
+        <MasonryGrid :items="images" />
       </div>
     </div>
 
@@ -229,7 +213,7 @@ onMounted(() => {
       <div
           ref="postContainerRef"
           class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[36rem]"
-          @scroll="handleBoardScroll"
+          @scroll="handlePostScroll"
       >
         <ul class="w-full flex flex-col-reverse">
           <li class="p-4 bg-zinc-800 rounded-md" v-for="post in posts" :key="post.id">
@@ -243,7 +227,6 @@ onMounted(() => {
           </li>
         </ul>
       </div>
-
 
       <div class="flex flex-col p-2">
         <!-- 업로드 영역 -->
@@ -274,7 +257,7 @@ onMounted(() => {
             <textarea v-model:="content" placeholder="간단한 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-full resize-none"></textarea>
           </div>
           <div class="h-full p-2">
-            <button @click="writeBoard" class="btn btn-ghost border h-full border-gray-400"> ↵ </button>
+            <button @click="writePost" class="btn btn-ghost border h-full border-gray-400"> ↵ </button>
           </div>
         </div>
       </div>
@@ -288,51 +271,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
-
-.scroll-hidden{
-  overflow-y: scroll;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scroll-hidden::-webkit-scrollbar {
-  display: none;
-}
-
-.masonry {
-  display: table-cell;
-  margin: auto;
-  column-count: 2;
-  column-gap: 0.5em;
-}
-
-.masonry::-webkit-scrollbar {
-  display: none; /* Chrome, Safari에서 스크롤바 숨기기 */
-}
-
-.masonry-item {
-  break-inside: avoid;
-  margin-bottom: 0.5em;
-}
-
-.masonry img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-
-.group {
-  position: relative;
-}
-
-.group:hover .group-hover\:opacity-100 {
-  opacity: 1;
-}
-
-.group-hover\:opacity-100 {
-  opacity: 0;
-  transition: opacity 0.3s;
 }
 
 .scroll-custom {

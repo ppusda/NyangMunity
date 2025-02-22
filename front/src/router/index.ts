@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainView from "@/views/MainView.vue";
-import BoardListView from "@/views/board/List.vue";
+import PostView from "@/views/post/List.vue";
 import LoginView from "@/views/member/Login.vue";
 import JoinView from "@/views/member/Join.vue";
 import UserView from "@/views/member/User.vue";
@@ -14,9 +14,9 @@ const router = createRouter({
       component: MainView,
     },
     {
-      path: "/boards",
-      name: "boards",
-      component: BoardListView,
+      path: "/posts",
+      name: "posts",
+      component: PostView,
     },
     {
       path: "/member/login",
