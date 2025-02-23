@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
-import cat.community.nyangmunity.global.exception.MemeBatchReadException;
+import cat.community.nyangmunity.global.exception.ImageBatchReadException;
 import cat.community.nyangmunity.image.batch.response.TenorResponse;
 import cat.community.nyangmunity.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +46,8 @@ public class ImageBatchReader implements ItemReader<List<TenorResponse>> {
                 isRead = true;
                 return tenorResponseList;
             } catch (Exception e) {
-                log.error("ERROR : MemeBatchReader - {}", e.getMessage());
-                throw new MemeBatchReadException();
+                log.error("ERROR : ImageBatchReader - {}", e.getMessage());
+                throw new ImageBatchReadException();
             }
         } else {
             return null; // 이미 데이터를 읽은 경우 null을 반환하여 처리 종료를 알림

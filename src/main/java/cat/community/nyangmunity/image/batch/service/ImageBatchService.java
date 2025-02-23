@@ -16,16 +16,16 @@ import org.springframework.stereotype.Service;
 public class ImageBatchService {
 
     private final JobLauncher jobLauncher;
-    private final Job memeBatchJob;
+    private final Job imageBatchJob;
 
-    public void runMemeBatchJob() {
+    public void runImageBatch() {
         try {
             String execDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             JobParameters parameters = new JobParametersBuilder()
                     .addString("execDate", execDate)
                     .toJobParameters();
 
-            jobLauncher.run(memeBatchJob, parameters);
+            jobLauncher.run(imageBatchJob, parameters);
         } catch (Exception e) {
             log.error("[ERROR] : 배치 업데이트 중 오류 발생, {}", e.getMessage());
         }

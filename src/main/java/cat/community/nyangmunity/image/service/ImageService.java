@@ -94,13 +94,13 @@ public class ImageService {
     }
 
     @Transactional
-    public void saveImages(List<Image> saveMemeList) {
-        imageRepository.saveAll(saveMemeList);
+    public void saveImages(List<Image> saveImageList) {
+        imageRepository.saveAll(saveImageList);
     }
 
     @Transactional
-    public void deleteImages(List<Image> deleteMemeList) {
-        imageRepository.deleteAll(deleteMemeList);
+    public void deleteImages(List<Image> deleteImageList) {
+        imageRepository.deleteAll(deleteImageList);
     }
 
     @Transactional(readOnly = true)
@@ -109,10 +109,10 @@ public class ImageService {
         return convertToImageResponse(imageRepository.findAll(pageable));
     }
 
-    private Page<ImageResponse> convertToImageResponse(Page<Image> memes) {
-        return memes.map(meme -> ImageResponse.builder()
-            .id(meme.getId())
-            .url(meme.getUrl())
+    private Page<ImageResponse> convertToImageResponse(Page<Image> images) {
+        return images.map(image -> ImageResponse.builder()
+            .id(image.getId())
+            .url(image.getUrl())
             .build());
     }
 }

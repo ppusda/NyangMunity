@@ -28,7 +28,7 @@ public class ImageBatchConfig {
     private final static int CHUNK_SIZE = 50;
 
     @Bean(name = "imageBatchJob")
-    public Job memeJob(JobRepository jobRepository, Step step) {
+    public Job imageJob(JobRepository jobRepository, Step step) {
         return new JobBuilder("imageBatchJob", jobRepository)
                 .start(step)
                 .build();
@@ -42,7 +42,7 @@ public class ImageBatchConfig {
             ImageBatchProcessor imageBatchProcessor,
             ImageBatchWriter imageBatchwriter
     ){
-        return new StepBuilder("getCatMeme", jobRepository)
+        return new StepBuilder("getCatImages", jobRepository)
                 .<List<TenorResponse>, List<Image>>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(imageBatchReader)
                 .processor(imageBatchProcessor)

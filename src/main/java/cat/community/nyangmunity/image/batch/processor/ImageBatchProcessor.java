@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, List<Image>> {
 
-    private final ImageService memeService;
+    private final ImageService imageService;
 
     @Override
     public List<Image> process(List<TenorResponse> tenorResponses) {
-        List<Image> existImages = memeService.getAllImages();
+        List<Image> existImages = imageService.getAllImages();
         Set<String> existImageIds = existImages.stream()
                 .map(Image::getId)
                 .collect(Collectors.toSet());
@@ -29,18 +29,16 @@ public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, L
                 .map(this::convertTenorResponseToImages)
                 .toList();
 
-        // 새로 추가할 밈 목록
-        List<Image> memesToAdd = filteringForAddingImages(newImages, existImageIds);
+        List<Image> imagesToAdd = filteringForAddingImages(newImages, existImageIds);
 
         Set<String> newIds = newImages.stream()
                 .map(Image::getId)
                 .collect(Collectors.toSet());
 
-        // 제거할 밈 목록
-        List<Image> memesToDelete = filteringForDeleteImages(existImages, newIds);
-        memeService.deleteImages(memesToDelete);
+        List<Image> imagesToDelete = filteringForDeleteImages(existImages, newIds);
+        imageService.deleteImages(imagesToDelete);
 
-        return memesToAdd;
+        return imagesToAdd;
     }
 
     private Image convertTenorResponseToImages(TenorResponse tenorResponse) {
@@ -51,15 +49,15 @@ public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, L
                 .build();
     }
 
-    private List<Image> filteringForAddingImages(List<Image> memes, Set<String> existIdSet) {
-        return memes.stream()
-                .filter(meme -> !existIdSet.contains(meme.getId()))
+    private List<Image> filteringForAddingImages(List<Image> images, Set<String> existIdSet) {
+        return images.stream()
+                .filter(image -> !existIdSet.contains(image.getId()))
                 .toList();
     }
 
-    private List<Image> filteringForDeleteImages(List<Image> memes, Set<String> newIdSet) {
-        return memes.stream()
-                .filter(meme -> !newIdSet.contains(meme.getId()))
+    private List<Image> filteringForDeleteImages(List<Image> images, Set<String> newIdSet) {
+        return images.stream()
+                .filter(image -> !newIdSet.contains(image.getId()))
                 .toList();
     }
 }
