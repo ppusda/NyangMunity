@@ -7,7 +7,7 @@ import Masonry from "masonry-layout";
 import imagesLoaded from "imagesloaded";
 
 const props = defineProps({
-  items: Array, // Masonry에 표시할 이미지 리스트
+  images: Array, // Masonry에 표시할 이미지 리스트
 });
 
 const masonryContainer = ref(null);
@@ -29,20 +29,24 @@ const initMasonry = () => {
   });
 };
 
-// Masonry 적용
+// 첫 로딩 시 이미지가 다 뜨기 전에 Masonry 실행 방지
 onMounted(async () => {
-  await nextTick();
-  initMasonry();
+  await nextTick(); // Vue DOM이 렌더링된 후 실행
+  imagesLoaded(masonryContainer.value, () => {
+    initMasonry();
+  });
 });
 
 // items 변경 시 Masonry 업데이트
 watch(
-    () => props.items,
+    () => props.images,
     () => {
       nextTick(() => {
         if (masonryInstance) {
-          masonryInstance.reloadItems();
-          masonryInstance.layout();
+          imagesLoaded(masonryContainer.value, () => {
+            masonryInstance.reloadItems();
+            masonryInstance.layout();
+          });
         }
       });
     },
@@ -63,18 +67,16 @@ const copyLink = (link) => {
 <template>
   <div ref="masonryContainer" class="masonry w-full h-auto">
     <div
-        v-for="item in items"
+        v-for="item in images"
         :key="item.id"
         class="masonry-item group relative cursor-pointer"
         @click="copyLink(item.url)"
     >
       <img :src="item.url" class="w-full h-auto rounded-md" />
-
-      <!-- 마우스를 올리면 어두워지며 텍스트 표시 -->
       <div
           class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"
       >
-        <p class="text-xs text-white">클릭하여 링크 복사</p>
+        <p class="text-xs text-white">이미지 선택 및 복사</p>
       </div>
     </div>
   </div>
