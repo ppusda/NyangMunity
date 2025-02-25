@@ -18,6 +18,9 @@ interface Image {
   url: string;
 }
 
+// 이미지 제공자 상태
+const providers = reactive<String[]>([]);
+
 // 게시물 및 페이지네이션 상태
 const posts = reactive<Post[]>([]);
 const postPage = reactive({ value: 1 });
@@ -81,9 +84,11 @@ const writePost = () => {
 }
 
 // Provider 가져오기
-const getProviders = async (pageValue: number) => {
+const getProviders = async () => {
   const response = await axios.get(`/nm/images/providers`);
-
+  response.data.Provider.forEach((item: String) => {
+      providers.push(item);
+  });
 };
 
 // 이미지 가져오기
@@ -152,6 +157,7 @@ onMounted(() => {
   const imageListElement = document.querySelector('.imageList');
   imageListElement?.addEventListener('scroll', handleImageScroll);
 
+  getProviders();
   getPosts(postPage.value, true);
   postContainerRef.value?.addEventListener('scroll', handlePostScroll);
 });
@@ -166,8 +172,7 @@ onMounted(() => {
         <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
       </div>
       <div class="flex flex-row py-2">
-        <button class="btn btn-ghost mr-2">Nyangmunity</button>
-        <button class="btn btn-ghost mr-2">Tenor</button>
+        <button v-for="provider in providers" class="btn btn-ghost mr-2">{{ provider }}</button>
       </div>
       <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom" @scroll="handleImageScroll">
         <MasonryGrid :images="images" />
