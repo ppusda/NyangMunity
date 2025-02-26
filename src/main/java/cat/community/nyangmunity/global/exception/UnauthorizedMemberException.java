@@ -3,11 +3,11 @@ package cat.community.nyangmunity.global.exception;
 import lombok.Getter;
 
 @Getter
-public class UnauthorizedUserException extends NyangmunityException{
+public class UnauthorizedMemberException extends NyangmunityException{
 
     private static final String MESSAGE = "인증되지 않은 유저입니다.";
 
-    public UnauthorizedUserException() {
+    public UnauthorizedMemberException() {
         super(MESSAGE);
     }
 
