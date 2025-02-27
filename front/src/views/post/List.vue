@@ -19,7 +19,8 @@ interface Image {
 }
 
 // 이미지 제공자 상태
-const providers = reactive<String[]>([]);
+const providers = reactive<string[]>([]);
+const selectedProvider = reactive({ value: "Nyangmunity" });
 
 // 게시물 및 페이지네이션 상태
 const posts = reactive<Post[]>([]);
@@ -91,11 +92,19 @@ const getProviders = async () => {
   });
 };
 
+const handleProviderClick = (provider: string) => {
+  selectedProvider.value = provider;
+
+  images.splice(0, images.length);
+  imagePage.value = 0;
+
+  getImages(imagePage.value);
+};
 // 이미지 가져오기
 const getImages = async (pageValue: number) => {
   if (imageTotalPage.value !== 0 && pageValue >= imageTotalPage.value) return;
 
-  const response = await axios.get(`/nm/images?page=${pageValue}`);
+  const response = await axios.get(`/nm/images?page=${pageValue}&provider=${selectedProvider.value}`);
   imageTotalPage.value = response.data.totalPages;
 
   const newImages = response.data.content.filter((newImage: Image) => !images.some(image => image.id === newImage.id));
@@ -172,7 +181,7 @@ onMounted(() => {
         <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
       </div>
       <div class="flex flex-row py-2">
-        <button v-for="provider in providers" class="btn btn-ghost mr-2">{{ provider }}</button>
+        <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">{{ provider }}</button>
       </div>
       <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom" @scroll="handleImageScroll">
         <MasonryGrid :images="images" />

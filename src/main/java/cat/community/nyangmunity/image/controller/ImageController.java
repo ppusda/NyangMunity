@@ -25,8 +25,8 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping
-    public Page<ImageResponse> getImages(@RequestParam("page") int page) {
-        return imageService.getImageList(page);
+    public Page<ImageResponse> getImages(@RequestParam int page, @RequestParam Provider provider) {
+        return imageService.getImageList(page, provider);
     }
 
     @GetMapping("/providers")

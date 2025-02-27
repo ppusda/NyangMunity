@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Provider {
-    NYANGMUNITY("NyangMunity"),
+    NYANGMUNITY("Nyangmunity"),
     TENOR("Tenor");
 
     private final String provider;

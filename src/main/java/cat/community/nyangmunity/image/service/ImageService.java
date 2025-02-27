@@ -1,24 +1,9 @@
 package cat.community.nyangmunity.image.service;
 
-import cat.community.nyangmunity.image.batch.response.ImageResponse;
-import cat.community.nyangmunity.image.batch.response.TenorApiResponse;
-import cat.community.nyangmunity.image.batch.response.TenorResponse;
-import cat.community.nyangmunity.image.config.TenorConfig;
-import cat.community.nyangmunity.image.entity.Image;
-import cat.community.nyangmunity.image.repository.ImageRepository;
-import cat.community.nyangmunity.image.response.UploadImageResponse;
-import cat.community.nyangmunity.image.util.S3ImageUtil;
-
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
-
-import io.netty.channel.ChannelOption;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +12,21 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import cat.community.nyangmunity.image.batch.response.ImageResponse;
+import cat.community.nyangmunity.image.batch.response.TenorApiResponse;
+import cat.community.nyangmunity.image.batch.response.TenorResponse;
+import cat.community.nyangmunity.image.config.TenorConfig;
+import cat.community.nyangmunity.image.entity.Image;
+import cat.community.nyangmunity.image.entity.Provider;
+import cat.community.nyangmunity.image.repository.ImageRepository;
+import cat.community.nyangmunity.image.response.UploadImageResponse;
+import cat.community.nyangmunity.image.util.S3ImageUtil;
+import io.netty.channel.ChannelOption;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 @Slf4j
 @Service
@@ -104,9 +104,9 @@ public class ImageService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ImageResponse> getImageList(int page) {
+    public Page<ImageResponse> getImageList(int page, Provider provider) {
         Pageable pageable = PageRequest.of(page, 30);
-        return convertToImageResponse(imageRepository.findAll(pageable));
+        return convertToImageResponse(imageRepository.findAllByProvider(pageable, provider));
     }
 
     private Page<ImageResponse> convertToImageResponse(Page<Image> images) {
