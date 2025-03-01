@@ -1,7 +1,5 @@
 <script setup>
 import { onMounted, ref, nextTick, watch } from "vue";
-import { toast } from "vue3-toastify";
-import { useClipboard } from "@vueuse/core";
 
 import Masonry from "masonry-layout";
 import imagesLoaded from "imagesloaded";
@@ -12,6 +10,8 @@ const props = defineProps({
 
 const masonryContainer = ref(null);
 let masonryInstance = null;
+
+const emit = defineEmits(["select-image"]);
 
 // Masonry 초기화 함수
 const initMasonry = () => {
@@ -40,28 +40,23 @@ onMounted(async () => {
 // items 변경 시 Masonry 업데이트
 watch(
     () => props.images,
-    () => {
-      nextTick(() => {
-        if (masonryInstance) {
-          imagesLoaded(masonryContainer.value, () => {
-            masonryInstance.reloadItems();
-            masonryInstance.layout();
-          });
-        }
-      });
+    async () => {
+      await nextTick(); // DOM 업데이트 이후 실행
+      if (masonryInstance) {
+        imagesLoaded(masonryContainer.value, () => {
+          masonryInstance.reloadItems();
+          masonryInstance.layout();
+        });
+      }
     },
     { deep: true }
 );
 
-// 클립보드 복사 기능
-const { copy } = useClipboard();
-const copyLink = (link) => {
-  copy(link);
-  toast("이미지 복사 완료!", {
-    autoClose: 2000,
-    theme: "dark",
-  });
+
+const selectImage = (url) => {
+  emit("select-image", url);
 };
+
 </script>
 
 <template>
@@ -70,13 +65,13 @@ const copyLink = (link) => {
         v-for="item in images"
         :key="item.id"
         class="masonry-item group relative cursor-pointer"
-        @click="copyLink(item.url)"
+        @click="selectImage(item.url)"
     >
       <img :src="item.url" class="w-full h-auto rounded-md" />
       <div
           class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"
       >
-        <p class="text-xs text-white">이미지 선택 및 복사</p>
+        <p class="text-xs text-white">이미지 선택</p>
       </div>
     </div>
   </div>

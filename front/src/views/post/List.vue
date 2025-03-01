@@ -4,6 +4,7 @@ import axios from 'axios';
 import MasonryGrid from "@/components/MasonryGrid.vue";
 import PostChat from "@/components/PostChat.vue";
 import 'vue3-toastify/dist/index.css';
+import {toast} from "vue3-toastify";
 
 interface Post {
   id: string;
@@ -31,15 +32,17 @@ const postContainerRef = ref<HTMLElement | null>(null);
 // 게시물 작성
 const content = ref<string>("");
 
-// 밈 및 페이지네이션 상태
+// 이미지 및 페이지네이션 상태
 const images = reactive<Image[]>([]);
 const imagePage = reactive({ value: 0 });
 const imageTotalPage = reactive({ value: 0 });
 
 // 업로드 이미지
-const uploadImageList = ref<string[]>([]);
+const uploadImageList = reactive<string[]>([]);
+const selectedPreviewImage = ref<string | null>(null);
 const uploadImage = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const MAX_UPLOAD_IMAGES = 5;
 
 // 게시물 가져오기
 const getPosts = async (page: number, init: boolean) => {
@@ -65,6 +68,19 @@ const getPosts = async (page: number, init: boolean) => {
   }
 };
 
+// 게시물 업로드
+const writePost = () => {
+  console.log(uploadImageList);
+  axios.post('/nm/post', {
+    content: content.value,
+    postImages: uploadImageList,
+  }).then(() => {
+    uploadImageList.splice(0, uploadImageList.length);  // 업로드 후 초기화
+    content.value = "";  // 내용 초기화
+    getPosts(postPage.value, true); // 최신 글 불러오기
+  });
+};
+
 // 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
 const handlePostScroll = (event: Event) => {
   const element = event.target as HTMLElement;
@@ -73,16 +89,6 @@ const handlePostScroll = (event: Event) => {
     getPosts(postPage.value, false);
   }
 };
-
-
-// 게시물 업로드
-const writePost = () => {
-  axios.post('/nm/post', {
-    "content": content.value,
-    "postImages": uploadImageList.value
-  });
-  getPosts(postPage.value, true);
-}
 
 // Provider 가져오기
 const getProviders = async () => {
@@ -100,6 +106,20 @@ const handleProviderClick = (provider: string) => {
 
   getImages(imagePage.value);
 };
+
+// MasonryGrid에서 이미지 선택 시 업로드 리스트에 추가
+const selectImageFromMasonry = (url: string) => {
+  if (uploadImageList.length >= MAX_UPLOAD_IMAGES) {
+    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
+    return;  // 업로드 제한
+  }
+
+  if (!uploadImageList.includes(url)) {
+    alertToast("이미지가 선택되었습니다!")
+    uploadImageList.push(url);
+    selectedPreviewImage.value = url;
+  }
+};
 // 이미지 가져오기
 const getImages = async (pageValue: number) => {
   if (imageTotalPage.value !== 0 && pageValue >= imageTotalPage.value) return;
@@ -109,6 +129,17 @@ const getImages = async (pageValue: number) => {
 
   const newImages = response.data.content.filter((newImage: Image) => !images.some(image => image.id === newImage.id));
   images.push(...newImages);
+};
+
+// 이미지 제거 함수 (업로드 리스트에서 제거)
+const removeUploadImage = (url: string) => {
+  const index = uploadImageList.indexOf(url);
+  if (index > -1) {
+    uploadImageList.splice(index, 1);
+  }
+  if (selectedPreviewImage.value === url) {
+    selectedPreviewImage.value = null;
+  }
 };
 
 // 스크롤 이벤트 감지 후 다음 페이지 로드
@@ -123,14 +154,31 @@ const handleImageScroll = (event: Event) => {
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
   const files = event.dataTransfer?.files;
-  if (files && files.length > 0) {
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      uploadImage.value = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+  if (files) {
+    const filesArray = Array.from(files);
+    if (uploadImageList.length + filesArray.length > MAX_UPLOAD_IMAGES) {
+      warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
+      return;
+    }
+    filesArray.forEach(processFile);
   }
+};
+
+const processFile = (file: File) => {
+  if (uploadImageList.length >= MAX_UPLOAD_IMAGES) {
+    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
+    return;  // 업로드 제한
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e: ProgressEvent<FileReader>) => {
+    const result = e.target?.result as string;
+    if (!uploadImageList.includes(result)) {
+      uploadImageList.push(result);
+      selectedPreviewImage.value = result;
+    }
+  };
+  reader.readAsDataURL(file);
 };
 
 const handleClick = () => {
@@ -170,6 +218,22 @@ onMounted(() => {
   getPosts(postPage.value, true);
   postContainerRef.value?.addEventListener('scroll', handlePostScroll);
 });
+
+const warningToast = (message: string) => {
+  toast(message, {
+    autoClose: 2000,
+    theme: "dark",
+    type: "warning",
+  });
+}
+
+const alertToast = (message: string) => {
+  toast(message, {
+    autoClose: 2000,
+    theme: "dark",
+    type: "info",
+  });
+}
 </script>
 
 
@@ -184,7 +248,7 @@ onMounted(() => {
         <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">{{ provider }}</button>
       </div>
       <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom" @scroll="handleImageScroll">
-        <MasonryGrid :images="images" />
+        <MasonryGrid :images="images" @select-image="selectImageFromMasonry" />
       </div>
     </div>
 
@@ -195,25 +259,34 @@ onMounted(() => {
       <div class="flex flex-col p-2">
         <!-- 업로드 영역 -->
         <div class="h-full mx-2">
-          <div
-              class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative"
-              @drop="handleDrop"
-              @dragover.prevent
-              @click="handleClick"
+          <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative"
+               @drop="handleDrop"
+               @dragover.prevent
+               @click="handleClick"
           >
             <input
                 type="file"
                 ref="fileInput"
                 class="hidden"
                 @change="handleFileSelect"
+                multiple
             />
-            <div v-if="uploadImage">
-              <img :src="uploadImage" class="w-full h-16 object-cover rounded-md" />
+            <div v-if="uploadImageList.length" class="flex flex-wrap gap-2">
+              <div v-for="(img, index) in uploadImageList" :key="index" class="relative w-20 h-20">
+                <img :src="img" class="w-full h-full object-cover rounded-md" />
+                <button
+                    @click.stop="removeUploadImage(img)"
+                    class="absolute top-0 right-0 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div v-else class="p-4">
               <p class="text-center text-gray-400">왼쪽에서 이미지를 선택하거나 첨부하세요!</p>
             </div>
           </div>
+
         </div>
         <div class="flex flex-row mt-2">
           <!-- 입력창 영역 -->

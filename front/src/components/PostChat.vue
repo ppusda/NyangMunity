@@ -49,7 +49,7 @@ const getWriteTime = (time: string) => {
 <template>
   <div
       ref="postContainerRef"
-      class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[36rem]"
+      class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[35rem]"
       @scroll="handlePostScroll"
   >
     <ul class="w-full flex flex-col-reverse">
