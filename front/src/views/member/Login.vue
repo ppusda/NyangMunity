@@ -8,15 +8,18 @@ const email = ref("");
 const password = ref("");
 
 const login = function () {
-  axios.post("http://localhost:8080/member/login", {
+  axios.post("/nm/member/login", {
     email: email.value,
     password: password.value
   }, { withCredentials: true })
   .then(response => {
-    store.dispatch('login', {
+    const userData = {
       id: response.data.id,
       nickname: response.data.nickname
-    });
+    };
+
+    store.dispatch('login', userData);
+    localStorage.setItem('user', JSON.stringify(userData));
 
     router.replace({ name: "main" });
   })

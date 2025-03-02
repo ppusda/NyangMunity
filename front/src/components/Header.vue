@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+import {computed} from 'vue';
+import {useStore} from 'vuex';
 
 const store = useStore();
 
+const isLogin = computed(() => !!store.state.userId);
 const userNickname = computed(() => store.state.userNickname);
-console.log(userNickname);
 
 const logout = () => {
   store.dispatch('logout');
+  localStorage.removeItem('user');
 };
 
 </script>
@@ -22,7 +23,7 @@ const logout = () => {
       <div class="navbar-center">
       </div>
       <div class="navbar-end">
-        <div v-if="userNickname" class="dropdown dropdown-end">
+        <div v-if="isLogin" class="dropdown dropdown-end">
           <div tabindex="0" role="button" class="btn btn-ghost rounded-btn"> {{userNickname}}님, 환영합니다!</div>
           <ul tabindex="0" class="menu menu-md dropdown-content mt-5 z-[1] p-3 shadow rounded-box w-52 bg-zinc-800">
             <li><router-link :to="{name: 'info'}"><i class="fa-solid fa-address-card" />마이페이지</router-link></li>
