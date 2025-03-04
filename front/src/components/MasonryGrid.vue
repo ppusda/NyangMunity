@@ -31,7 +31,7 @@ const initMasonry = () => {
 
 // 첫 로딩 시 이미지가 다 뜨기 전에 Masonry 실행 방지
 onMounted(async () => {
-  await nextTick(); // Vue DOM이 렌더링된 후 실행
+  await nextTick();
   imagesLoaded(masonryContainer.value, () => {
     initMasonry();
   });
@@ -53,8 +53,8 @@ watch(
 );
 
 
-const selectImage = (url) => {
-  emit("select-image", url);
+const selectImage = (item) => {
+  emit("select-image", item);
 };
 
 </script>
@@ -65,7 +65,7 @@ const selectImage = (url) => {
         v-for="item in images"
         :key="item.id"
         class="masonry-item group relative cursor-pointer"
-        @click="selectImage(item.url)"
+        @click="selectImage(item)"
     >
       <img :src="item.url" class="w-full h-auto rounded-md" />
       <div

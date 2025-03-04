@@ -15,8 +15,10 @@ interface Post {
 }
 
 interface Image {
-  id: string;
+  id: string | null;
+  filename: string | null;
   url: string;
+  source: "gallery" | "upload";
 }
 
 // 이미지 제공자 상태
@@ -38,7 +40,7 @@ const imagePage = reactive({ value: 0 });
 const imageTotalPage = reactive({ value: 0 });
 
 // 업로드 이미지
-const uploadImageList = reactive<string[]>([]);
+const uploadImageList = reactive<Image[]>([]);
 const selectedPreviewImage = ref<string | null>(null);
 const uploadImage = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -69,17 +71,55 @@ const getPosts = async (page: number, init: boolean) => {
 };
 
 // 게시물 업로드
-const writePost = () => {
-  console.log(uploadImageList);
+const writePost = async () => {
+  const uploadedImageIds: string[] = await uploadImages();
   axios.post('/nm/post', {
     content: content.value,
-    postImages: uploadImageList,
+    postImages: uploadedImageIds,
   }).then(() => {
     uploadImageList.splice(0, uploadImageList.length);  // 업로드 후 초기화
     content.value = "";  // 내용 초기화
     getPosts(postPage.value, true); // 최신 글 불러오기
   });
 };
+
+// 이미지 업로드
+const uploadImages = async () => {
+  const uploadedImageIds: string[] = [];
+
+  for (const image of uploadImageList) {
+    if (image.source === "gallery") { // 선택된 이미지
+      uploadedImageIds.push(image.id as string);
+    } else if (image.source === "upload") { // 업로드 될 이미지
+      // 직접 업로드한 이미지 -> presigned URL 요청 후 업로드
+      const response = await axios.get(`/nm/image/upload?${image.filename}`);
+
+      const { id, uploadUrl, filePath } = response.data;
+
+      await axios.put(uploadUrl + filePath, dataUrlToBlob(image.url));
+
+      // 업로드 완료 후 서버에 저장된 이미지 ID 수집
+      uploadedImageIds.push(id);
+    }
+  }
+
+  return uploadedImageIds;
+};
+
+const dataUrlToBlob = (dataUrl: string) => {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new Blob([u8arr], { type: mime });
+};
+
 
 // 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
 const handlePostScroll = (event: Event) => {
@@ -108,18 +148,26 @@ const handleProviderClick = (provider: string) => {
 };
 
 // MasonryGrid에서 이미지 선택 시 업로드 리스트에 추가
-const selectImageFromMasonry = (url: string) => {
+const selectImageFromMasonry = (item: Image) => {
   if (uploadImageList.length >= MAX_UPLOAD_IMAGES) {
-    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
-    return;  // 업로드 제한
+    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장 까지 업로드할 수 있습니다.`);
+    return;
   }
 
-  if (!uploadImageList.includes(url)) {
-    alertToast("이미지가 선택되었습니다!")
-    uploadImageList.push(url);
-    selectedPreviewImage.value = url;
+  // 이미 선택된 이미지인지 확인
+  if (!uploadImageList.some(image => image.url === item.url)) {
+    uploadImageList.push({
+      id: item.id,
+      url: item.url,
+      filename: null,
+      source: "gallery",
+    });
+    alertToast("이미지가 선택되었습니다.")
+  } else {
+    warningToast("이미 선택된 이미지 입니다.")
   }
 };
+
 // 이미지 가져오기
 const getImages = async (pageValue: number) => {
   if (imageTotalPage.value !== 0 && pageValue >= imageTotalPage.value) return;
@@ -166,16 +214,20 @@ const handleDrop = (event: DragEvent) => {
 
 const processFile = (file: File) => {
   if (uploadImageList.length >= MAX_UPLOAD_IMAGES) {
-    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
-    return;  // 업로드 제한
+    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장 까지 업로드할 수 있습니다.`);
+    return;
   }
 
   const reader = new FileReader();
   reader.onload = (e: ProgressEvent<FileReader>) => {
-    const result = e.target?.result as string;
-    if (!uploadImageList.includes(result)) {
-      uploadImageList.push(result);
-      selectedPreviewImage.value = result;
+    const result = e.target?.result
+    console.log(result);
+    if (result) {
+      uploadImageList.push({
+        id: null, url: result.url,
+        filename: result.filename,
+        source: "upload"
+      });
     }
   };
   reader.readAsDataURL(file);
@@ -234,6 +286,7 @@ const alertToast = (message: string) => {
     type: "info",
   });
 }
+
 </script>
 
 
@@ -273,7 +326,7 @@ const alertToast = (message: string) => {
             />
             <div v-if="uploadImageList.length" class="flex flex-wrap gap-2">
               <div v-for="(img, index) in uploadImageList" :key="index" class="relative w-20 h-20">
-                <img :src="img" class="w-full h-full object-cover rounded-md" />
+                <img :src="img.url" class="w-full h-full object-cover rounded-md" />
                 <button
                     @click.stop="removeUploadImage(img)"
                     class="absolute top-0 right-0 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
