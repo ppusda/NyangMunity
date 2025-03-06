@@ -7,9 +7,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 @Getter @Builder
-public class PostListRequest {
+public class PostsRequest {
 
-    private static final Integer MAX_SIZE = 100;
+    private static final Integer MAX_SIZE = 10;
 
     @Builder.Default
     private Integer page = 1;

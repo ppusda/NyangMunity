@@ -7,7 +7,6 @@ import java.util.List;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.post.editor.PostEditor;
 import cat.community.nyangmunity.post.editor.PostEditor.BoardEditorBuilder;
-import cat.community.nyangmunity.image.entity.Image;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,14 +26,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Post {
 
-    @Builder
-    public Post(String content, Member member, ArrayList<Image> images, LocalDateTime createDate) {
-        this.content = content;
-        this.member = member;
-        this.images = images;
-        this.createDate = createDate;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,7 +41,7 @@ public class Post {
     private Member member;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Image> images = new ArrayList<>();
+    private List<PostImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostLike> likes = new ArrayList<>();
@@ -60,14 +51,26 @@ public class Post {
                 .content(content);
     }
 
+    @Builder
+    public Post(String content, Member member, LocalDateTime createDate) {
+        this.content = content;
+        this.member = member;
+        this.createDate = createDate;
+    }
+
+    public void addPostImage(PostImage postImage) {
+        images.add(postImage);
+        postImage.setRelation(this);
+    }
+
+    public void updatePostImages(List<PostImage> postImages) {
+        for (PostImage postImage : postImages) {
+            addPostImage(postImage);
+        }
+    }
+
     public void edit(PostEditor postEditor){
         content = postEditor.getContent();
     }
 
-    public void setMember(Member member) {
-        this.member = member;
-        if(!member.getPosts().contains(this)){
-            member.getPosts().add(this);
-        }
-    }
 }

@@ -1,50 +1,63 @@
 package cat.community.nyangmunity.post.service;
 
-import cat.community.nyangmunity.post.editor.PostEditor;
-import cat.community.nyangmunity.post.entity.Post;
-import cat.community.nyangmunity.post.entity.PostLike;
-import cat.community.nyangmunity.global.exception.UnauthorizedUserException;
-import cat.community.nyangmunity.post.repository.PostLikeRepository;
-import cat.community.nyangmunity.post.request.PostFormRequest;
-import cat.community.nyangmunity.global.exception.BoardNotFoundException;
-import cat.community.nyangmunity.post.repository.PostRepository;
-import cat.community.nyangmunity.post.request.PostEditRequest;
-import cat.community.nyangmunity.post.response.PostImageResponse;
-import cat.community.nyangmunity.post.response.PostResponse;
-import cat.community.nyangmunity.post.response.PostLikeResponse;
-import cat.community.nyangmunity.member.entity.Member;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import cat.community.nyangmunity.global.exception.BoardNotFoundException;
+import cat.community.nyangmunity.global.exception.UnauthorizedMemberException;
+import cat.community.nyangmunity.image.service.ImageService;
+import cat.community.nyangmunity.member.entity.Member;
+import cat.community.nyangmunity.post.editor.PostEditor;
+import cat.community.nyangmunity.post.entity.Post;
+import cat.community.nyangmunity.post.entity.PostImage;
+import cat.community.nyangmunity.post.entity.PostLike;
+import cat.community.nyangmunity.post.repository.PostImageRepository;
+import cat.community.nyangmunity.post.repository.PostLikeRepository;
+import cat.community.nyangmunity.post.repository.PostRepository;
+import cat.community.nyangmunity.post.request.PostEditRequest;
+import cat.community.nyangmunity.post.request.PostWriteRequest;
+import cat.community.nyangmunity.post.response.PostImageResponse;
+import cat.community.nyangmunity.post.response.PostLikeResponse;
+import cat.community.nyangmunity.post.response.PostResponse;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
+    private final ImageService imageService;
+
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
+    private final PostImageRepository postImageRepository;
 
     public Post getBoard(Long bid) {
         return postRepository.findById(bid).orElseThrow(BoardNotFoundException::new);
     }
 
-    public void write(PostFormRequest postFormRequest, Member member){
-        Post post = Post.builder()
-                .content(postFormRequest.content())
+    @Transactional
+    public void write(PostWriteRequest postWriteRequest, Member member){
+        Post savedPost = postRepository.save(
+            Post.builder()
+                .content(postWriteRequest.content())
                 .member(member)
                 .createDate(LocalDateTime.now())
-                .build();
+                .build()
+        );
 
-        postRepository.save(post);
+        List<PostImage> postImages = imageService.findPostImagesByIds(postWriteRequest.postImageIds());
+        savedPost.updatePostImages(postImages);
+        postImageRepository.saveAll(postImages);
     }
 
     public PostResponse read(Long bid) {
@@ -64,7 +77,7 @@ public class PostService {
         Post post = getBoard(bid);
 
         if (!post.getMember().getId().equals(uid)) {
-            throw new UnauthorizedUserException();
+            throw new UnauthorizedMemberException();
         }
 
         postRepository.save(post);
@@ -82,7 +95,7 @@ public class PostService {
         Post post = getBoard(bid);
 
         if (!post.getMember().getId().equals(uid)) {
-            throw new UnauthorizedUserException();
+            throw new UnauthorizedMemberException();
         }
 
         postRepository.delete(post);
@@ -113,7 +126,7 @@ public class PostService {
 
         return PostLikeResponse.builder()
                 .bid(maxLikePost.getId())
-                .boardImages(convertToBoardImageResponse(maxLikePost))
+                .postImages(convertToBoardImageResponse(maxLikePost))
                 .nickName(maxLikePost.getMember().getNickname())
                 .build();
     }

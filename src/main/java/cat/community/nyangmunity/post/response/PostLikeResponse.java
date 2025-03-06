@@ -6,7 +6,7 @@ import java.util.List;
 @Builder
 public record PostLikeResponse(
     Long bid,
-    List<PostImageResponse> boardImages,
+    List<PostImageResponse> postImages,
     String nickName
 ) {
 

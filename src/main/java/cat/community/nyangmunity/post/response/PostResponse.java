@@ -10,17 +10,17 @@ import java.util.List;
 public record PostResponse(
     Long id,
     String content,
-    List<PostImageResponse> boardImages,
+    List<PostImageResponse> postImages,
     LocalDateTime createDate,
     Long uid,
     String writer
 ) {
 
-    public static PostResponse from(Post post, List<PostImageResponse> boardImages) {
+    public static PostResponse from(Post post, List<PostImageResponse> postImages) {
         return PostResponse.builder()
                 .id(post.getId())
                 .content(post.getContent())
-                .boardImages(boardImages)
+                .postImages(postImages)
                 .createDate(post.getCreateDate())
                 .uid(post.getMember().getId())
                 .writer(post.getMember().getNickname())
