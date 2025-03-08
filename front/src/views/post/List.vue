@@ -75,7 +75,7 @@ const writePost = async () => {
   const uploadedImageIds: string[] = await uploadImages();
   axios.post('/nm/post', {
     content: content.value,
-    postImages: uploadedImageIds,
+    postImageIds: uploadedImageIds,
   }).then(() => {
     uploadImageList.splice(0, uploadImageList.length);  // 업로드 후 초기화
     content.value = "";  // 내용 초기화
