@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
-import {computed, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
+import {toast} from "vue3-toastify";
+import { useClipboard } from '@vueuse/core';
 
 interface Post {
   id: string;
@@ -19,6 +21,16 @@ interface PostImage {
 const props = defineProps({
   posts: Array<Post>,
 });
+
+// 클립보드에 링크 복사
+const { copy } = useClipboard();
+
+const copyLink = (link: string) => {
+  copy(link);
+  toast("이미지 복사 완료!", {
+    autoClose: 2000, theme: "dark"
+  });
+};
 
 // 모달 상태 관리
 const showModal = ref(false);
@@ -93,16 +105,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 };
 
-// 컴포넌트 마운트 시 키보드 이벤트 리스너 등록
-const mounted = () => {
-  window.addEventListener('keydown', handleKeyDown);
-};
-
-// 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
-const beforeUnmount = () => {
-  window.removeEventListener('keydown', handleKeyDown);
-};
-
 // 작성 시간 표시
 const getWriteTime = (time: string) => {
   const now = new Date();
@@ -142,6 +144,16 @@ const getWriteTime = (time: string) => {
     return `${year}.${month}.${date}. ${formatTime(writeTime)}`;
   }
 };
+
+// 컴포넌트 마운트 시 키보드 이벤트 리스너 등록
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown);
+});
+
+// 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
+});
 </script>
 
 <template>
@@ -219,7 +231,7 @@ const getWriteTime = (time: string) => {
         <img
             :src="currentImage"
             alt="Full size image"
-            class="max-w-full max-h-[80vh] object-contain transition-opacity duration-300"
+            class="max-w-full max-h-[50vh] object-contain transition-opacity duration-300"
             :key="currentImageIndex"
         />
       </div>
@@ -235,6 +247,30 @@ const getWriteTime = (time: string) => {
         </svg>
       </button>
 
+      <!-- 컨트롤 패널 - 상단 오른쪽에 배치 -->
+      <div class="absolute top-4 right-4 flex space-x-2">
+        <button
+            @click.stop="copyLink(currentImage)"
+            class="bg-black bg-opacity-60 text-white px-3 py-2 rounded-md flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
+            aria-label="이미지 링크 복사"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+        </button>
+
+        <!-- 닫기 버튼 -->
+        <button
+            @click.stop="closeModal"
+            class="bg-black bg-opacity-60 text-white px-3 py-2 rounded-md flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
+            aria-label="모달 닫기"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
       <!-- 인디케이터 -->
       <div class="absolute bottom-6 left-0 right-0 flex justify-center space-x-2">
         <button
@@ -248,17 +284,6 @@ const getWriteTime = (time: string) => {
             :aria-label="`이미지 ${index + 1}로 이동`"
         ></button>
       </div>
-
-      <!-- 닫기 버튼 -->
-      <button
-          @click.stop="closeModal"
-          class="absolute top-4 right-4 bg-black bg-opacity-60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
-          aria-label="모달 닫기"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
     </div>
   </div>
 </template>
@@ -341,7 +366,7 @@ img {
 }
 
 /* 모달 내의 이미지는 원본 비율 유지 */
-.max-w-full.max-h-\[80vh\] {
+.max-w-full.max-h-\[50vh\] {
   object-fit: contain;
 }
 
