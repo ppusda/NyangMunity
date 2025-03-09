@@ -9,9 +9,15 @@ import {toast} from "vue3-toastify";
 interface Post {
   id: string;
   content: string;
+  postImages: Array<PostImage>;
   createDate: string;
   uid: number;
   writer: string;
+}
+
+interface PostImage {
+  id: string | null;
+  url: string;
 }
 
 interface Image {
@@ -65,6 +71,8 @@ const getPosts = async (page: number, init: boolean) => {
       const currentScrollHeight = postContainerRef.value?.scrollHeight || 0;
       postContainerRef.value?.scrollTo(0, currentScrollHeight - prevScrollHeight);
     }
+
+    console.log(posts);
   } catch (error) {
     console.error(error);
   }

@@ -1,8 +1,107 @@
 <script setup lang="ts">
 
+import {computed, ref} from "vue";
+
+interface Post {
+  id: string;
+  content: string;
+  postImages: Array<PostImage>;
+  createDate: string;
+  uid: number;
+  writer: string;
+}
+
+interface PostImage {
+  id: string | null;
+  url: string;
+}
+
 const props = defineProps({
-  posts: Array,
+  posts: Array<Post>,
 });
+
+// 모달 상태 관리
+const showModal = ref(false);
+const currentPostIndex = ref(-1);
+const currentImageIndex = ref(0);
+
+// 현재 포스트의 이미지 배열
+const currentImages = computed(() => {
+  if (currentPostIndex.value >= 0 && props.posts && props.posts[currentPostIndex.value]) {
+    return props.posts[currentPostIndex.value].postImages || [];
+  }
+  return [];
+});
+
+// 현재 이미지 URL
+const currentImage = computed(() => {
+  if (currentImages.value.length > 0 && currentImageIndex.value < currentImages.value.length) {
+    return currentImages.value[currentImageIndex.value].url;
+  }
+  return '';
+});
+
+// 이미지 클릭 핸들러
+const openImageModal = (postIndex: number, imageIndex: number) => {
+  currentPostIndex.value = postIndex;
+  currentImageIndex.value = imageIndex;
+  showModal.value = true;
+};
+
+// 모달 닫기
+const closeModal = () => {
+  showModal.value = false;
+  currentPostIndex.value = -1;
+  currentImageIndex.value = 0;
+};
+
+// 이전 이미지로 이동
+const prevImage = () => {
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--;
+  } else {
+    // 처음 이미지일 경우 마지막 이미지로 순환
+    currentImageIndex.value = currentImages.value.length - 1;
+  }
+};
+
+// 다음 이미지로 이동
+const nextImage = () => {
+  if (currentImageIndex.value < currentImages.value.length - 1) {
+    currentImageIndex.value++;
+  } else {
+    // 마지막 이미지일 경우 첫 이미지로 순환
+    currentImageIndex.value = 0;
+  }
+};
+
+// 특정 이미지로 이동
+const goToImage = (index: number) => {
+  currentImageIndex.value = index;
+};
+
+// 키보드 이벤트 처리
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (!showModal.value) return;
+
+  if (event.key === 'ArrowLeft') {
+    prevImage();
+  } else if (event.key === 'ArrowRight') {
+    nextImage();
+  } else if (event.key === 'Escape') {
+    closeModal();
+  }
+};
+
+// 컴포넌트 마운트 시 키보드 이벤트 리스너 등록
+const mounted = () => {
+  window.addEventListener('keydown', handleKeyDown);
+};
+
+// 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
+const beforeUnmount = () => {
+  window.removeEventListener('keydown', handleKeyDown);
+};
 
 // 작성 시간 표시
 const getWriteTime = (time: string) => {
@@ -65,15 +164,16 @@ const getWriteTime = (time: string) => {
         <!-- 이미지 섹션 -->
         <div class="mt-3" v-if="post.postImages && post.postImages.length > 0">
           <div :class="['grid-layout', post.postImages.length === 2 ? 'two-images' : 'three-images']">
-            <template v-for="(image, index) in post.postImages.slice(0, 3)" :key="image.id">
+            <template v-for="(image, imageIndex) in post.postImages.slice(0, 3)" :key="image.id">
               <div
                   :class="[
-                    'relative',
-                    'image-container',
-                    post.postImages.length === 2
-                      ? `two-image-${index}`
-                      : (index === 0 ? 'first-image' : index === 1 ? 'second-image' : 'third-image')
-                  ]"
+            'relative',
+            'image-container',
+            post.postImages.length === 2
+              ? `two-image-${imageIndex}`
+              : (imageIndex === 0 ? 'first-image' : imageIndex === 1 ? 'second-image' : 'third-image')
+          ]"
+                  @click="openImageModal(posts.indexOf(post), imageIndex)"
               >
                 <img
                     :src="image.url"
@@ -82,7 +182,7 @@ const getWriteTime = (time: string) => {
                 />
                 <!-- 더보기 표시 -->
                 <div
-                    v-if="index === 2 && post.postImages.length > 3"
+                    v-if="imageIndex === 2 && post.postImages.length > 3"
                     class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white font-bold text-lg rounded-md"
                 >
                   +{{ post.postImages.length - 3 }}
@@ -91,9 +191,75 @@ const getWriteTime = (time: string) => {
             </template>
           </div>
         </div>
-
       </li>
     </ul>
+  </div>
+
+  <!-- 이미지 케러셀 모달 -->
+  <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 transition-opacity duration-200"
+      @click="closeModal"
+  >
+    <!-- 메인 이미지 컨테이너 -->
+    <div class="relative max-w-4xl max-h-screen p-4 w-full" @click.stop>
+      <!-- 왼쪽 화살표 -->
+      <button
+          @click.stop="prevImage"
+          class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-12 h-12 rounded-full flex items-center justify-center z-10 hover:bg-opacity-70 transition-all duration-200"
+          aria-label="이전 이미지"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <!-- 이미지 -->
+      <div class="flex justify-center items-center h-full">
+        <img
+            :src="currentImage"
+            alt="Full size image"
+            class="max-w-full max-h-[80vh] object-contain transition-opacity duration-300"
+            :key="currentImageIndex"
+        />
+      </div>
+
+      <!-- 오른쪽 화살표 -->
+      <button
+          @click.stop="nextImage"
+          class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-12 h-12 rounded-full flex items-center justify-center z-10 hover:bg-opacity-70 transition-all duration-200"
+          aria-label="다음 이미지"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      <!-- 인디케이터 -->
+      <div class="absolute bottom-6 left-0 right-0 flex justify-center space-x-2">
+        <button
+            v-for="(image, index) in currentImages"
+            :key="image.id"
+            @click.stop="goToImage(index)"
+            :class="[
+            'w-2.5', 'h-2.5', 'rounded-full', 'transition-all', 'duration-200',
+            index === currentImageIndex ? 'bg-white scale-110' : 'bg-gray-400 bg-opacity-60'
+          ]"
+            :aria-label="`이미지 ${index + 1}로 이동`"
+        ></button>
+      </div>
+
+      <!-- 닫기 버튼 -->
+      <button
+          @click.stop="closeModal"
+          class="absolute top-4 right-4 bg-black bg-opacity-60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
+          aria-label="모달 닫기"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -121,20 +287,18 @@ const getWriteTime = (time: string) => {
   aspect-ratio: 2/1; /* 가로:세로 비율 조정 */
 }
 
-/* 첫 번째 이미지 (큰 정사각형) - 3개 이미지일 때 */
+/* 첫 번째, 두 번째, 세 번째 이미지 스타일 */
 .first-image {
   grid-column: 1;
   grid-row: 1 / span 2;
   aspect-ratio: 1/1; /* 정사각형 비율 유지 */
 }
 
-/* 두 번째 이미지 (첫 번째 이미지 오른쪽 위) - 3개 이미지일 때 */
 .second-image {
   grid-column: 2;
   grid-row: 1;
 }
 
-/* 세 번째 이미지 (두 번째 이미지 아래) - 3개 이미지일 때 */
 .third-image {
   grid-column: 2;
   grid-row: 2;
@@ -161,6 +325,12 @@ const getWriteTime = (time: string) => {
   height: 100%;
   position: relative;
   overflow: hidden;
+  transition: transform 0.2s;
+}
+
+/* 호버 효과 */
+.image-container:hover {
+  transform: scale(0.98);
 }
 
 /* 이미지 정사각형으로 맞추기 */
@@ -169,4 +339,31 @@ img {
   width: 100%;
   height: 100%;
 }
+
+/* 모달 내의 이미지는 원본 비율 유지 */
+.max-w-full.max-h-\[80vh\] {
+  object-fit: contain;
+}
+
+/* 케러셀 화살표 애니메이션 */
+button:hover svg {
+  transform: scale(1.1);
+  transition: transform 0.2s;
+}
+
+/* 모달 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fixed {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.scroll-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #52525b #27272a; /* 스크롤바 색상과 트랙 색상 */
+}
+
 </style>
