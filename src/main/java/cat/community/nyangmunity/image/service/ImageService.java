@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import cat.community.nyangmunity.image.entity.Provider;
 import cat.community.nyangmunity.image.repository.ImageRepository;
 import cat.community.nyangmunity.image.response.UploadImageResponse;
 import cat.community.nyangmunity.image.util.S3ImageUtil;
+import cat.community.nyangmunity.post.entity.PostImage;
 import io.netty.channel.ChannelOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,16 @@ public class ImageService {
 
         Image savedImage = imageRepository.save(image);
         return UploadImageResponse.from(generateURL(filePath), filePath, savedImage.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Image> findImagesByIds(List<String> imageIds) {
+        return imageRepository.findAllByIdIn(imageIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostImage> findPostImagesByIds(List<String> imageIds) {
+        return findImagesByIds(imageIds).stream().map(PostImage::new).collect(Collectors.toList());
     }
 
     private String generateRandomUUIDFilePath(String filename) {
