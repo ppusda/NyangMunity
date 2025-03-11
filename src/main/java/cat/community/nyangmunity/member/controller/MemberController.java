@@ -30,12 +30,12 @@ public class MemberController {
 
     @PostMapping("/join")
     private void memberJoin(@RequestBody @Valid JoinRequest joinRequest) {
-        memberService.joinMember(joinRequest);
+        memberService.join(joinRequest);
     }
 
     @PostMapping("/login")
-    private ResponseEntity<MemberInfos> userLogin(@RequestBody @Valid LoginRequest loginRequest) {
-        MemberLoginResponse memberLoginResponse = memberService.userLogin(loginRequest);
+    private ResponseEntity<MemberInfos> login(@RequestBody @Valid LoginRequest loginRequest) {
+        MemberLoginResponse memberLoginResponse = memberService.login(loginRequest);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(
@@ -49,10 +49,10 @@ public class MemberController {
                 .body(memberLoginResponse.memberInfos());
     }
 
-    @PostMapping("/check")
+    @GetMapping("/check")
     private MemberCheckResponse loginCheck(Principal principal) {
         if (principal != null) {
-            Member member = memberService.getUserById(Long.parseLong(principal.getName()));
+            Member member = memberService.findMemberById(Long.parseLong(principal.getName()));
 
             return MemberCheckResponse.builder()
                     .nickname(member.getNickname())
@@ -67,27 +67,27 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
-    private MemberResponse userInfo(Principal principal) {
+    private MemberResponse info(Principal principal) {
         return MemberResponse.toUserResponse(
-                memberService.getUserById(Long.parseLong(principal.getName()))
+                memberService.findMemberById(Long.parseLong(principal.getName()))
         );
     }
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/profile")
-    private void userEdit(@RequestBody @Valid MemberEditForm memberEditForm, Principal principal) {
-        memberService.userEdit(memberEditForm, Long.parseLong(principal.getName()));
+    private void edit(@RequestBody @Valid MemberEditForm memberEditForm, Principal principal) {
+        memberService.edit(memberEditForm, Long.parseLong(principal.getName()));
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/cancel") // 회원 탈퇴
-    private void userCancel(Principal principal) {
-        memberService.userCancel(Long.parseLong(principal.getName()));
+    @PostMapping("/cancel")
+    private void cancel(Principal principal) {
+        memberService.cancel(Long.parseLong(principal.getName()));
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
-    private void userLogout(Principal principal) {
-        memberService.userLogout(Long.parseLong(principal.getName()));
+    private void logout(Principal principal) {
+        memberService.logout(Long.parseLong(principal.getName()));
     }
 }

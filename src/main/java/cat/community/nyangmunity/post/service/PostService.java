@@ -141,8 +141,8 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    private boolean isWriter(Long writerId, Long userId) {
-        return Objects.equals(writerId, userId);
+    private boolean isWriter(Long writerId, Long memberId) {
+        return Objects.equals(writerId, memberId);
     }
 
 }

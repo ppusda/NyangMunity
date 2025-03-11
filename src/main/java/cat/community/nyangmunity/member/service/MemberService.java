@@ -2,7 +2,7 @@ package cat.community.nyangmunity.member.service;
 
 import cat.community.nyangmunity.global.exception.AlreadyExistsNicknameException;
 import cat.community.nyangmunity.global.exception.InvalidPasswordException;
-import cat.community.nyangmunity.global.exception.UserNotFoundException;
+import cat.community.nyangmunity.global.exception.MemberNotFoundException;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
 import cat.community.nyangmunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.nyangmunity.member.entity.Member;
@@ -38,8 +38,8 @@ public class MemberService {
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
     @Transactional(readOnly = true)
-    public Member getUserById(Long userId) {
-        return memberRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
@@ -48,7 +48,7 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberLoginResponse userLogin(LoginRequest loginRequest) {
+    public MemberLoginResponse login(LoginRequest loginRequest) {
         Member member = findMemberByEmail(loginRequest.email()).orElseThrow(InvalidLoginInformationException::new);
 
         if(!isPasswordMatches(loginRequest.password(), member)) {
@@ -61,10 +61,10 @@ public class MemberService {
                 .build();
     }
 
-    private MemberTokens createTokens(Long userId) {
-        String accessToken = jwtTokenProvider.createAccessToken(userId);
-        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
-        tokenService.register(refreshToken, userId);
+    private MemberTokens createTokens(Long memberId) {
+        String accessToken = jwtTokenProvider.createAccessToken(memberId);
+        String refreshToken = jwtTokenProvider.createRefreshToken(memberId);
+        tokenService.register(refreshToken, memberId);
 
         return MemberTokens.builder()
                 .accessToken(accessToken)
@@ -73,7 +73,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void joinMember(JoinRequest joinRequest) {
+    public void join(JoinRequest joinRequest) {
         checkDuplicateEmail(joinRequest.email());
         checkDuplicateNickname(joinRequest.nickname());
 
@@ -98,21 +98,21 @@ public class MemberService {
     }
 
     @Transactional
-    public void userLogout(Long userId) {
-        tokenService.deleteToken(userId);
+    public void logout(Long memberId) {
+        tokenService.deleteToken(memberId);
     }
 
     @Transactional
-    public void userEdit(MemberEditForm memberEditForm, Long userId) {
-        Member member = getUserById(userId);
+    public void edit(MemberEditForm memberEditForm, Long memberId) {
+        Member member = findMemberById(memberId);
 
         if(!isPasswordMatches(memberEditForm.password(), member)) {
             throw new InvalidPasswordException();
         }
 
-        MemberEditor.UserEditorBuilder userEditorBuilder = member.toEditor();
+        MemberEditor.UserEditorBuilder memberEditorBuilder = member.toEditor();
 
-        MemberEditor memberEditor = userEditorBuilder
+        MemberEditor memberEditor = memberEditorBuilder
                 .nickname(memberEditForm.nickname() != null && !memberEditForm.nickname().isEmpty()
                         ? memberEditForm.nickname() : member.getNickname())
                 .password(memberEditForm.password() != null && !memberEditForm.password().isEmpty()
@@ -125,8 +125,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void userCancel(Long userId) {
-        memberRepository.deleteById(userId);
+    public void cancel(Long memberId) {
+        memberRepository.deleteById(memberId);
     }
 
     private boolean isPasswordMatches(String password, Member member) {

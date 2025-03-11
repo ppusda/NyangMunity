@@ -1,6 +1,6 @@
 package cat.community.nyangmunity.token.service;
 
-import cat.community.nyangmunity.global.exception.UnauthorizedUserException;
+import cat.community.nyangmunity.global.exception.UnauthorizedMemberException;
 import cat.community.nyangmunity.token.entity.Token;
 import cat.community.nyangmunity.token.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +19,12 @@ public class TokenService {
      */
     public Token getToken(String memberId) {
         return tokenRepository.findByMemberId(Long.parseLong(memberId))
-                .orElseThrow(UnauthorizedUserException::new);
+                .orElseThrow(UnauthorizedMemberException::new);
     }
 
     @Transactional
-    public void deleteToken(Long userId) {
-        tokenRepository.deleteByMemberId(userId);
+    public void deleteToken(Long memberId) {
+        tokenRepository.deleteByMemberId(memberId);
     }
 
     @Transactional

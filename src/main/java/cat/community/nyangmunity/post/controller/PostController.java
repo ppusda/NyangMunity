@@ -35,7 +35,7 @@ public class PostController {
 
     @PostMapping
     public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
-        postService.write(postWriteRequest, memberService.getUserById(Long.parseLong(principal.getName())));
+        postService.write(postWriteRequest, memberService.findMemberById(Long.parseLong(principal.getName())));
     }
 
     @GetMapping("/{postId}")
@@ -63,7 +63,7 @@ public class PostController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/like/{postId}")
     public void postLike(@PathVariable(name = "postId") Long bid, Principal principal){
-        postService.like(bid, memberService.getUserById(Long.parseLong(principal.getName())));
+        postService.like(bid, memberService.findMemberById(Long.parseLong(principal.getName())));
     }
 
     @PreAuthorize("isAuthenticated()")
