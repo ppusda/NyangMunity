@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import {onMounted, reactive, ref} from "vue";
-import { useCookies } from "vue3-cookies";
+import {useRouter} from "vue-router";
+import {onMounted, ref} from "vue";
+import {useCookies} from "vue3-cookies";
 import axios from "axios";
 
 let cookieValue = ref("");
@@ -13,6 +13,7 @@ const member = ref({
   nickname: "",
   birthday: "",
 });
+
 const formData = new FormData();
 const pwdCheck = ref("");
 const newPassword = ref("");
@@ -23,7 +24,8 @@ const router = useRouter();
 
 const userLogout = function () {
   axios.post("/nm/member/logout").then(() => {
-    cookies.remove("SESSION");
+    cookies.remove("accessToken");
+    cookies.remove("refreshToken");
     router.replace({ name: "main" }). then(() => router.go(0));
   });
 };
@@ -72,7 +74,7 @@ const cancelUser = function () {
 };
 
 onMounted(async () => {
-    await axios.post("/nm/member/info", ).then(response => {
+    await axios.get("/nm/member/profile").then(response => {
       member.value = response.data;
     }).catch(error => {
       if(error.response) {
@@ -159,12 +161,6 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<!--<div class="alert alert-info alert-dismissable">-->
-<!--<a class="panel-close close" data-dismiss="alert">×</a>-->
-<!--<i class="fa fa-coffee"></i>-->
-<!--This is an <strong>.alert</strong>. Use this to show important messages to the member.-->
-<!--</div>-->
 
 <style scoped>
 .btn-upload {

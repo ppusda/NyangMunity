@@ -3,7 +3,7 @@ import MainView from "@/views/MainView.vue";
 import PostView from "@/views/post/List.vue";
 import LoginView from "@/views/member/Login.vue";
 import JoinView from "@/views/member/Join.vue";
-import UserView from "@/views/member/User.vue";
+import MemberView from "@/views/member/Member.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,7 +31,7 @@ const router = createRouter({
     {
       path: "/member/info",
       name: "info",
-      component: UserView,
+      component: MemberView,
     },
   ],
 });
