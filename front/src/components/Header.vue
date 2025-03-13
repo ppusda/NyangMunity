@@ -4,7 +4,7 @@ import {useStore} from 'vuex';
 
 const store = useStore();
 
-const isLogin = computed(() => !!store.state.userId);
+const isLogin = computed(() => !!store.state.memberId);
 const userNickname = computed(() => store.state.userNickname);
 
 const logout = () => {

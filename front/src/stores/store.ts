@@ -2,16 +2,16 @@ import Vuex from 'vuex';
 
 const store = new Vuex.Store({
   state: {
-    userId: null,
+    memberId: null,
     userNickname: null,
   },
   mutations: {
     setUser(state, user) {
-      state.userId = user.id;
+      state.memberId = user.id;
       state.userNickname = user.nickname;
     },
     clearUser(state) {
-      state.userId = null;
+      state.memberId = null;
       state.userNickname = null;
     },
   },
