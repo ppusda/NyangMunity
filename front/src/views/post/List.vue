@@ -141,8 +141,8 @@ const handlePostScroll = (event: Event) => {
 // Provider 가져오기
 const getProviders = async () => {
   const response = await axios.get(`/nm/images/providers`);
-  response.data.Provider.forEach((item: String) => {
-      providers.push(item);
+  response.data.Provider.forEach((item: string) => {  // Change String to string
+    providers.push(item);
   });
 };
 
@@ -188,12 +188,12 @@ const getImages = async (pageValue: number) => {
 };
 
 // 이미지 제거 함수 (업로드 리스트에서 제거)
-const removeUploadImage = (url: string) => {
-  const index = uploadImageList.indexOf(url);
+const removeUploadImage = (removeImage: Image) => {
+  const index = uploadImageList.findIndex(img => img.url === removeImage.url);
   if (index > -1) {
     uploadImageList.splice(index, 1);
   }
-  if (selectedPreviewImage.value === url) {
+  if (selectedPreviewImage.value === removeImage.url) {
     selectedPreviewImage.value = null;
   }
 };
@@ -228,12 +228,12 @@ const processFile = (file: File) => {
 
   const reader = new FileReader();
   reader.onload = (e: ProgressEvent<FileReader>) => {
-    const result = e.target?.result
-    console.log(result);
-    if (result) {
+    const resultString = e.target?.result as string;
+    if (resultString) {
       uploadImageList.push({
-        id: null, url: result.url,
-        filename: result.filename,
+        id: null,
+        url: resultString,
+        filename: file.name,
         source: "upload"
       });
     }
@@ -260,11 +260,11 @@ const handleFileSelect = (event: Event) => {
 
 // 이미지 업로드
 const postImageUpload = () => {
-  uploadImageList.value.push();
-  axios.get(`/nm/image`, {
+  // uploadImageList is reactive, not a ref, so no .value needed
+  // uploadImageList.push(...); // Correct way to add items
 
-  }).then(response => {
-
+  axios.get(`/nm/image`).then(response => {
+    // Handle response
   });
 };
 
@@ -315,8 +315,10 @@ const alertToast = (message: string) => {
 
     <!-- 메인 게시판 섹션 -->
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
-      <PostChat :posts="posts"></PostChat>
-
+      <PostChat
+          :posts="posts"
+          @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
+      ></PostChat>
       <div class="flex flex-col p-2">
         <!-- 업로드 영역 -->
         <div class="h-full mx-2">

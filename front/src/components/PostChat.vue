@@ -18,9 +18,19 @@ interface PostImage {
   url: string;
 }
 
+// View 데이터 설정
 const props = defineProps({
   posts: Array<Post>,
 });
+
+const postContainerRef = ref<HTMLElement | null>(null);
+const emit = defineEmits(['scrollTop']);
+
+const handlePostScroll = (event: Event) => {
+  if (postContainerRef.value && postContainerRef.value.scrollTop === 0) {
+    emit('scrollTop');
+  }
+};
 
 // 클립보드에 링크 복사
 const { copy } = useClipboard();
@@ -55,11 +65,12 @@ const currentImage = computed(() => {
 
 // 이미지 클릭 핸들러
 const openImageModal = (postIndex: number, imageIndex: number) => {
-  currentPostIndex.value = postIndex;
-  currentImageIndex.value = imageIndex;
-  showModal.value = true;
+  if (props.posts && props.posts[postIndex]) {
+    currentPostIndex.value = postIndex;
+    currentImageIndex.value = imageIndex;
+    showModal.value = true;
+  }
 };
-
 // 모달 닫기
 const closeModal = () => {
   showModal.value = false;
@@ -178,14 +189,9 @@ onUnmounted(() => {
           <div :class="['grid-layout', post.postImages.length === 2 ? 'two-images' : 'three-images']">
             <template v-for="(image, imageIndex) in post.postImages.slice(0, 3)" :key="image.id">
               <div
-                  :class="[
-            'relative',
-            'image-container',
-            post.postImages.length === 2
-              ? `two-image-${imageIndex}`
-              : (imageIndex === 0 ? 'first-image' : imageIndex === 1 ? 'second-image' : 'third-image')
-          ]"
-                  @click="openImageModal(posts.indexOf(post), imageIndex)"
+                  :class="['relative','image-container',
+                  post.postImages.length === 2 ? `two-image-${imageIndex}`: (imageIndex === 0 ? 'first-image' : imageIndex === 1 ? 'second-image' : 'third-image')]"
+                  @click="openImageModal(props.posts?.indexOf(post) ?? 0, imageIndex)"
               >
                 <img
                     :src="image.url"
@@ -275,12 +281,10 @@ onUnmounted(() => {
       <div class="absolute bottom-6 left-0 right-0 flex justify-center space-x-2">
         <button
             v-for="(image, index) in currentImages"
-            :key="image.id"
+            :key="image.id ?? index"
             @click.stop="goToImage(index)"
-            :class="[
-            'w-2.5', 'h-2.5', 'rounded-full', 'transition-all', 'duration-200',
-            index === currentImageIndex ? 'bg-white scale-110' : 'bg-gray-400 bg-opacity-60'
-          ]"
+            :class="['w-2.5', 'h-2.5', 'rounded-full', 'transition-all', 'duration-200',
+            index === currentImageIndex ? 'bg-white scale-110' : 'bg-gray-400 bg-opacity-60']"
             :aria-label="`이미지 ${index + 1}로 이동`"
         ></button>
       </div>
