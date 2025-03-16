@@ -249,23 +249,13 @@ const handleClick = () => {
 const handleFileSelect = (event: Event) => {
   const files = (event.target as HTMLInputElement).files;
   if (files) {
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      uploadImage.value = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    const filesArray = Array.from(files);
+    if (uploadImageList.length + filesArray.length > MAX_UPLOAD_IMAGES) {
+      warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
+      return;
+    }
+    filesArray.forEach(processFile);
   }
-};
-
-// 이미지 업로드
-const postImageUpload = () => {
-  // uploadImageList is reactive, not a ref, so no .value needed
-  // uploadImageList.push(...); // Correct way to add items
-
-  axios.get(`/nm/image`).then(response => {
-    // Handle response
-  });
 };
 
 // Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
