@@ -30,21 +30,12 @@ public class Image {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
-
     @Builder
-    public Image(String id, String name, String url, Post post, Provider provider) {
+    public Image(String id, String name, String url, Provider provider) {
         this.id = id;
         this.name = name;
         this.url = url;
-        this.post = post;
         this.provider = provider;
-    }
-
-    public void addPost(Post post) {
-        this.post = post;
     }
 }
 
