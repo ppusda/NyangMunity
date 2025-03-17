@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import cat.community.nyangmunity.image.batch.response.ImageResponse;
 import cat.community.nyangmunity.image.batch.response.TenorApiResponse;
 import cat.community.nyangmunity.image.batch.response.TenorResponse;
+import cat.community.nyangmunity.image.config.ImageConfig;
 import cat.community.nyangmunity.image.config.TenorConfig;
 import cat.community.nyangmunity.image.entity.Image;
 import cat.community.nyangmunity.image.entity.Provider;
@@ -38,22 +39,28 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final S3ImageUtil s3ImageUtil;
     private final TenorConfig tenorConfig;
+    private final ImageConfig imageConfig;
 
     /***
-     * // 업로드 할 URL을 반환해주는 메서드
-     * @param filename // 파일 이름을 전달 받으면 UUID 파일 이름으로 변환, 이를 DB에 저장
-     * @return // 이후 이미지를 업로드 할 수 있는 presigned url, 변환된 이름의 filePath, 할당된 imageId를 반환한다.
+     * 업로드 할 URL을 반환해주는 메서드
+     * @param filename 파일 이름을 전달 받으면 UUID 파일 이름으로 변환, 이를 DB에 저장
+     * @return 이미지를 업로드 할 수 있는 presigned url, 변환된 이름의 filePath, 할당된 imageId를 반환
      */
+    @Transactional
     public UploadImageResponse createImageInfo(String filename) {
-        String filePath = generateRandomUUIDFilePath(filename);
-        Image image = Image.builder()
-                .name(filename)
-                .url(filePath)
-                .post(null)
-                .build();
+        String uuid = generateRandomUUID();
+        String filePath = createFilepath(uuid, filename);
 
-        Image savedImage = imageRepository.save(image);
-        return UploadImageResponse.from(generateURL(filePath), filePath, savedImage.getId());
+        Image savedImage = imageRepository.save(
+            Image.builder()
+                .id(uuid)
+                .name(filename)
+                .url(imageConfig.getImageUrl() + filePath)
+                .provider(Provider.NYANGMUNITY)
+                .build()
+        );
+
+        return UploadImageResponse.from(generatePresignedUrl(filePath), savedImage.getId());
     }
 
     @Transactional(readOnly = true)
@@ -66,16 +73,16 @@ public class ImageService {
         return findImagesByIds(imageIds).stream().map(PostImage::new).collect(Collectors.toList());
     }
 
-    private String generateRandomUUIDFilePath(String filename) {
-        return UUID.randomUUID() + getExtension(filename);
+    private String generateRandomUUID() {
+        return UUID.randomUUID().toString();
     }
 
-    private URL generateURL(String filePath) {
+    private URL generatePresignedUrl(String filePath) {
         return s3ImageUtil.generatePresignedUrl(filePath);
     }
 
-    private String getExtension(String fileName) {
-        return fileName.substring(fileName.lastIndexOf('.'));
+    private String createFilepath(String uuid, String fileName) {
+        return uuid + fileName.substring(fileName.lastIndexOf('.'));
     }
 
     public Mono<List<TenorResponse>> getCatImages(String searchTerm) {

@@ -100,11 +100,10 @@ const uploadImages = async () => {
       uploadedImageIds.push(image.id as string);
     } else if (image.source === "upload") { // 업로드 될 이미지
       // 직접 업로드한 이미지 -> presigned URL 요청 후 업로드
-      const response = await axios.get(`/nm/image/upload?${image.filename}`);
+      const response = await axios.get(`/nm/images/upload?filename=${image.filename}`);
 
-      const { id, uploadUrl, filePath } = response.data;
-
-      await axios.put(uploadUrl + filePath, dataUrlToBlob(image.url));
+      const { id, uploadUrl } = response.data;
+      await axios.put(uploadUrl, dataUrlToBlob(image.url));
 
       // 업로드 완료 후 서버에 저장된 이미지 ID 수집
       uploadedImageIds.push(id);

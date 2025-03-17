@@ -6,16 +6,13 @@ import lombok.Builder;
 @Builder
 public record UploadImageResponse(
         String id,
-        URL uploadUrl,
-        String filePath
-
+        URL uploadUrl
 ) {
 
-    public static UploadImageResponse from(URL url, String filePath, String imageId) {
+    public static UploadImageResponse from(URL url, String imageId) {
         return UploadImageResponse.builder()
                 .id(imageId)
                 .uploadUrl(url)
-                .filePath(filePath)
                 .build();
     }
 
