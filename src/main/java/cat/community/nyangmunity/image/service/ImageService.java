@@ -17,13 +17,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import cat.community.nyangmunity.image.batch.response.ImageResponse;
 import cat.community.nyangmunity.image.batch.response.TenorApiResponse;
 import cat.community.nyangmunity.image.batch.response.TenorResponse;
-import cat.community.nyangmunity.image.config.ImageConfig;
 import cat.community.nyangmunity.image.config.TenorConfig;
 import cat.community.nyangmunity.image.entity.Image;
 import cat.community.nyangmunity.image.entity.Provider;
 import cat.community.nyangmunity.image.repository.ImageRepository;
 import cat.community.nyangmunity.image.response.UploadImageResponse;
-import cat.community.nyangmunity.image.util.S3ImageUtil;
+import cat.community.nyangmunity.image.util.ImageUtil;
 import cat.community.nyangmunity.post.entity.PostImage;
 import io.netty.channel.ChannelOption;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +36,8 @@ import reactor.netty.http.client.HttpClient;
 public class ImageService {
 
     private final ImageRepository imageRepository;
-    private final S3ImageUtil s3ImageUtil;
+    private final ImageUtil imageUtil;
     private final TenorConfig tenorConfig;
-    private final ImageConfig imageConfig;
 
     /***
      * 업로드 할 URL을 반환해주는 메서드
@@ -55,7 +53,7 @@ public class ImageService {
             Image.builder()
                 .id(uuid)
                 .name(filename)
-                .url(imageConfig.getImageUrl() + filePath)
+                .url(imageUtil.getImageUrl() + filePath)
                 .provider(Provider.NYANGMUNITY)
                 .build()
         );
@@ -78,7 +76,7 @@ public class ImageService {
     }
 
     private URL generatePresignedUrl(String filePath) {
-        return s3ImageUtil.generatePresignedUrl(filePath);
+        return imageUtil.generatePresignedUrl(filePath);
     }
 
     private String createFilepath(String uuid, String fileName) {

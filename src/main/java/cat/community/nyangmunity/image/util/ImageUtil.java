@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 @RequiredArgsConstructor
-public class S3ImageUtil {
+public class ImageUtil {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -23,12 +23,14 @@ public class S3ImageUtil {
     @Value("${cloud.aws.s3.path}")
     private String filePath;
 
+    @Value("${nyangmunity.image-url}")
+    private String imageUrl;
+
     private final AmazonS3 amazonS3;
     private final S3Config s3Config;
 
     public URL generatePresignedUrl(String filePath) {
         LocalDateTime expiration = LocalDateTime.now().plusMinutes(15);
-
         Date from = Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant());
         return amazonS3.generatePresignedUrl(bucketName, filePath, from, HttpMethod.PUT);
     }
