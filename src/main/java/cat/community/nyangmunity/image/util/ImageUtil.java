@@ -7,6 +7,8 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,4 +37,15 @@ public class ImageUtil {
         return amazonS3.generatePresignedUrl(bucketName, filePath, from, HttpMethod.PUT);
     }
 
+    public String generateRandomUUID() {
+        return UUID.randomUUID().toString();
+    }
+
+    public String createFilepath(String uuid, String fileName) {
+        return uuid + fileName.substring(fileName.lastIndexOf('.'));
+    }
+
+    public String getImageUrl() {
+        return imageUrl + filePath;
+    }
 }

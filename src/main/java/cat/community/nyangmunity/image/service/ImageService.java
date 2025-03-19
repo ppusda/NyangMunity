@@ -46,8 +46,8 @@ public class ImageService {
      */
     @Transactional
     public UploadImageResponse createImageInfo(String filename) {
-        String uuid = generateRandomUUID();
-        String filePath = createFilepath(uuid, filename);
+        String uuid = imageUtil.generateRandomUUID();
+        String filePath = imageUtil.createFilepath(uuid, filename);
 
         Image savedImage = imageRepository.save(
             Image.builder()
@@ -58,7 +58,7 @@ public class ImageService {
                 .build()
         );
 
-        return UploadImageResponse.from(generatePresignedUrl(filePath), savedImage.getId());
+        return UploadImageResponse.from(imageUtil.generatePresignedUrl(filePath), savedImage.getId());
     }
 
     @Transactional(readOnly = true)
@@ -69,18 +69,6 @@ public class ImageService {
     @Transactional(readOnly = true)
     public List<PostImage> findPostImagesByIds(List<String> imageIds) {
         return findImagesByIds(imageIds).stream().map(PostImage::new).collect(Collectors.toList());
-    }
-
-    private String generateRandomUUID() {
-        return UUID.randomUUID().toString();
-    }
-
-    private URL generatePresignedUrl(String filePath) {
-        return imageUtil.generatePresignedUrl(filePath);
-    }
-
-    private String createFilepath(String uuid, String fileName) {
-        return uuid + fileName.substring(fileName.lastIndexOf('.'));
     }
 
     public Mono<List<TenorResponse>> getCatImages(String searchTerm) {
