@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import cat.community.nyangmunity.global.exception.ImageBatchReadException;
 import cat.community.nyangmunity.image.batch.response.TenorResponse;
+import cat.community.nyangmunity.image.batch.service.ImageApiService;
 import cat.community.nyangmunity.image.batch.service.ImageBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class ImageBatchReader implements ItemReader<List<TenorResponse>> {
     private boolean isRead = false; // 데이터가 이미 읽혔는지 여부를 저장하는 플래그
     private static String[] searchTerms = {"cat", "cuteCat"}; // 검색어
 
-    private final ImageBatchService imageBatchService;
+    private final ImageApiService imageApiService;
 
     @Override
     public List<TenorResponse> read() {
@@ -32,7 +33,7 @@ public class ImageBatchReader implements ItemReader<List<TenorResponse>> {
             try {
                 List<Mono<List<TenorResponse>>> monoList = new ArrayList<>();
                 for (String searchTerm : searchTerms) {
-                    monoList.add(imageBatchService.getCatImages(searchTerm));
+                    monoList.add(imageApiService.getCatImages(searchTerm));
                 }
 
                 List<List<TenorResponse>> resultList = Flux.merge(monoList)

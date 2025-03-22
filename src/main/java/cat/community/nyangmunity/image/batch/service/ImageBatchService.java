@@ -27,7 +27,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class ImageBatchService {
 
-    private final TenorConfig tenorConfig;
     private final JobLauncher jobLauncher;
     private final Job imageBatchJob;
 
@@ -42,28 +41,6 @@ public class ImageBatchService {
         } catch (Exception e) {
             log.error("[ERROR] : 배치 업데이트 중 오류 발생, {}", e.getMessage());
         }
-    }
-
-    public Mono<List<TenorResponse>> getCatImages(String searchTerm) {
-        URI requestUri = tenorConfig.generateRequestUri(searchTerm);
-
-        HttpClient httpClient = HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
-
-        WebClient webClient = WebClient.builder()
-            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(5 * 1024 * 1024))
-            .baseUrl(requestUri.toString())
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .build();
-
-        return webClient.get()
-            .uri(requestUri)
-            .retrieve()
-            .bodyToMono(TenorApiResponse.class)
-            .map(TenorApiResponse::results)
-            .doOnError(error -> {
-                log.error("ERROR : getCatImage() - {}", error.getMessage());
-            });
     }
 
 }
