@@ -36,6 +36,7 @@ const posts = reactive<Post[]>([]);
 const postPage = reactive({ value: 1 });
 const postTotalPage = reactive({ value: 0 });
 const postContainerRef = ref<HTMLElement | null>(null);
+const postChatRef = ref(null);
 
 // 게시물 작성
 const content = ref<string>("");
@@ -63,7 +64,9 @@ const getPosts = async (page: number, init: boolean) => {
     if (init) {
       posts.splice(0, posts.length, ...response.data.content);
       await nextTick();
-      postContainerRef.value?.scrollTo(0, postContainerRef.value.scrollHeight); // 초기 로드 시 맨 아래로 스크롤
+      setTimeout(() => {
+        postChatRef.value?.scrollToBottom(true);
+      }, 50);
     } else {
       const prevScrollHeight = postContainerRef.value?.scrollHeight || 0;
       posts.push(...response.data.content);
@@ -87,7 +90,11 @@ const writePost = async () => {
   }).then(() => {
     uploadImageList.splice(0, uploadImageList.length);  // 업로드 후 초기화
     content.value = "";  // 내용 초기화
-    getPosts(postPage.value, true); // 최신 글 불러오기
+    getPosts(postPage.value, true).then(() => {
+      setTimeout(() => {
+        postChatRef.value?.scrollToBottom(true);
+      }, 50);
+    });
   });
 };
 
@@ -305,6 +312,7 @@ const alertToast = (message: string) => {
     <!-- 메인 게시판 섹션 -->
     <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
       <PostChat
+          ref="postChatRef"
           :posts="posts"
           @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
       ></PostChat>

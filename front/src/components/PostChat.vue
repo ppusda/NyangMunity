@@ -156,15 +156,31 @@ const getWriteTime = (time: string) => {
   }
 };
 
+const scrollToBottom = (smooth = true) => {
+  if (postContainerRef.value) {
+    postContainerRef.value.scrollTo({
+      top: postContainerRef.value.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }
+};
+
+
 // 컴포넌트 마운트 시 키보드 이벤트 리스너 등록
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
+
+  setTimeout(() => {
+    scrollToBottom(true);
+  }, 50);
 });
 
 // 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
 });
+
+defineExpose({ scrollToBottom });
 </script>
 
 <template>
