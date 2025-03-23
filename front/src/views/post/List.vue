@@ -49,7 +49,6 @@ const imageTotalPage = reactive({ value: 0 });
 // 업로드 이미지
 const uploadImageList = reactive<Image[]>([]);
 const selectedPreviewImage = ref<string | null>(null);
-const uploadImage = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const MAX_UPLOAD_IMAGES = 5;
 
@@ -65,7 +64,7 @@ const getPosts = async (page: number, init: boolean) => {
       posts.splice(0, posts.length, ...response.data.content);
       await nextTick();
       setTimeout(() => {
-        postChatRef.value?.scrollToBottom(true);
+        scrollToPostBottom(true);
       }, 50);
     } else {
       const prevScrollHeight = postContainerRef.value?.scrollHeight || 0;
@@ -92,7 +91,7 @@ const writePost = async () => {
     content.value = "";  // 내용 초기화
     getPosts(postPage.value, true).then(() => {
       setTimeout(() => {
-        postChatRef.value?.scrollToBottom(true);
+        scrollToPostBottom(true);
       }, 50);
     });
   });
@@ -143,6 +142,16 @@ const handlePostScroll = (event: Event) => {
     getPosts(postPage.value, false);
   }
 };
+
+const scrollToPostBottom = (smooth = true) => {
+  if (postContainerRef.value) {
+    postContainerRef.value.scrollTo({
+      top: postContainerRef.value.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }
+};
+
 
 // Provider 가져오기
 const getProviders = async () => {
