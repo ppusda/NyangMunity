@@ -50,10 +50,9 @@ const login = function () {
         </div>
         <div class="flex flex-col justify-center mt-8 m-3">
           <a @click="login" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5"><i class="fa-solid fa-door-open"></i> 로그인</a>
-          <div class="flex flex-row justify-center m-3 mb-0">
-            <a class="btn btn-outline btn-warning p-3 rounded-md w-4/12 mr-3"><i class="fa-solid fa-comment fa-flip-horizontal"></i></a>
-            <a class="btn btn-outline btn-ghost p-3 rounded-md text-white w-4/12 mr-3"><i class="fa-brands fa-google"></i></a>
-            <a class="btn btn-outline btn-ghost p-3 rounded-md text-black w-4/12"><i class="fa-brands fa-github"></i></a>
+          <div class="flex flex-row justify-center m-1 mb-0">
+            <a class="btn btn-outline btn-warning y-3 rounded-md w-6/12 mr-2"><i class="fa-solid fa-comment fa-flip-horizontal"></i></a>
+            <a class="btn btn-outline btn-ghost p-3 rounded-md text-white w-6/12"><i class="fa-brands fa-google"></i></a>
           </div>
         </div>
       </form>
