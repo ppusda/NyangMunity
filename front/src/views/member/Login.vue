@@ -3,6 +3,7 @@ import {ref} from "vue";
 import axios from "axios";
 import store from "@/stores/store";
 import router from "@/router";
+import {toast} from "vue3-toastify";
 
 const email = ref("");
 const password = ref("");
@@ -25,10 +26,26 @@ const login = function () {
   })
   .catch(error => {
     if (error.response) {
-      alert(error.response.data.message);
+      warningToast(error.response.data.message);
     } else {
-      alert("계정이 올바르지 않습니다.");
+      warningToast("계정이 올바르지 않습니다.");
     }
+  });
+}
+
+const warningToast = (message: string) => {
+  toast(message, {
+    autoClose: 2000,
+    theme: "dark",
+    type: "warning",
+  });
+}
+
+const alertToast = (message: string) => {
+  toast(message, {
+    autoClose: 2000,
+    theme: "dark",
+    type: "info",
   });
 }
 
