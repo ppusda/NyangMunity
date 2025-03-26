@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {computed, onMounted, onUnmounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import {toast} from "vue3-toastify";
 import { useClipboard } from '@vueuse/core';
 
@@ -170,9 +170,16 @@ const scrollToBottom = (smooth = true) => {
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
 
-  setTimeout(() => {
-    scrollToBottom(true);
-  }, 50);
+  watch(
+      () => props.posts,
+      (newPosts) => {
+        if (newPosts && newPosts.length > 0) {
+          setTimeout(() => {
+            scrollToBottom(true);
+          }, 100);
+        }
+      },
+      {deep: true, immediate: true}); // deep 옵션으로 배열 내부 변화도 감지
 });
 
 // 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
