@@ -1,4 +1,4 @@
-package cat.community.nyangmunity.token.entity;
+package cat.community.nyangmunity.member.entity;
 
 import lombok.Builder;
 import lombok.Getter;

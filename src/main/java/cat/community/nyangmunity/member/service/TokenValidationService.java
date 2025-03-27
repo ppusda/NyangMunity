@@ -1,8 +1,8 @@
-package cat.community.nyangmunity.token.service;
+package cat.community.nyangmunity.member.service;
 
 import cat.community.nyangmunity.global.exception.UnauthorizedAccessException;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
-import cat.community.nyangmunity.token.entity.Token;
+import cat.community.nyangmunity.member.entity.Token;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -40,24 +40,12 @@ public class TokenValidationService {
     }
 
     /***
-     * @param memberId // 토큰을 초기화 하기 위한 메서드, RTR 기법을 적용
+     * @param memberId // 토큰을 초기화 하기 위한 메서드
      * @return
      */
     public String[] refreshTokens(Long memberId) {
         String accessToken = jwtTokenProvider.createAccessToken(memberId);
-        String refreshToken = jwtTokenProvider.createRefreshToken(memberId);
-        updateRefreshToken(memberId, refreshToken);
 
-        return new String[] {accessToken, refreshToken};
+        return new String[] {accessToken};
     }
-
-    /***
-     * @param memberId // 토큰 업데이트를 위한 메서드, 기존 토큰 교체 작업 진행
-     * @param refreshToken
-     */
-    private void updateRefreshToken(Long memberId, String refreshToken) {
-        tokenService.deleteToken(memberId);
-        tokenService.register(refreshToken, memberId);
-    }
-
 }

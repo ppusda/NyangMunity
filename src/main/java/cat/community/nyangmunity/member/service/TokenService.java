@@ -1,8 +1,8 @@
-package cat.community.nyangmunity.token.service;
+package cat.community.nyangmunity.member.service;
 
 import cat.community.nyangmunity.global.exception.UnauthorizedMemberException;
-import cat.community.nyangmunity.token.entity.Token;
-import cat.community.nyangmunity.token.repository.TokenRepository;
+import cat.community.nyangmunity.member.entity.Token;
+import cat.community.nyangmunity.member.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

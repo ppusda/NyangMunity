@@ -1,6 +1,6 @@
-package cat.community.nyangmunity.token.repository;
+package cat.community.nyangmunity.member.repository;
 
-import cat.community.nyangmunity.token.entity.Token;
+import cat.community.nyangmunity.member.entity.Token;
 
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
