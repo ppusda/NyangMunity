@@ -3,8 +3,8 @@ import {nextTick, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import MasonryGrid from "@/components/MasonryGrid.vue";
 import PostChat from "@/components/PostChat.vue";
+import {warningToast, infoToast} from '@/utils/toaster';
 import 'vue3-toastify/dist/index.css';
-import {toast} from "vue3-toastify";
 
 interface Post {
   id: string;
@@ -185,7 +185,7 @@ const selectImageFromMasonry = (item: Image) => {
       filename: null,
       source: "gallery",
     });
-    alertToast("이미지가 선택되었습니다.")
+    infoToast("이미지가 선택되었습니다.")
   } else {
     warningToast("이미 선택된 이미지 입니다.")
   }
@@ -283,22 +283,6 @@ onMounted(() => {
   getPosts(postPage.value, true);
   postContainerRef.value?.addEventListener('scroll', handlePostScroll);
 });
-
-const warningToast = (message: string) => {
-  toast(message, {
-    autoClose: 2000,
-    theme: "dark",
-    type: "warning",
-  });
-}
-
-const alertToast = (message: string) => {
-  toast(message, {
-    autoClose: 2000,
-    theme: "dark",
-    type: "info",
-  });
-}
 
 </script>
 
