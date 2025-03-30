@@ -9,7 +9,7 @@ const email = ref("");
 const password = ref("");
 
 const login = function () {
-  axios.post("/nm/member/login", {
+  axios.post("/nm/members/login", {
     email: email.value,
     password: password.value
   }, { withCredentials: true })

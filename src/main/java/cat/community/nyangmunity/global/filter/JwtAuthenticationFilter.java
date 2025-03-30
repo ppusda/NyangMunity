@@ -2,7 +2,7 @@ package cat.community.nyangmunity.global.filter;
 
 import cat.community.nyangmunity.global.provider.CookieProvider;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
-import cat.community.nyangmunity.token.service.TokenValidationService;
+import cat.community.nyangmunity.member.service.TokenValidationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -41,12 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = getTokenFromRequest(request, "accessToken");
 
-        if (!StringUtils.hasText(accessToken)) {
+        if (!StringUtils.hasText(accessToken)) { // AccessToken 이 존재하지 않을 때
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (!jwtTokenProvider.validateToken(accessToken)){
+        if (!jwtTokenProvider.validateToken(accessToken)) { // AccessToken이 존재할 때, 검증 진행
             String memberId = jwtTokenProvider.getClaims(accessToken).getSubject();
             String refreshToken = getTokenFromRequest(request, "refreshToken");
 

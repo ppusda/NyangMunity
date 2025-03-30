@@ -6,7 +6,6 @@ import cat.community.nyangmunity.global.exception.MemberNotFoundException;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
 import cat.community.nyangmunity.global.crypto.ScryptPasswordEncoder;
 import cat.community.nyangmunity.member.entity.Member;
-import cat.community.nyangmunity.token.service.TokenService;
 import cat.community.nyangmunity.member.editor.MemberEditor;
 import cat.community.nyangmunity.global.exception.AlreadyExistsEmailException;
 import cat.community.nyangmunity.global.exception.InvalidLoginInformationException;

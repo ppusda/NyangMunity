@@ -4,8 +4,9 @@ import lombok.Builder;
 
 @Builder
 public record MemberCheckResponse(
-        String nickname,
-        Boolean result
+	Long memberId,
+	String nickname,
+	Boolean result
 ) {
 
 }

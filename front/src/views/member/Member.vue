@@ -23,7 +23,7 @@ const { cookies } = useCookies();
 const router = useRouter();
 
 const userLogout = function () {
-  axios.post("/nm/member/logout").then(() => {
+  axios.post("/nm/members/logout").then(() => {
     cookies.remove("accessToken");
     cookies.remove("refreshToken");
     router.replace({ name: "main" }). then(() => router.go(0));
@@ -35,7 +35,7 @@ const userEdit = function () {
     alert("비밀번호가 다릅니다.")
   } else {
     formData.append("pwdCheck", pwdCheck.value);
-    axios.post("/nm/member/pwdCheck", formData).then(response => {
+    axios.post("/nm/members/pwdCheck", formData).then(response => {
       if (response.data) {
         member.value.password = newPassword.value;
 
@@ -43,7 +43,7 @@ const userEdit = function () {
         formData.append("password",  member.value.password);
         formData.append("birthday", member.value.birthday);
 
-        axios.post("/nm/member/edit", formData).then(() => {
+        axios.post("/nm/members/edit", formData).then(() => {
           alert("정보 수정이 완료되었습니다.");
           router.replace({ name: "main" }).then(() => router.go(0));
         });
@@ -56,10 +56,10 @@ const userEdit = function () {
 
 const cancelUser = function () {
   formData.append("pwdCheck", pwdCheck.value);
-  axios.post("/nm/member/pwdCheck", formData).then(response => {
+  axios.post("/nm/members/pwdCheck", formData).then(response => {
     if (response.data) {
       alert("냥뮤니티를 이용해주셔서 감사했습니다.");
-      axios.post("/nm/member/cancel", ).then(() => {
+      axios.post("/nm/members/cancel", ).then(() => {
         router.replace({ name: "main" }).then(() => router.go(0));
       });
     } else {
@@ -74,7 +74,7 @@ const cancelUser = function () {
 };
 
 onMounted(async () => {
-    await axios.get("/nm/member/profile").then(response => {
+    await axios.get("/nm/members/profile").then(response => {
       member.value = response.data;
     }).catch(error => {
       if(error.response) {

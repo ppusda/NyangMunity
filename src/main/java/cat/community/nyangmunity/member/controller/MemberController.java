@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -55,9 +55,10 @@ public class MemberController {
             Member member = memberService.findMemberById(Long.parseLong(principal.getName()));
 
             return MemberCheckResponse.builder()
-                    .nickname(member.getNickname())
-                    .result(true)
-                    .build();
+                .memberId(member.getId())
+                .nickname(member.getNickname())
+                .result(true)
+				.build();
         }
 
         return MemberCheckResponse.builder()
