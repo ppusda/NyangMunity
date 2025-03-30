@@ -57,7 +57,7 @@ const getPosts = async (page: number, init: boolean) => {
   if (postTotalPage.value !== 0 && page >= postTotalPage.value) return;
 
   try {
-    const response = await axios.get(`/nm/post?page=${page - 1}&size=10`);
+    const response = await axios.get(`/nm/posts?page=${page - 1}&size=10`);
     postTotalPage.value = response.data.totalPages;
 
     if (init) {
@@ -83,7 +83,7 @@ const getPosts = async (page: number, init: boolean) => {
 // 게시물 업로드
 const writePost = async () => {
   const uploadedImageIds: string[] = await uploadImages();
-  axios.post('/nm/post', {
+  axios.post('/nm/posts', {
     content: content.value,
     postImageIds: uploadedImageIds,
   }).then(() => {
