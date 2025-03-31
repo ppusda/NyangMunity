@@ -1,31 +1,14 @@
 <script setup lang="ts">
-import {nextTick, onMounted, reactive, ref} from 'vue';
+import { nextTick, onMounted, reactive, ref } from 'vue';
+import { warningToast, infoToast } from '@/utils/toaster';
+
 import axios from 'axios';
 import MasonryGrid from "@/components/MasonryGrid.vue";
 import PostChat from "@/components/PostChat.vue";
-import {warningToast, infoToast} from '@/utils/toaster';
+
+import type {Post, Image} from '@/interfaces/post';
+
 import 'vue3-toastify/dist/index.css';
-
-interface Post {
-  id: string;
-  content: string;
-  postImages: Array<PostImage>;
-  createDate: string;
-  uid: number;
-  writer: string;
-}
-
-interface PostImage {
-  id: string | null;
-  url: string;
-}
-
-interface Image {
-  id: string | null;
-  filename: string | null;
-  url: string;
-  source: "gallery" | "upload";
-}
 
 // 이미지 제공자 상태
 const providers = reactive<string[]>([]);

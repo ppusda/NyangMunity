@@ -1,22 +1,10 @@
 <script setup lang="ts">
 
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
-import {toast} from "vue3-toastify";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { infoToast } from '@/utils/toaster';
 import { useClipboard } from '@vueuse/core';
 
-interface Post {
-  id: string;
-  content: string;
-  postImages: Array<PostImage>;
-  createDate: string;
-  uid: number;
-  writer: string;
-}
-
-interface PostImage {
-  id: string | null;
-  url: string;
-}
+import type {Post} from '@/interfaces/post';
 
 // View 데이터 설정
 const props = defineProps({
@@ -37,9 +25,7 @@ const { copy } = useClipboard();
 
 const copyLink = (link: string) => {
   copy(link);
-  toast("이미지 복사 완료!", {
-    autoClose: 2000, theme: "dark"
-  });
+  infoToast("이미지 복사 완료!");
 };
 
 // 모달 상태 관리
