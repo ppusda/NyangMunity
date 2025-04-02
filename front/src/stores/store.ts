@@ -1,31 +1,31 @@
 import Vuex from 'vuex';
 
-const store = new Vuex.Store({
+const member = new Vuex.Store({
   state: {
     memberId: null,
-    userNickname: null,
+    nickname: null,
     isLogin: false,
   },
   mutations: {
-    setUser(state, user) {
-      state.memberId = user.id;
-      state.userNickname = user.nickname;
+    setMember(state, member) {
+      state.memberId = member.id;
+      state.nickname = member.nickname;
       state.isLogin = true;
     },
-    clearUser(state) {
+    clearMember(state) {
       state.memberId = null;
-      state.userNickname = null;
+      state.nickname = null;
       state.isLogin = false;
     },
   },
   actions: {
-    login({ commit }, user) {
-      commit('setUser', user);
+    login({ commit }, member) {
+      commit('setMember', member);
     },
     logout({ commit }) {
-      commit('clearUser');
+      commit('clearMember');
     },
   },
 });
 
-export default store;
+export default member;

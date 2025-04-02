@@ -18,3 +18,11 @@ export interface Image {
     url: string;
     source: "gallery" | "upload";
 }
+
+export interface Member {
+    id: string;
+    email: string;
+    password: string;
+    nickname: string;
+    birthday: string;
+}

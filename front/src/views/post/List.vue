@@ -6,7 +6,7 @@ import axios from 'axios';
 import MasonryGrid from "@/components/MasonryGrid.vue";
 import PostChat from "@/components/PostChat.vue";
 
-import type {Post, Image} from '@/interfaces/post';
+import type {Post, Image} from '@/interfaces/type';
 
 import 'vue3-toastify/dist/index.css';
 

@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
-import {onMounted, ref} from "vue";
-import {useCookies} from "vue3-cookies";
+import {onMounted, reactive, ref} from "vue";
 import axios from "axios";
+import type {Member} from "@/interfaces/type";
 
-let cookieValue = ref("");
-
-const member = ref({
-  id: 0,
+let member = reactive<Member>({
+  id: "",
   email: "",
   password: "",
   nickname: "",
@@ -19,16 +17,7 @@ const pwdCheck = ref("");
 const newPassword = ref("");
 const newPasswordChk = ref("");
 
-const { cookies } = useCookies();
 const router = useRouter();
-
-const userLogout = function () {
-  axios.post("/nm/members/logout").then(() => {
-    cookies.remove("accessToken");
-    cookies.remove("refreshToken");
-    router.replace({ name: "main" }). then(() => router.go(0));
-  });
-};
 
 const userEdit = function () {
   if(newPassword.value !== newPasswordChk.value){
@@ -37,11 +26,11 @@ const userEdit = function () {
     formData.append("pwdCheck", pwdCheck.value);
     axios.post("/nm/members/pwdCheck", formData).then(response => {
       if (response.data) {
-        member.value.password = newPassword.value;
+        member.password = newPassword.value;
 
-        formData.append("nickname", member.value.nickname);
-        formData.append("password",  member.value.password);
-        formData.append("birthday", member.value.birthday);
+        formData.append("nickname", member.nickname);
+        formData.append("password",  member.password);
+        formData.append("birthday", member.birthday);
 
         axios.post("/nm/members/edit", formData).then(() => {
           alert("정보 수정이 완료되었습니다.");
@@ -75,7 +64,7 @@ const cancelUser = function () {
 
 onMounted(async () => {
     await axios.get("/nm/members/profile").then(response => {
-      member.value = response.data;
+      member = response.data;
     }).catch(error => {
       if(error.response) {
         alert(error.response.data.message);
@@ -124,18 +113,11 @@ onMounted(async () => {
             </td>
           </tr>
           <tr>
-            <td class="w-25"><a class="text-white">생일 : </a></td>
-            <td class="w-50">
-              <input class="w-100" id="birthday" name="birthday" type="date" v-model="member.birthday"/>
-            </td>
-          </tr>
-          <tr>
             <td>
               <input id="passwordCheck" type="password" placeholder="현재 비밀번호 입력" v-model="pwdCheck"/>
             </td>
             <td colspan="2">
               <a class="clButton btn btn-primary text-white m-1" @click="userEdit()">수정</a>
-              <a class="clButton btn btn-secondary text-white m-1" @click="userLogout()">로그아웃</a>
               <a class="clButton btn btn-danger text-white m-1" data-bs-toggle="modal" data-bs-target="#cancelUserModal">회원탈퇴</a>
 
               <div class="modal fade" id="cancelUserModal" tabindex="-1" role="dialog" aria-hidden="true">

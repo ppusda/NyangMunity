@@ -4,9 +4,9 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { infoToast } from '@/utils/toaster';
 import { useClipboard } from '@vueuse/core';
 
-import type {Post} from '@/interfaces/post';
+import type {Post} from '@/interfaces/type';
 
-// View 데이터 설정
+// List.vue 데이터 설정
 const props = defineProps({
   posts: Array<Post>,
 });
@@ -204,7 +204,7 @@ defineExpose({ scrollToBottom });
               >
                 <img
                     :src="image.url"
-                    alt="Post Image"
+                    alt="Type Image"
                     class="absolute inset-0 w-full h-full object-cover rounded-md"
                 />
                 <!-- 더보기 표시 -->

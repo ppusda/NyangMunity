@@ -1,36 +1,14 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import axios from "axios";
-import store from "@/stores/store";
+import {login} from "@/utils/account";
 import router from "@/router";
-import {warningToast} from '@/utils/toaster';
 
-const email = ref("");
-const password = ref("");
+const email = ref<string>("");
+const password = ref<string>("");
 
-const login = function () {
-  axios.post("/nm/members/login", {
-    email: email.value,
-    password: password.value
-  }, { withCredentials: true })
-  .then(response => {
-    const userData = {
-      id: response.data.id,
-      nickname: response.data.nickname
-    };
-
-    store.dispatch('login', userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    router.replace({ name: "main" });
-  })
-  .catch(error => {
-    if (error.response) {
-      warningToast(error.response.data.message);
-    } else {
-      warningToast("계정이 올바르지 않습니다.");
-    }
-  });
+const loginAction = () => {
+  login(email.value, password.value);
+  router.replace({ name: "main" });
 }
 
 </script>
@@ -50,7 +28,7 @@ const login = function () {
           <input type="password" name="password" id="password" v-model="password" class="input input-bordered border-zinc-500 bg-zinc-900 w-full p-3 rounded-md text-white" placeholder="비밀번호를 입력해주세요.">
         </div>
         <div class="flex flex-col justify-center mt-8 m-3">
-          <a @click="login" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5"><i class="fa-solid fa-door-open"></i> 로그인</a>
+          <a @click="loginAction" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5"><i class="fa-solid fa-door-open"></i> 로그인</a>
           <div class="flex flex-row justify-center m-1 mb-0">
             <a class="btn btn-outline btn-warning y-3 rounded-md w-6/12 mr-2"><i class="fa-solid fa-comment fa-flip-horizontal"></i></a>
             <a class="btn btn-outline btn-ghost p-3 rounded-md text-white w-6/12"><i class="fa-brands fa-google"></i></a>
