@@ -1,29 +1,29 @@
 package cat.community.nyangmunity.global.filter;
 
-import cat.community.nyangmunity.global.provider.CookieProvider;
-import cat.community.nyangmunity.global.provider.JwtTokenProvider;
-import cat.community.nyangmunity.member.service.TokenValidationService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import cat.community.nyangmunity.global.data.JwtValidateStatus;
+import cat.community.nyangmunity.global.exception.InternalServerErrorException;
+import cat.community.nyangmunity.global.exception.UnauthorizedException;
+import cat.community.nyangmunity.global.provider.JwtTokenProvider;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenValidationService tokenValidationService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final CookieProvider cookieProvider;
 
     private String getTokenFromRequest(HttpServletRequest request, String tokenName) {
         Cookie[] cookies = request.getCookies();
@@ -46,16 +46,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!jwtTokenProvider.validateToken(accessToken)) { // AccessToken이 존재할 때, 검증 진행
-            String memberId = jwtTokenProvider.getClaims(accessToken).getSubject();
-            String refreshToken = getTokenFromRequest(request, "refreshToken");
+        if (StringUtils.hasText(accessToken)) {
+            JwtValidateStatus validateStatus = jwtTokenProvider.validateToken(accessToken);
 
-            tokenValidationService.validateRefreshToken(memberId, refreshToken);
-
-            String[] newTokens = tokenValidationService.refreshTokens(Long.parseLong(memberId));
-
-            response.setHeader(HttpHeaders.SET_COOKIE, cookieProvider.createAccessTokenCookie(newTokens[0]).toString());
-            response.setHeader(HttpHeaders.SET_COOKIE, cookieProvider.createRefreshTokenCookie(newTokens[1]).toString());
+            switch (validateStatus) {
+                case DENIED -> {
+                    SecurityContextHolder.clearContext();
+                    throw new UnauthorizedException("올바르지 않은 토큰입니다.");
+                }
+                case EXPIRED -> {
+                    SecurityContextHolder.clearContext();
+                    throw new UnauthorizedException("토큰이 만료되었습니다.");
+                }
+                case ACCEPTED -> {
+                    Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+                default -> throw new InternalServerErrorException();
+            }
         }
 
         Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
