@@ -1,9 +1,10 @@
-package cat.community.nyangmunity.global.exception;
+package cat.community.nyangmunity.global.exception.batch;
 
+import cat.community.nyangmunity.global.exception.NyangmunityException;
 import lombok.Getter;
 
 @Getter
-public class ImageBatchReadException extends NyangmunityException{
+public class ImageBatchReadException extends NyangmunityException {
 
     private static final String MESSAGE = "Batch Service Error - 이미지를 가져올 수 없습니다.";
 

@@ -1,6 +1,8 @@
-package cat.community.nyangmunity.global.exception;
+package cat.community.nyangmunity.global.exception.post;
 
-public class InvalidFileTypeException extends NyangmunityException{
+import cat.community.nyangmunity.global.exception.NyangmunityException;
+
+public class InvalidFileTypeException extends NyangmunityException {
     private static final String MESSAGE = "지원되지 않는 파일 형식입니다.";
 
     public InvalidFileTypeException() {
