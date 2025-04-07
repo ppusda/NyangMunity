@@ -1,6 +1,6 @@
 package cat.community.nyangmunity.post.request;
 
-import cat.community.nyangmunity.global.exception.InvalidRequest;
+import cat.community.nyangmunity.global.exception.global.InvalidRequestException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -23,7 +23,7 @@ public record PostWriteRequest(
     // TODO: 특정 키워드 Valid 옵션 추가 고려
    public void validate(String content) {
         if (content.contains("바보")) {
-            throw new InvalidRequest();
+            throw new InvalidRequestException();
         }
     }
 }

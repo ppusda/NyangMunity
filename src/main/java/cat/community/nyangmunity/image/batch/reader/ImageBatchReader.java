@@ -6,10 +6,9 @@ import java.util.List;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
-import cat.community.nyangmunity.global.exception.ImageBatchReadException;
+import cat.community.nyangmunity.global.exception.batch.ImageBatchReadException;
 import cat.community.nyangmunity.image.batch.response.TenorResponse;
 import cat.community.nyangmunity.image.batch.service.ImageApiService;
-import cat.community.nyangmunity.image.batch.service.ImageBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;

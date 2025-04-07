@@ -1,9 +1,10 @@
-package cat.community.nyangmunity.global.exception;
+package cat.community.nyangmunity.global.exception.global;
 
+import cat.community.nyangmunity.global.exception.NyangmunityException;
 import lombok.Getter;
 
 @Getter
-public class UnauthorizedException extends NyangmunityException{
+public class UnauthorizedException extends NyangmunityException {
 
     private static final String MESSAGE = "인증되지 않은 접근입니다.";
 

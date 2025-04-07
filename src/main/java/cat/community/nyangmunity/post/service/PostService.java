@@ -10,8 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import cat.community.nyangmunity.global.exception.BoardNotFoundException;
-import cat.community.nyangmunity.global.exception.UnauthorizedMemberException;
+import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
+import cat.community.nyangmunity.global.exception.global.ForbiddenException;
 import cat.community.nyangmunity.image.service.ImageService;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.post.editor.PostEditor;
@@ -42,7 +42,7 @@ public class PostService {
     private final PostImageRepository postImageRepository;
 
     public Post getBoard(Long bid) {
-        return postRepository.findById(bid).orElseThrow(BoardNotFoundException::new);
+        return postRepository.findById(bid).orElseThrow(PostNotFoundException::new);
     }
 
     @Transactional
@@ -77,7 +77,7 @@ public class PostService {
         Post post = getBoard(bid);
 
         if (!post.getMember().getId().equals(uid)) {
-            throw new UnauthorizedMemberException();
+            throw new ForbiddenException();
         }
 
         postRepository.save(post);
@@ -95,7 +95,7 @@ public class PostService {
         Post post = getBoard(bid);
 
         if (!post.getMember().getId().equals(uid)) {
-            throw new UnauthorizedMemberException();
+            throw new ForbiddenException();
         }
 
         postRepository.delete(post);
