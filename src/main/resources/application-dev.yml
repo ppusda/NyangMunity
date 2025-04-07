@@ -8,12 +8,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  servlet:
-    multipart:
-      location: D:\NyangMunityImages\
+
 nyangmunity:
-  image-path: D:\NyangMunityImages\
   domain: localhost
+
+jwt:
+  access-token-expiration: 900000 # 15분
+  refresh-token-expiration: 10800000 # 3시간
 
 kakao:
   redirect-uri: "http://localhost:8080/nm/user/kakaoLogin"

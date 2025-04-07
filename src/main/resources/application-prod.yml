@@ -8,13 +8,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  servlet:
-    multipart:
-      location: /home/ec2-user/nm/images/
 
 nyangmunity:
-  image-path: /home/ec2-user/nm/images/
-  domain: 52.79.200.204
+  domain: nyangmunity.bbgk.me
+
+jwt:
+  access-token-expiration: 1800000 # 30분
+  refresh-token-expiration: 7889280000 # 3달
 
 kakao:
   redirect-uri: "http://52.79.200.204/nm/user/kakaoLogin"

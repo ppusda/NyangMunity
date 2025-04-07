@@ -10,12 +10,10 @@ import java.util.Base64;
 public class AppConfig {
 
     private final byte[] jwtKey;
-    private final String imagePath;
     private final String domain;
 
-    public AppConfig(String jwtKey, String imagePath, String domain) {
+    public AppConfig(String jwtKey, String domain) {
         this.jwtKey = Base64.getDecoder().decode(jwtKey);
-        this.imagePath = imagePath;
         this.domain = domain;
     }
 }
