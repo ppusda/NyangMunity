@@ -3,8 +3,8 @@ package cat.community.nyangmunity.member.response;
 import lombok.Builder;
 
 @Builder
-public record MemberLoginResponse(
-        MemberInfos memberInfos,
+public record MemberAuthenticationResponse(
+        MemberInfoResponse memberInfoResponse,
         MemberTokens memberTokens
 ) {
 
