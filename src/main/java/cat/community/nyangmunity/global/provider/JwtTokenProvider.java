@@ -56,10 +56,10 @@ public class JwtTokenProvider {
      * @param memberId subject 등록을 위한 회원 아이디
      * @return 생성된 갱신 토큰
      */
-    public String createRefreshToken(String memberId) {
+    public String createRefreshToken(Long memberId) {
         Date now = new Date();
         return Jwts.builder()
-            .subject(memberId)
+            .subject(memberId.toString())
             .signWith(secretKey)
             .expiration(new Date(now.getTime() + refreshTokenExpiration))
             .issuedAt(now)

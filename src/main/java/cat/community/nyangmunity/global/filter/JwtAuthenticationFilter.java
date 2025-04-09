@@ -9,8 +9,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import cat.community.nyangmunity.global.data.JwtValidateStatus;
-import cat.community.nyangmunity.global.exception.InternalServerErrorException;
-import cat.community.nyangmunity.global.exception.UnauthorizedException;
+import cat.community.nyangmunity.global.exception.global.InternalServerErrorException;
+import cat.community.nyangmunity.global.exception.global.UnauthorizedException;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,18 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    private String getTokenFromRequest(HttpServletRequest request, String tokenName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(tokenName)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -71,4 +59,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+    private static String getTokenFromRequest(HttpServletRequest request, String tokenName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(tokenName)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
 }
