@@ -1,23 +1,29 @@
 package cat.community.nyangmunity.member.controller;
 
-import cat.community.nyangmunity.global.provider.CookieProvider;
-import cat.community.nyangmunity.member.entity.Member;
-import cat.community.nyangmunity.member.request.MemberEditForm;
-import cat.community.nyangmunity.member.request.JoinRequest;
-import cat.community.nyangmunity.member.request.LoginRequest;
-import cat.community.nyangmunity.member.response.MemberCheckResponse;
-import cat.community.nyangmunity.member.response.MemberInfos;
-import cat.community.nyangmunity.member.response.MemberLoginResponse;
-import cat.community.nyangmunity.member.response.MemberResponse;
-import cat.community.nyangmunity.member.service.MemberService;
-import jakarta.validation.Valid;
 import java.security.Principal;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import cat.community.nyangmunity.global.provider.CookieProvider;
+import cat.community.nyangmunity.member.entity.Member;
+import cat.community.nyangmunity.member.request.JoinRequest;
+import cat.community.nyangmunity.member.request.LoginRequest;
+import cat.community.nyangmunity.member.request.MemberEditForm;
+import cat.community.nyangmunity.member.response.MemberAuthenticationResponse;
+import cat.community.nyangmunity.member.response.MemberCheckResponse;
+import cat.community.nyangmunity.member.response.MemberInfoResponse;
+import cat.community.nyangmunity.member.service.MemberService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -34,19 +40,19 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    private ResponseEntity<MemberInfos> login(@RequestBody @Valid LoginRequest loginRequest) {
-        MemberLoginResponse memberLoginResponse = memberService.login(loginRequest);
+    private ResponseEntity<MemberInfoResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
+        MemberAuthenticationResponse memberAuthenticationResponse = memberService.login(loginRequest);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(
-                        cookieProvider.createAccessTokenCookie(memberLoginResponse.memberTokens()
+                        cookieProvider.createAccessTokenCookie(memberAuthenticationResponse.memberTokens()
                                 .accessToken())
                 ))
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(
-                        cookieProvider.createRefreshTokenCookie(memberLoginResponse.memberTokens()
+                        cookieProvider.createRefreshTokenCookie(memberAuthenticationResponse.memberTokens()
                                 .refreshToken())
                 ))
-                .body(memberLoginResponse.memberInfos());
+                .body(memberAuthenticationResponse.memberInfoResponse());
     }
 
     @GetMapping("/check")
@@ -68,8 +74,8 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
-    private MemberResponse info(Principal principal) {
-        return MemberResponse.toUserResponse(
+    private MemberInfoResponse info(Principal principal) {
+        return MemberInfoResponse.from(
                 memberService.findMemberById(Long.parseLong(principal.getName()))
         );
     }

@@ -1,30 +1,28 @@
 package cat.community.nyangmunity.member.service;
 
-import cat.community.nyangmunity.global.exception.AlreadyExistsNicknameException;
-import cat.community.nyangmunity.global.exception.InvalidPasswordException;
-import cat.community.nyangmunity.global.exception.MemberNotFoundException;
-import cat.community.nyangmunity.global.provider.JwtTokenProvider;
-import cat.community.nyangmunity.global.crypto.ScryptPasswordEncoder;
-import cat.community.nyangmunity.member.entity.Member;
-import cat.community.nyangmunity.member.editor.MemberEditor;
-import cat.community.nyangmunity.global.exception.AlreadyExistsEmailException;
-import cat.community.nyangmunity.global.exception.InvalidLoginInformationException;
-import cat.community.nyangmunity.member.repository.MemberRepository;
-import cat.community.nyangmunity.member.request.MemberEditForm;
-import cat.community.nyangmunity.member.request.JoinRequest;
-import cat.community.nyangmunity.member.request.LoginRequest;
-import cat.community.nyangmunity.member.response.MemberInfos;
-import cat.community.nyangmunity.member.response.MemberTokens;
-import cat.community.nyangmunity.member.response.MemberLoginResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import cat.community.nyangmunity.global.crypto.ScryptPasswordEncoder;
+import cat.community.nyangmunity.global.exception.member.AlreadyExistsMemberException;
+import cat.community.nyangmunity.global.exception.member.InvalidLoginRequestException;
+import cat.community.nyangmunity.global.exception.member.InvalidPasswordException;
+import cat.community.nyangmunity.global.exception.member.MemberNotFoundException;
+import cat.community.nyangmunity.member.editor.MemberEditor;
+import cat.community.nyangmunity.member.entity.Member;
+import cat.community.nyangmunity.member.repository.MemberRepository;
+import cat.community.nyangmunity.member.request.JoinRequest;
+import cat.community.nyangmunity.member.request.LoginRequest;
+import cat.community.nyangmunity.member.request.MemberEditForm;
+import cat.community.nyangmunity.member.response.MemberInfoResponse;
+import cat.community.nyangmunity.member.response.MemberAuthenticationResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -32,8 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final TokenService tokenService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenFacadeService tokenFacadeService;
     private final ScryptPasswordEncoder scryptPasswordEncoder;
 
     @Transactional(readOnly = true)
@@ -47,27 +44,16 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberLoginResponse login(LoginRequest loginRequest) {
-        Member member = findMemberByEmail(loginRequest.email()).orElseThrow(InvalidLoginInformationException::new);
+    public MemberAuthenticationResponse login(LoginRequest loginRequest) {
+        Member member = findMemberByEmail(loginRequest.email()).orElseThrow(InvalidLoginRequestException::new);
 
         if(!isPasswordMatches(loginRequest.password(), member)) {
-            throw new InvalidLoginInformationException();
+            throw new InvalidLoginRequestException();
         }
 
-        return MemberLoginResponse.builder()
-                .memberInfos(MemberInfos.from(member.getId(), member.getNickname()))
-                .memberTokens(createTokens(member.getId()))
-                .build();
-    }
-
-    private MemberTokens createTokens(Long memberId) {
-        String accessToken = jwtTokenProvider.createAccessToken(memberId);
-        String refreshToken = jwtTokenProvider.createRefreshToken(memberId);
-        tokenService.register(refreshToken, memberId);
-
-        return MemberTokens.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+        return MemberAuthenticationResponse.builder()
+                .memberInfoResponse(MemberInfoResponse.from(member))
+                .memberTokens(tokenFacadeService.createTokens(member.getId()))
                 .build();
     }
 
@@ -88,17 +74,17 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public void checkDuplicateEmail(String email) {
-        if (findMemberByEmail(email).isPresent()) throw new AlreadyExistsEmailException();
+        if (findMemberByEmail(email).isPresent()) throw new AlreadyExistsMemberException();
     }
 
     @Transactional(readOnly = true)
     public void checkDuplicateNickname(String nickname) {
-        if (memberRepository.findByNickname(nickname).isPresent()) throw new AlreadyExistsNicknameException();
+        if (memberRepository.findByNickname(nickname).isPresent()) throw new AlreadyExistsMemberException();
     }
 
     @Transactional
     public void logout(Long memberId) {
-        tokenService.deleteToken(memberId);
+        tokenFacadeService.deleteToken(memberId);
     }
 
     @Transactional
