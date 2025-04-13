@@ -70,7 +70,7 @@ public class TokenFacadeService {
         return tokenReadService.findTokenByMemberId(memberId);
     }
 
-    public void deleteToken(Long memberId) {
-        tokenCommandService.delete(memberId);
+    public void deleteToken(String memberId) {
+        tokenCommandService.delete(findTokenByMemberId(memberId));
     }
 }

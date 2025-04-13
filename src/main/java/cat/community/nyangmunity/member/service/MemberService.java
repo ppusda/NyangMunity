@@ -83,7 +83,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void logout(Long memberId) {
+    public void logout(String memberId) {
         tokenFacadeService.deleteToken(memberId);
     }
 

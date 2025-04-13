@@ -15,11 +15,11 @@ public class TokenCommandService {
 
     /**
 	 * 토큰 제거용 메서드 (로그아웃 시 사용)
-     * @param memberId 토큰과 연관 된 회원 아이디
+     * @param token 삭제할 토큰 객체
      */
     @Transactional
-    public void delete(Long memberId) {
-        tokenRepository.deleteByMemberId(memberId);
+    public void delete(Token token) {
+        tokenRepository.delete(token);
     }
 
     /**

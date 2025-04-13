@@ -92,9 +92,8 @@ public class MemberController {
         memberService.cancel(Long.parseLong(principal.getName()));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     private void logout(Principal principal) {
-        memberService.logout(Long.parseLong(principal.getName()));
+        memberService.logout(principal.getName());
     }
 }

@@ -10,6 +10,4 @@ import org.springframework.stereotype.Repository;
 public interface TokenRepository extends CrudRepository<Token, Long> {
 
     Optional<Token> findByMemberId(Long memberId);
-    void deleteByMemberId(Long memberId);
-
 }
