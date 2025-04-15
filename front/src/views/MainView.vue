@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import axios from "axios";
 import {reactive, ref} from 'vue';
+import axiosClient from "@/libs/axiosClient";
 
 const check = reactive({ value: false });
 const post = ref({
@@ -11,7 +11,7 @@ const post = ref({
 
 let rdNum = reactive({ value: 0 });
 
-axios.post("/nm/posts/like", ).then(response => {
+axiosClient.post("/nm/posts/like", ).then(response => {
   check.value = true;
   post.value = response.data;
   rdNum.value = Math.floor(Math.random() * post.value.postImages.length);

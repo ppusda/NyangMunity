@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import { infoToast } from '@/utils/toaster';
+import { infoToast } from '@/libs/toaster';
 import { useClipboard } from '@vueuse/core';
 
 import type {Post} from '@/interfaces/type';
@@ -10,9 +10,9 @@ import type {Post} from '@/interfaces/type';
 const props = defineProps({
   posts: Array<Post>,
 });
+const emit = defineEmits(['scrollTop']);
 
 const postContainerRef = ref<HTMLElement | null>(null);
-const emit = defineEmits(['scrollTop']);
 
 const handlePostScroll = (event: Event) => {
   if (postContainerRef.value && postContainerRef.value.scrollTop === 0) {

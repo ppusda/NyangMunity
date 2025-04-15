@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import axios from "axios";
 import {ref} from "vue";
 import router from "@/router";
+import axiosClient from "@/libs/axiosClient";
 
 const email = ref("")
 const password = ref("")
@@ -14,7 +14,7 @@ const joinConfirm = function () {
   if(password.value != passwordChk.value){
     alert("비밀번호가 다릅니다.")
   }else{
-    axios.post("/nm/members/join", {
+    axiosClient.post("/nm/members/join", {
       email: email.value,
       password: password.value,
       birthday: birthday.value,

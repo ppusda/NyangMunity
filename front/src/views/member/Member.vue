@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, reactive, ref} from "vue";
-import axios from "axios";
 import type {Member} from "@/interfaces/type";
+import axiosClient from "@/libs/axiosClient";
 
 let member = reactive<Member>({
   id: "",
@@ -24,7 +24,7 @@ const userEdit = function () {
     alert("비밀번호가 다릅니다.")
   } else {
     formData.append("pwdCheck", pwdCheck.value);
-    axios.post("/nm/members/pwdCheck", formData).then(response => {
+    axiosClient.post("/nm/members/pwdCheck", formData).then(response => {
       if (response.data) {
         member.password = newPassword.value;
 
@@ -32,7 +32,7 @@ const userEdit = function () {
         formData.append("password", member.password);
         formData.append("birthday", member.birthday);
 
-        axios.post("/nm/members/edit", formData).then(() => {
+        axiosClient.post("/nm/members/edit", formData).then(() => {
           alert("정보 수정이 완료되었습니다.");
           router.replace({ name: "main" }).then(() => router.go(0));
         });
@@ -45,10 +45,10 @@ const userEdit = function () {
 
 const cancelUser = function () {
   formData.append("pwdCheck", pwdCheck.value);
-  axios.post("/nm/members/pwdCheck", formData).then(response => {
+  axiosClient.post("/nm/members/pwdCheck", formData).then(response => {
     if (response.data) {
       alert("냥뮤니티를 이용해주셔서 감사했습니다.");
-      axios.post("/nm/members/cancel", ).then(() => {
+      axiosClient.post("/nm/members/cancel", ).then(() => {
         router.replace({ name: "main" }).then(() => router.go(0));
       });
     } else {
@@ -63,7 +63,7 @@ const cancelUser = function () {
 };
 
 onMounted(async () => {
-    await axios.get("/nm/members/profile").then(response => {
+    await axiosClient.get("/nm/members/profile").then(response => {
       member = response.data;
     }).catch(error => {
       if(error.response) {

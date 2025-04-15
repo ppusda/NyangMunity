@@ -6,21 +6,21 @@
 </template>
 
 <script setup lang="ts">
-  import {warningToast} from "@/utils/toaster";
+  import {warningToast} from "@/libs/toaster";
   import {onMounted} from "vue";
   import {logout} from "@/utils/account";
 
   import store from "@/stores/store";
-  import axios from "axios";
 
   import Header from "@/components/Header.vue";
   import "./assets/main.css";
+  import axiosClient from "@/libs/axiosClient";
 
 
   onMounted(() => {
     const member = localStorage.getItem('member');
     if (member) {
-      axios.get("/nm/members/check", ).then(response => {
+      axiosClient.get("/nm/members/check", ).then(response => {
         if (response.data.result) {
           const memberData = {
             id: response.data.memberId,
