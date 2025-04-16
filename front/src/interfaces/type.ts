@@ -26,3 +26,9 @@ export interface Member {
     nickname: string;
     birthday: string;
 }
+
+export interface MemberResponse {
+    id: string;
+    email: string;
+    nickname: string;
+};

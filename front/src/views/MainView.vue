@@ -11,7 +11,7 @@ const post = ref({
 
 let rdNum = reactive({ value: 0 });
 
-axiosClient.post("/nm/posts/like", ).then(response => {
+axiosClient.post("/posts/like", ).then(response => {
   check.value = true;
   post.value = response.data;
   rdNum.value = Math.floor(Math.random() * post.value.postImages.length);

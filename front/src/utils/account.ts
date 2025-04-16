@@ -1,21 +1,23 @@
 import {useCookies} from "vue3-cookies";
 import {warningToast} from "@/libs/toaster";
+
 import store from "@/stores/store";
 import axiosClient from "@/libs/axiosClient";
+import type {MemberResponse} from "@/interfaces/type";
 
 const { cookies } = useCookies();
 
 export const login = function (email: string, password: string) {
     // 로그인 (서버 측 토큰 생성)
-    axiosClient.post("/members/login", {email: email, password: password}, { withCredentials: true })
+    axiosClient.post("/members/login", {email: email, password: password})
         .then(response => {
-            const memberData = {
+            const memberResponse: MemberResponse = {
                 id: response.data.id,
+                email: response.data.email,
                 nickname: response.data.nickname
             };
 
-            store.dispatch('login', memberData);
-            localStorage.setItem('member', JSON.stringify(memberData));
+            saveMemberInfo(memberResponse);
         })
         .catch(error => {
             if (error.response) {
@@ -24,6 +26,11 @@ export const login = function (email: string, password: string) {
                 warningToast("계정이 올바르지 않습니다.");
             }
         });
+}
+
+export const saveMemberInfo = function (memberResponse: MemberResponse) {
+    store.dispatch('login', memberResponse);
+    localStorage.setItem('member', JSON.stringify(memberResponse));
 }
 
 export const logout = function () {
@@ -42,9 +49,8 @@ export const logout = function () {
     });
 };
 
-export const reissue = function() {
-    // 토큰 재발급
-    axiosClient.post("/tokens").then((response) => {
-        return response;
+export const reissue = function(): Promise<MemberResponse> {
+    return axiosClient.post("/tokens").then((response) => {
+        return response.data as MemberResponse;
     });
 }

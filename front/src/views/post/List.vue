@@ -40,7 +40,7 @@ const getPosts = async (page: number, init: boolean) => {
   if (postTotalPage.value !== 0 && page >= postTotalPage.value) return;
 
   try {
-    const response = await axiosClient.get(`/nm/posts?page=${page - 1}&size=10`);
+    const response = await axiosClient.get(`/posts?page=${page - 1}&size=10`);
     postTotalPage.value = response.data.totalPages;
 
     if (init) {
@@ -66,7 +66,7 @@ const getPosts = async (page: number, init: boolean) => {
 // 게시물 업로드
 const writePost = async () => {
   const uploadedImageIds: string[] = await uploadImages();
-  axiosClient.post('/nm/posts', {
+  axiosClient.post('/posts', {
     content: content.value,
     postImageIds: uploadedImageIds,
   }).then(() => {
@@ -89,7 +89,7 @@ const uploadImages = async () => {
       uploadedImageIds.push(image.id as string);
     } else if (image.source === "upload") { // 업로드 될 이미지
       // 직접 업로드한 이미지 -> presigned URL 요청 후 업로드
-      const response = await axiosClient.get(`/nm/images/upload?filename=${image.filename}`);
+      const response = await axiosClient.get(`/images/upload?filename=${image.filename}`);
 
       const { id, uploadUrl } = response.data;
       await axiosClient.put(uploadUrl, dataUrlToBlob(image.url));
@@ -138,7 +138,7 @@ const scrollToPostBottom = (smooth = true) => {
 
 // Provider 가져오기
 const getProviders = async () => {
-  const response = await axiosClient.get(`/nm/images/providers`);
+  const response = await axiosClient.get(`/images/providers`);
   response.data.Provider.forEach((item: string) => {  // Change String to string
     providers.push(item);
   });
@@ -178,7 +178,7 @@ const selectImageFromMasonry = (item: Image) => {
 const getImages = async (pageValue: number) => {
   if (imageTotalPage.value !== 0 && pageValue >= imageTotalPage.value) return;
 
-  const response = await axiosClient.get(`/nm/images?page=${pageValue}&provider=${selectedProvider.value}`);
+  const response = await axiosClient.get(`/images?page=${pageValue}&provider=${selectedProvider.value}`);
   imageTotalPage.value = response.data.totalPages;
 
   const newImages = response.data.content.filter((newImage: Image) => !images.some(image => image.id === newImage.id));

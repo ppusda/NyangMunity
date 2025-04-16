@@ -20,7 +20,7 @@
   onMounted(() => {
     const member = localStorage.getItem('member');
     if (member) {
-      axiosClient.get("/nm/members/check", ).then(response => {
+      axiosClient.get("/members/check").then(response => {
         if (response.data.result) {
           const memberData = {
             id: response.data.memberId,
