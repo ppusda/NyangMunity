@@ -52,7 +52,8 @@ public class Post {
     }
 
     @Builder
-    public Post(String content, Member member, LocalDateTime createDate) {
+    public Post(Long id, String content, Member member, LocalDateTime createDate) {
+        this.id = id;
         this.content = content;
         this.member = member;
         this.createDate = createDate;

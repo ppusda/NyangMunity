@@ -5,9 +5,10 @@ import java.util.List;
 
 @Builder
 public record PostLikeResponse(
-    Long bid,
+    Long id,
     List<PostImageResponse> postImages,
-    String nickName
+    String nickname,
+	String message
 ) {
 
 }

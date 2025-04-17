@@ -10,8 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.global.exception.global.ForbiddenException;
+import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.image.service.ImageService;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.post.editor.PostEditor;
@@ -122,13 +122,19 @@ public class PostService {
     }
 
     public PostLikeResponse maxLikePost() {
-        Post maxLikePost = postLikeRepository.getMaxLikePost();
-
-        return PostLikeResponse.builder()
-                .bid(maxLikePost.getId())
-                .postImages(convertToBoardImageResponse(maxLikePost))
-                .nickName(maxLikePost.getMember().getNickname())
+        try {
+            Post post = postLikeRepository.getMaxLikePost();
+            return PostLikeResponse.builder()
+                .id(post.getId())
+                .postImages(convertToBoardImageResponse(post))
+                .nickname(post.getMember().getNickname())
+                .message("가장 인기 많은 " + post.getMember().getNickname() + "님의 이미지 입니다!")
                 .build();
+        } catch (PostNotFoundException e) {
+            return PostLikeResponse.builder()
+                .message(e.getMessage())
+                .build();
+        }
     }
 
     private Page<PostResponse> convertToBoardResponse(Page<Post> boardPage) {
