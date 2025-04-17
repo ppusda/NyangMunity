@@ -31,7 +31,6 @@ public class TokenController {
 	 * @param principal 접근 토큰 검증을 끝낸 인증 객체
 	 * @return 갱신된 인증 정보
 	 */
-	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public ResponseEntity<MemberInfoResponse> reissue(Principal principal) {
 		if (principal != null) {

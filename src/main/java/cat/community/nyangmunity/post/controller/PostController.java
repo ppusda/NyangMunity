@@ -33,19 +33,20 @@ public class PostController {
     private final MemberService memberService;
     private final PostService postService;
 
-    @PostMapping
-    public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
-        postService.write(postWriteRequest, memberService.findMemberById(Long.parseLong(principal.getName())));
-    }
-
-    @GetMapping("/{postId}")
-    public PostResponse readPost(@PathVariable(name = "postId") Long id) {
-        return postService.read(id);
-    }
-
     @GetMapping
     public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest){
         return postService.getList(postsRequest.getPage(), postsRequest.getSize());
+    }
+
+    @GetMapping("/likes")
+    public PostLikeResponse maxLikePost() {
+        return postService.maxLikePost();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping
+    public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
+        postService.write(postWriteRequest, memberService.findMemberById(Long.parseLong(principal.getName())));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -70,10 +71,5 @@ public class PostController {
     @PostMapping("/like/check/{postId}")
     public boolean postLikeCheck(@PathVariable(name = "postId") Long bid, Principal principal){
         return postService.likeCheck(bid, Long.parseLong(principal.getName()));
-    }
-
-    @PostMapping("/like")
-    public PostLikeResponse maxLikePost() {
-        return postService.maxLikePost();
     }
 }

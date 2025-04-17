@@ -55,6 +55,11 @@ public class MemberController {
                 .body(memberAuthenticationResponse.memberInfoResponse());
     }
 
+    @PostMapping("/logout")
+    private void logout(Principal principal) {
+        memberService.logout(principal.getName());
+    }
+
     @GetMapping("/check")
     private MemberCheckResponse loginCheck(Principal principal) {
         if (principal != null) {
@@ -90,10 +95,5 @@ public class MemberController {
     @PostMapping("/cancel")
     private void cancel(Principal principal) {
         memberService.cancel(Long.parseLong(principal.getName()));
-    }
-
-    @PostMapping("/logout")
-    private void logout(Principal principal) {
-        memberService.logout(principal.getName());
     }
 }
