@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import {useCookies} from "vue3-cookies";
 import {warningToast} from "@/libs/toaster";
-import {logout, reissue} from "@/utils/account";
+import {logout, reissue, saveMemberInfo} from "@/utils/account";
 
 const { cookies } = useCookies();
 
@@ -48,54 +48,21 @@ axiosClient.interceptors.response.use(
       if (error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true; // 재요청 플래그 설정
 
-        const reissueResponse = reissue(); // 토큰 재발급
+        const reissueResponse = await reissue(); // 토큰 재발급
         if (reissueResponse) {
-          axios.defaults.headers.common['Authorization'] = `${reissueResponse}`; // 새 토큰으로 헤더 설정
-          originalRequest.headers['Authorization'] = `${reissueResponse}`; // 현재 요청에도 새 토큰 설정
-
+          saveMemberInfo(reissueResponse);
           return axiosClient(originalRequest); // 요청 재실행
         }
       }
 
       if (error.response) {
+        // 에러 메시지 처리
         const errorData = error.response.data;
-        if (errorData.validMessages !== null) {
-          if (errorData.validMessages.username) {
-            warningToast(errorData.validMessages.username);
-            return Promise.reject(error);
-          }
-
-          if (errorData.validMessages.nickname) {
-            warningToast(errorData.validMessages.nickname);
-            return Promise.reject(error);
-          }
-
-          if (errorData.validMessages.password) {
-            warningToast(errorData.validMessages.password);
-            return Promise.reject(error);
-          }
-
-          if (errorData.validMessages.newPassword) {
-            warningToast(errorData.validMessages.newPassword);
-            return Promise.reject(error);
-          }
-
-          if (errorData.validMessages.newPasswordCheck) {
-            warningToast(errorData.validMessages.newPasswordCheck);
-            return Promise.reject(error);
-          }
-
-          if (errorData.validMessages.email) {
-            warningToast(errorData.validMessages.email);
-            return Promise.reject(error);
-          }
-        }
-        // 기타 에러 메시지 처리
         warningToast(errorData.message);
         return Promise.reject(error);
       } else {
-        // 네트워크 에러 등 기타 에러 처리
-        warningToast("네트워크 오류가 발생했습니다.");
+        // 기타 에러 발생 시
+        warningToast("예기치 못한 오류가 발생했습니다.");
       }
 
       return Promise.reject(error);

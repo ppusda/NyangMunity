@@ -7,6 +7,13 @@ export interface Post {
     writer: string;
 }
 
+export interface PostLike {
+    id: string|null;
+    postImages: Array<PostImage>|null;
+    nickname: string|null;
+    message: string;
+}
+
 export interface PostImage {
     id: string | null;
     url: string;

@@ -29,9 +29,6 @@
           };
 
           store.dispatch('login', memberData);
-        } else { // 토큰 재검증 및 로그인 갱신 필요
-          warningToast("재검증 필요.");
-          store.dispatch('logout');
         }
       }).catch(() => {
         warningToast("로그인이 만료되었습니다.");
