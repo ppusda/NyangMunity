@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import type {Member} from "@/interfaces/type";
 import axiosClient from "@/libs/axiosClient";
+import store from "@/stores/store";
 
 let member = reactive<Member>({
   id: "",
@@ -18,6 +19,9 @@ const newPassword = ref("");
 const newPasswordChk = ref("");
 
 const router = useRouter();
+
+const email = computed(() => store.state.email);
+const nickname = computed(() => store.state.nickname);
 
 const userEdit = function () {
   if(newPassword.value !== newPasswordChk.value){
@@ -63,14 +67,21 @@ const cancelUser = function () {
 };
 
 onMounted(async () => {
+  if (email.value && nickname.value) {
+    member.email = email.value;
+    member.nickname = nickname.value;
+  } else {
     await axiosClient.get("/members/profile").then(response => {
       member = response.data;
+      console.log(member);
     }).catch(error => {
       if(error.response) {
         alert(error.response.data.message);
         router.replace({name: "main"});
       }
     });
+  }
+
 });
 
 </script>

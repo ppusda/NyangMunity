@@ -5,7 +5,7 @@ import {logout} from "@/utils/account";
 
 const store = useStore();
 
-const isLogin = computed(() => !!store.state.memberId);
+const isLogin = computed(() => store.state.isLogin);
 const nickname = computed(() => store.state.nickname);
 
 </script>
