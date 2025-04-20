@@ -54,3 +54,11 @@ export const reissue = function(): Promise<MemberResponse> {
         return response.data as MemberResponse;
     });
 }
+
+export const isTokenExist = function (): Boolean {
+    if (cookies.get("accessToken") || cookies.get("refreshToken")) {
+        return true;
+    }
+
+    return false;
+}

@@ -6,34 +6,21 @@
 </template>
 
 <script setup lang="ts">
-  import {warningToast} from "@/libs/toaster";
   import {onMounted} from "vue";
-  import {logout} from "@/utils/account";
-
-  import store from "@/stores/store";
+  import {isTokenExist, logout, saveMemberInfo} from "@/utils/account";
 
   import Header from "@/components/Header.vue";
   import "./assets/main.css";
-  import axiosClient from "@/libs/axiosClient";
+  import {warningToast} from "@/libs/toaster";
 
 
   onMounted(() => {
-    const member = localStorage.getItem('member');
-    if (member) {
-      axiosClient.get("/members/check").then(response => {
-        if (response.data.result) {
-          const memberData = {
-            id: response.data.memberId,
-            nickname: response.data.nickname,
-            isLogin: true
-          };
-
-          store.dispatch('login', memberData);
-        }
-      }).catch(() => {
-        warningToast("로그인이 만료되었습니다.");
-        logout();
-      });
+    if (isTokenExist()) {
+      const memberInfo = localStorage.getItem("member");
+      saveMemberInfo(JSON.parse(memberInfo!!));
+    } else {
+      logout();
+      warningToast("토큰이 만료되었습니다.")
     }
   });
 </script>
