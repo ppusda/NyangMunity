@@ -14,26 +14,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostLikeRepositoryImpl implements PostLikeRepositoryCustom {
 
-    private final JPAQueryFactory jpaQueryFactory;
+	private final JPAQueryFactory jpaQueryFactory;
 
-    @Override
-    public Post getMaxLikePost() {
-        QPost post = QPost.post;
-        QPostLike postLike = QPostLike.postLike;
+	@Override
+	public Post getMaxLikePost() {
+		QPost post = QPost.post;
+		QPostLike postLike = QPostLike.postLike;
 
-        LocalDateTime week = LocalDateTime.now().minusWeeks(1);
+		LocalDateTime week = LocalDateTime.now().minusWeeks(1);
 
-        Post maxLikePost = jpaQueryFactory
-            .selectFrom(post)
-            .leftJoin(post.likes, postLike)
-            .where(post.createDate.between(week, LocalDateTime.now()),
-                    post.createDate.after(week))
-            .groupBy(post.id)
-            .orderBy(postLike.id.count().desc())
-            .limit(1)
-            .fetchOne();
+		Post maxLikePost = jpaQueryFactory
+			.selectFrom(post)
+			.leftJoin(post.likes, postLike)
+			.where(post.createDate.between(week, LocalDateTime.now()),
+				post.createDate.after(week))
+			.groupBy(post.id)
+			.orderBy(postLike.id.count().desc())
+			.limit(1)
+			.fetchOne();
 
-        return Optional.ofNullable(maxLikePost)
-            .orElseThrow(() -> new PostNotFoundException("이번 주의 인기 이미지가 없습니다!"));
-    }
+		return Optional.ofNullable(maxLikePost)
+			.orElseThrow(() -> new PostNotFoundException("이번 주의 인기 이미지가 없습니다!"));
+	}
 }

@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cat.community.nyangmunity.member.service.MemberService;
 import cat.community.nyangmunity.post.request.PostEditRequest;
 import cat.community.nyangmunity.post.request.PostWriteRequest;
 import cat.community.nyangmunity.post.request.PostsRequest;
-import cat.community.nyangmunity.post.response.PostResponse;
 import cat.community.nyangmunity.post.response.PostLikeResponse;
+import cat.community.nyangmunity.post.response.PostResponse;
 import cat.community.nyangmunity.post.service.PostService;
-import cat.community.nyangmunity.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -30,46 +30,47 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final MemberService memberService;
-    private final PostService postService;
+	private final MemberService memberService;
+	private final PostService postService;
 
-    @GetMapping
-    public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest){
-        return postService.getList(postsRequest.getPage(), postsRequest.getSize());
-    }
+	@GetMapping
+	public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest) {
+		return postService.getList(postsRequest.getPage(), postsRequest.getSize());
+	}
 
-    @GetMapping("/likes")
-    public PostLikeResponse maxLikePost() {
-        return postService.maxLikePost();
-    }
+	@GetMapping("/likes")
+	public PostLikeResponse maxLikePost() {
+		return postService.maxLikePost();
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping
-    public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
-        postService.write(postWriteRequest, memberService.findMemberById(Long.parseLong(principal.getName())));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping
+	public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
+		postService.write(postWriteRequest, memberService.findMemberById(Long.parseLong(principal.getName())));
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/{postId}")
-    public void editPost(@PathVariable Long postId, @ModelAttribute @Valid PostEditRequest postEditRequest, Principal principal) {
-        postService.edit(postId, postEditRequest, Long.parseLong(principal.getName()));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PatchMapping("/{postId}")
+	public void editPost(@PathVariable Long postId, @ModelAttribute @Valid PostEditRequest postEditRequest,
+		Principal principal) {
+		postService.edit(postId, postEditRequest, Long.parseLong(principal.getName()));
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable Long postId, Principal principal) {
-        postService.delete(postId, Long.parseLong(principal.getName()));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@DeleteMapping("/{postId}")
+	public void deletePost(@PathVariable Long postId, Principal principal) {
+		postService.delete(postId, Long.parseLong(principal.getName()));
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/like/{postId}")
-    public void postLike(@PathVariable(name = "postId") Long bid, Principal principal){
-        postService.like(bid, memberService.findMemberById(Long.parseLong(principal.getName())));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/like/{postId}")
+	public void postLike(@PathVariable(name = "postId") Long bid, Principal principal) {
+		postService.like(bid, memberService.findMemberById(Long.parseLong(principal.getName())));
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/like/check/{postId}")
-    public boolean postLikeCheck(@PathVariable(name = "postId") Long bid, Principal principal){
-        return postService.likeCheck(bid, Long.parseLong(principal.getName()));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/like/check/{postId}")
+	public boolean postLikeCheck(@PathVariable(name = "postId") Long bid, Principal principal) {
+		return postService.likeCheck(bid, Long.parseLong(principal.getName()));
+	}
 }

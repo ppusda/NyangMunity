@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record MemberAuthenticationResponse(
-        MemberInfoResponse memberInfoResponse,
-        MemberTokens memberTokens
+	MemberInfoResponse memberInfoResponse,
+	MemberTokens memberTokens
 ) {
 
 }

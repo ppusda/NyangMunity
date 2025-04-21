@@ -24,29 +24,29 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ImageBatchConfig {
 
-    // TODO: 향후 이미지 개수 늘려 수집 진행하면 CHUNK 범위 조정하며 적정 값 잧기
-    private final static int CHUNK_SIZE = 50;
+	// TODO: 향후 이미지 개수 늘려 수집 진행하면 CHUNK 범위 조정하며 적정 값 잧기
+	private final static int CHUNK_SIZE = 50;
 
-    @Bean(name = "imageBatchJob")
-    public Job imageJob(JobRepository jobRepository, Step step) {
-        return new JobBuilder("imageBatchJob", jobRepository)
-                .start(step)
-                .build();
-    }
+	@Bean(name = "imageBatchJob")
+	public Job imageJob(JobRepository jobRepository, Step step) {
+		return new JobBuilder("imageBatchJob", jobRepository)
+			.start(step)
+			.build();
+	}
 
-    @Bean
-    public Step getCatImageStep(
-            JobRepository jobRepository,
-            PlatformTransactionManager platformTransactionManager,
-            ImageBatchReader imageBatchReader,
-            ImageBatchProcessor imageBatchProcessor,
-            ImageBatchWriter imageBatchwriter
-    ){
-        return new StepBuilder("getCatImages", jobRepository)
-                .<List<TenorResponse>, List<Image>>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(imageBatchReader)
-                .processor(imageBatchProcessor)
-                .writer(imageBatchwriter)
-                .build();
-    }
+	@Bean
+	public Step getCatImageStep(
+		JobRepository jobRepository,
+		PlatformTransactionManager platformTransactionManager,
+		ImageBatchReader imageBatchReader,
+		ImageBatchProcessor imageBatchProcessor,
+		ImageBatchWriter imageBatchwriter
+	) {
+		return new StepBuilder("getCatImages", jobRepository)
+			.<List<TenorResponse>, List<Image>>chunk(CHUNK_SIZE, platformTransactionManager)
+			.reader(imageBatchReader)
+			.processor(imageBatchProcessor)
+			.writer(imageBatchwriter)
+			.build();
+	}
 }

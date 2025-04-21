@@ -24,7 +24,7 @@ const email = computed(() => store.state.email);
 const nickname = computed(() => store.state.nickname);
 
 const userEdit = function () {
-  if(newPassword.value !== newPasswordChk.value){
+  if (newPassword.value !== newPasswordChk.value) {
     alert("비밀번호가 다릅니다.")
   } else {
     formData.append("pwdCheck", pwdCheck.value);
@@ -38,7 +38,7 @@ const userEdit = function () {
 
         axiosClient.post("/members/edit", formData).then(() => {
           alert("정보 수정이 완료되었습니다.");
-          router.replace({ name: "main" }).then(() => router.go(0));
+          router.replace({name: "main"}).then(() => router.go(0));
         });
       } else {
         alert("비밀번호가 올바르지 않습니다.");
@@ -52,14 +52,14 @@ const cancelUser = function () {
   axiosClient.post("/members/pwdCheck", formData).then(response => {
     if (response.data) {
       alert("냥뮤니티를 이용해주셔서 감사했습니다.");
-      axiosClient.post("/members/cancel", ).then(() => {
-        router.replace({ name: "main" }).then(() => router.go(0));
+      axiosClient.post("/members/cancel",).then(() => {
+        router.replace({name: "main"}).then(() => router.go(0));
       });
     } else {
       alert("비밀번호가 올바르지 않습니다.");
     }
   }).catch(error => {
-    if(error.response) {
+    if (error.response) {
       alert(error.response.data.message);
       router.replace({name: "main"});
     }
@@ -75,7 +75,7 @@ onMounted(async () => {
       member = response.data;
       console.log(member);
     }).catch(error => {
-      if(error.response) {
+      if (error.response) {
         alert(error.response.data.message);
         router.replace({name: "main"});
       }
@@ -90,13 +90,13 @@ onMounted(async () => {
     <div class="bg-zinc-800 p-6 rounded-md sm:w-[30rem] w-[32rem]">
       <div class="text-center mb-6">
         <h3 class="text-2xl font-bold text-white">User info</h3>
-        <hr class="border-gray-600 mt-3" />
+        <hr class="border-gray-600 mt-3"/>
       </div>
 
       <div class="flex flex-col items-center mb-6">
         <img class="w-24 h-24 rounded-full object-cover mb-2"
              src="/assets/images/cat_loading.gif"
-             @mousedown.prevent />
+             @mousedown.prevent/>
         <button class="btn btn-outline btn-ghost text-sm text-white px-4 py-1 rounded-md">
           파일 업로드하기
         </button>
@@ -105,7 +105,7 @@ onMounted(async () => {
       <div class="flex flex-col space-y-4">
         <div class="flex flex-row items-center">
           <label class="text-white w-32">이메일 :</label>
-          <p id="email" class="text-white flex-1">{{member.email}}</p>
+          <p id="email" class="text-white flex-1">{{ member.email }}</p>
         </div>
 
         <div class="flex flex-row items-center">
@@ -124,7 +124,7 @@ onMounted(async () => {
               class="flex-1 input input-bordered border-zinc-500 bg-zinc-900 p-2 rounded-md text-white"
               v-model="newPassword"
               id="newPassword"
-              type="password" />
+              type="password"/>
         </div>
 
         <div class="flex flex-row items-center">
@@ -133,7 +133,7 @@ onMounted(async () => {
               class="flex-1 input input-bordered border-zinc-500 bg-zinc-900 p-2 rounded-md text-white"
               v-model="newPasswordChk"
               id="newPasswordChk"
-              type="password" />
+              type="password"/>
         </div>
 
         <div class="pt-4 border-t border-gray-600">
@@ -142,7 +142,7 @@ onMounted(async () => {
               type="password"
               placeholder="현재 비밀번호 입력"
               v-model="pwdCheck"
-              class="input input-bordered border-zinc-500 bg-zinc-900 w-full p-2 rounded-md text-white mb-4" />
+              class="input input-bordered border-zinc-500 bg-zinc-900 w-full p-2 rounded-md text-white mb-4"/>
 
           <div class="flex justify-center gap-3">
             <button

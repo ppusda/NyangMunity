@@ -4,5 +4,5 @@ import cat.community.nyangmunity.post.entity.Post;
 
 public interface PostLikeRepositoryCustom {
 
-    Post getMaxLikePost();
+	Post getMaxLikePost();
 }

@@ -19,22 +19,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageController {
 
-    private final ImageService imageService;
+	private final ImageService imageService;
 
-    @GetMapping
-    public Page<ImageResponse> getImages(@RequestParam int page, @RequestParam Provider provider) {
-        return imageService.getImageList(page, provider);
-    }
+	@GetMapping
+	public Page<ImageResponse> getImages(@RequestParam int page, @RequestParam Provider provider) {
+		return imageService.getImageList(page, provider);
+	}
 
-    @GetMapping("/providers")
-    public ProviderResponse getProviderList() {
-        return new ProviderResponse(Provider.getProviderNames());
-    }
+	@GetMapping("/providers")
+	public ProviderResponse getProviderList() {
+		return new ProviderResponse(Provider.getProviderNames());
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/upload")
-    public UploadImageResponse getUploadURL(@RequestParam(name = "filename") String filename) {
-        return imageService.createImageInfo(filename);
-    }
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/upload")
+	public UploadImageResponse getUploadURL(@RequestParam(name = "filename") String filename) {
+		return imageService.createImageInfo(filename);
+	}
 
 }

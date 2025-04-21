@@ -53,7 +53,7 @@ axiosClient.get("/posts/likes").then((response) => {
               </router-link>
             </div>
             <div v-else class="w-4/6 text-center">
-              <img class="rounded-2xl" src="/assets/images/cat_loading.gif" />
+              <img class="rounded-2xl" src="/assets/images/cat_loading.gif"/>
               <p class="py-3">{{ likePost.message }}</p>
               <p class="btn btn-outline btn-ghost">
                 메인 페이지의 주인공에 도전해보세요!

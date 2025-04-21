@@ -23,53 +23,54 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+	private final JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = getTokenFromRequest(request, "accessToken");
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+		FilterChain filterChain) throws ServletException, IOException {
+		String accessToken = getTokenFromRequest(request, "accessToken");
 
-        if (!StringUtils.hasText(accessToken)) { // AccessToken 이 존재하지 않을 때
-            filterChain.doFilter(request, response);
-            return;
-        }
+		if (!StringUtils.hasText(accessToken)) { // AccessToken 이 존재하지 않을 때
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        if (StringUtils.hasText(accessToken)) {
-            JwtValidateStatus validateStatus = jwtTokenProvider.validateToken(accessToken);
+		if (StringUtils.hasText(accessToken)) {
+			JwtValidateStatus validateStatus = jwtTokenProvider.validateToken(accessToken);
 
-            switch (validateStatus) {
-                case DENIED -> {
-                    SecurityContextHolder.clearContext();
-                    throw new UnauthorizedException("올바르지 않은 토큰입니다.");
-                }
-                case EXPIRED -> {
-                    SecurityContextHolder.clearContext();
-                    throw new UnauthorizedException("토큰이 만료되었습니다.");
-                }
-                case ACCEPTED -> {
-                    Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-                default -> throw new InternalServerErrorException();
-            }
-        }
+			switch (validateStatus) {
+				case DENIED -> {
+					SecurityContextHolder.clearContext();
+					throw new UnauthorizedException("올바르지 않은 토큰입니다.");
+				}
+				case EXPIRED -> {
+					SecurityContextHolder.clearContext();
+					throw new UnauthorizedException("토큰이 만료되었습니다.");
+				}
+				case ACCEPTED -> {
+					Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+				}
+				default -> throw new InternalServerErrorException();
+			}
+		}
 
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 
-    private static String getTokenFromRequest(HttpServletRequest request, String tokenName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(tokenName)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
+	private static String getTokenFromRequest(HttpServletRequest request, String tokenName) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(tokenName)) {
+					return cookie.getValue();
+				}
+			}
+		}
+		return null;
+	}
 
 }

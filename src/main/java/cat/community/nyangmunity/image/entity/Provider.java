@@ -10,14 +10,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Provider {
-    NYANGMUNITY("Nyangmunity"),
-    TENOR("Tenor");
+	NYANGMUNITY("Nyangmunity"),
+	TENOR("Tenor");
 
-    private final String provider;
+	private final String provider;
 
-    public static List<String> getProviderNames() {
-        return Arrays.stream(Provider.values())
-            .map(Provider::getProvider)
-            .collect(Collectors.toList());
-    }
+	public static List<String> getProviderNames() {
+		return Arrays.stream(Provider.values())
+			.map(Provider::getProvider)
+			.collect(Collectors.toList());
+	}
 }

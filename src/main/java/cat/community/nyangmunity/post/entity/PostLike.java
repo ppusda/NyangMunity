@@ -11,25 +11,26 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity @Getter
+@Entity
+@Getter
 @NoArgsConstructor
 public class PostLike {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+	@ManyToOne
+	@JoinColumn(name = "post_id")
+	private Post post;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+	@ManyToOne
+	@JoinColumn(name = "member_id")
+	private Member member;
 
-    @Builder
-    public PostLike(Post post, Member member) {
-        this.post = post;
-        this.member = member;
-    }
+	@Builder
+	public PostLike(Post post, Member member) {
+		this.post = post;
+		this.member = member;
+	}
 }

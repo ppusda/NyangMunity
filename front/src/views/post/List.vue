@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref } from 'vue';
-import { warningToast, infoToast } from '@/libs/toaster';
+import {nextTick, onMounted, reactive, ref} from 'vue';
+import {infoToast, warningToast} from '@/libs/toaster';
 
 import MasonryGrid from "@/components/MasonryGrid.vue";
 import PostChat from "@/components/PostChat.vue";
 
-import type {Post, Image} from '@/interfaces/type';
+import type {Image, Post} from '@/interfaces/type';
 
 import 'vue3-toastify/dist/index.css';
 import axiosClient from "@/libs/axiosClient";
 
 // 이미지 제공자 상태
 const providers = reactive<string[]>([]);
-const selectedProvider = reactive({ value: "Nyangmunity" });
+const selectedProvider = reactive({value: "Nyangmunity"});
 
 // 게시물 및 페이지네이션 상태
 const posts = reactive<Post[]>([]);
-const postPage = reactive({ value: 1 });
-const postTotalPage = reactive({ value: 0 });
+const postPage = reactive({value: 1});
+const postTotalPage = reactive({value: 0});
 const postContainerRef = ref<HTMLElement | null>(null);
 const postChatRef = ref(null);
 
@@ -26,8 +26,8 @@ const content = ref<string>("");
 
 // 이미지 및 페이지네이션 상태
 const images = reactive<Image[]>([]);
-const imagePage = reactive({ value: 0 });
-const imageTotalPage = reactive({ value: 0 });
+const imagePage = reactive({value: 0});
+const imageTotalPage = reactive({value: 0});
 
 // 업로드 이미지
 const uploadImageList = reactive<Image[]>([]);
@@ -91,7 +91,7 @@ const uploadImages = async () => {
       // 직접 업로드한 이미지 -> presigned URL 요청 후 업로드
       const response = await axiosClient.get(`/images/upload?filename=${image.filename}`);
 
-      const { id, uploadUrl } = response.data;
+      const {id, uploadUrl} = response.data;
       await axiosClient.put(uploadUrl, dataUrlToBlob(image.url));
 
       // 업로드 완료 후 서버에 저장된 이미지 ID 수집
@@ -113,7 +113,7 @@ const dataUrlToBlob = (dataUrl: string) => {
     u8arr[n] = bstr.charCodeAt(n);
   }
 
-  return new Blob([u8arr], { type: mime });
+  return new Blob([u8arr], {type: mime});
 };
 
 
@@ -278,10 +278,13 @@ onMounted(() => {
         <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
       </div>
       <div class="flex flex-row py-2">
-        <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">{{ provider }}</button>
+        <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">
+          {{ provider }}
+        </button>
       </div>
-      <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom" @scroll="handleImageScroll">
-        <MasonryGrid :images="images" @select-image="selectImageFromMasonry" />
+      <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom"
+           @scroll="handleImageScroll">
+        <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
       </div>
     </div>
 
@@ -309,7 +312,7 @@ onMounted(() => {
             />
             <div v-if="uploadImageList.length" class="flex flex-wrap gap-2">
               <div v-for="(img, index) in uploadImageList" :key="index" class="relative w-20 h-20">
-                <img :src="img.url" class="w-full h-full object-cover rounded-md" />
+                <img :src="img.url" class="w-full h-full object-cover rounded-md"/>
                 <button
                     @click.stop="removeUploadImage(img)"
                     class="absolute top-0 right-0 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
@@ -327,10 +330,11 @@ onMounted(() => {
         <div class="flex flex-row mt-2">
           <!-- 입력창 영역 -->
           <div class="bg-zinc-800 rounded-md w-full h-full p-2">
-            <textarea v-model:="content" placeholder="간단한 설명을 입력해주세요." maxlength="100" class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-full resize-none"></textarea>
+            <textarea v-model:="content" placeholder="간단한 설명을 입력해주세요." maxlength="100"
+                      class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-full resize-none"></textarea>
           </div>
           <div class="h-full p-2">
-            <button @click="writePost" class="btn btn-ghost border h-full border-gray-400"> ↵ </button>
+            <button @click="writePost" class="btn btn-ghost border h-full border-gray-400"> ↵</button>
           </div>
         </div>
       </div>

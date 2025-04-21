@@ -5,7 +5,7 @@ import store from "@/stores/store";
 import axiosClient from "@/libs/axiosClient";
 import type {MemberResponse} from "@/interfaces/type";
 
-const { cookies } = useCookies();
+const {cookies} = useCookies();
 
 export const login = function (email: string, password: string) {
     // 로그인 (서버 측 토큰 생성)
@@ -49,7 +49,7 @@ export const logout = function () {
     });
 };
 
-export const reissue = function(): Promise<MemberResponse> {
+export const reissue = function (): Promise<MemberResponse> {
     return axiosClient.post("/tokens").then((response) => {
         return response.data as MemberResponse;
     });

@@ -5,16 +5,16 @@ import lombok.Builder;
 
 @Builder
 public record MemberInfoResponse(
-        Long id,
-        String nickname,
-        String email
+	Long id,
+	String nickname,
+	String email
 ) {
 
-    public static MemberInfoResponse from(Member member) {
-        return MemberInfoResponse.builder()
-            .id(member.getId())
-            .nickname(member.getNickname())
-            .email(member.getEmail())
-            .build();
-    }
+	public static MemberInfoResponse from(Member member) {
+		return MemberInfoResponse.builder()
+			.id(member.getId())
+			.nickname(member.getNickname())
+			.email(member.getEmail())
+			.build();
+	}
 }

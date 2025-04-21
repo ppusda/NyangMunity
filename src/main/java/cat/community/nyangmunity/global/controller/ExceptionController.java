@@ -15,29 +15,29 @@ import cat.community.nyangmunity.global.response.ErrorResponse;
 @RestControllerAdvice
 public class ExceptionController {
 
-    @ResponseBody
-    @ExceptionHandler(NyangmunityException.class)
-    public ResponseEntity<ErrorResponse> globalResponseException(NyangmunityException e) {
-        int statusCode = e.getStatusCode();
+	@ResponseBody
+	@ExceptionHandler(NyangmunityException.class)
+	public ResponseEntity<ErrorResponse> globalResponseException(NyangmunityException e) {
+		int statusCode = e.getStatusCode();
 
-        ErrorResponse body = ErrorResponse.builder()
-                .code(String.valueOf(statusCode))
-                .message(e.getMessage())
-                .validation(e.getValidation())
-                .build();
+		ErrorResponse body = ErrorResponse.builder()
+			.code(String.valueOf(statusCode))
+			.message(e.getMessage())
+			.validation(e.getValidation())
+			.build();
 
-        ResponseEntity<ErrorResponse> response = ResponseEntity.status(statusCode)
-                .body(body);
+		ResponseEntity<ErrorResponse> response = ResponseEntity.status(statusCode)
+			.body(body);
 
-        return response;
-    }
+		return response;
+	}
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-            errors.put("message", error.getDefaultMessage())
-        );
-        return ResponseEntity.badRequest().body(errors);
-    }
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		Map<String, String> errors = new HashMap<>();
+		ex.getBindingResult().getFieldErrors().forEach(error ->
+			errors.put("message", error.getDefaultMessage())
+		);
+		return ResponseEntity.badRequest().body(errors);
+	}
 }

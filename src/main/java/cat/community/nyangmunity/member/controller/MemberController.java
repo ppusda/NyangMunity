@@ -31,69 +31,69 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberService memberService;
-    private final CookieProvider cookieProvider;
+	private final MemberService memberService;
+	private final CookieProvider cookieProvider;
 
-    @PostMapping("/join")
-    private void memberJoin(@RequestBody @Valid JoinRequest joinRequest) {
-        memberService.join(joinRequest);
-    }
+	@PostMapping("/join")
+	private void memberJoin(@RequestBody @Valid JoinRequest joinRequest) {
+		memberService.join(joinRequest);
+	}
 
-    @PostMapping("/login")
-    private ResponseEntity<MemberInfoResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
-        MemberAuthenticationResponse memberAuthenticationResponse = memberService.login(loginRequest);
+	@PostMapping("/login")
+	private ResponseEntity<MemberInfoResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
+		MemberAuthenticationResponse memberAuthenticationResponse = memberService.login(loginRequest);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, String.valueOf(
-                        cookieProvider.createAccessTokenCookie(memberAuthenticationResponse.memberTokens()
-                                .accessToken())
-                ))
-                .header(HttpHeaders.SET_COOKIE, String.valueOf(
-                        cookieProvider.createRefreshTokenCookie(memberAuthenticationResponse.memberTokens()
-                                .refreshToken())
-                ))
-                .body(memberAuthenticationResponse.memberInfoResponse());
-    }
+		return ResponseEntity.ok()
+			.header(HttpHeaders.SET_COOKIE, String.valueOf(
+				cookieProvider.createAccessTokenCookie(memberAuthenticationResponse.memberTokens()
+					.accessToken())
+			))
+			.header(HttpHeaders.SET_COOKIE, String.valueOf(
+				cookieProvider.createRefreshTokenCookie(memberAuthenticationResponse.memberTokens()
+					.refreshToken())
+			))
+			.body(memberAuthenticationResponse.memberInfoResponse());
+	}
 
-    @PostMapping("/logout")
-    private void logout(Principal principal) {
-        memberService.logout(principal.getName());
-    }
+	@PostMapping("/logout")
+	private void logout(Principal principal) {
+		memberService.logout(principal.getName());
+	}
 
-    @GetMapping("/check")
-    private MemberCheckResponse loginCheck(Principal principal) {
-        if (principal != null) {
-            Member member = memberService.findMemberById(Long.parseLong(principal.getName()));
+	@GetMapping("/check")
+	private MemberCheckResponse loginCheck(Principal principal) {
+		if (principal != null) {
+			Member member = memberService.findMemberById(Long.parseLong(principal.getName()));
 
-            return MemberCheckResponse.builder()
-                .memberId(member.getId())
-                .nickname(member.getNickname())
-                .result(true)
+			return MemberCheckResponse.builder()
+				.memberId(member.getId())
+				.nickname(member.getNickname())
+				.result(true)
 				.build();
-        }
+		}
 
-        return MemberCheckResponse.builder()
-                .result(false)
-                .build();
-    }
+		return MemberCheckResponse.builder()
+			.result(false)
+			.build();
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/profile")
-    private MemberInfoResponse info(Principal principal) {
-        return MemberInfoResponse.from(
-                memberService.findMemberById(Long.parseLong(principal.getName()))
-        );
-    }
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/profile")
+	private MemberInfoResponse info(Principal principal) {
+		return MemberInfoResponse.from(
+			memberService.findMemberById(Long.parseLong(principal.getName()))
+		);
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping("/profile")
-    private void edit(@RequestBody @Valid MemberEditForm memberEditForm, Principal principal) {
-        memberService.edit(memberEditForm, Long.parseLong(principal.getName()));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PutMapping("/profile")
+	private void edit(@RequestBody @Valid MemberEditForm memberEditForm, Principal principal) {
+		memberService.edit(memberEditForm, Long.parseLong(principal.getName()));
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/cancel")
-    private void cancel(Principal principal) {
-        memberService.cancel(Long.parseLong(principal.getName()));
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/cancel")
+	private void cancel(Principal principal) {
+		memberService.cancel(Long.parseLong(principal.getName()));
+	}
 }

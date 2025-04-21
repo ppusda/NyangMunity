@@ -1,12 +1,13 @@
 package cat.community.nyangmunity;
 
-import cat.community.nyangmunity.global.config.AppConfig;
-import cat.community.nyangmunity.image.config.TenorConfig;
-import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import cat.community.nyangmunity.global.config.AppConfig;
+import cat.community.nyangmunity.image.config.TenorConfig;
+import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
 
 @EnableScheduling
 @SpringBootApplication

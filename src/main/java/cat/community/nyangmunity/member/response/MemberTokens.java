@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record MemberTokens(
-        String accessToken,
-        String refreshToken
+	String accessToken,
+	String refreshToken
 ) {
 
 }

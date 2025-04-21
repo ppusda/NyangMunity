@@ -12,7 +12,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity @Getter
+@Entity
+@Getter
 @NoArgsConstructor
 public class PostImage {
 

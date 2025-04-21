@@ -12,6 +12,7 @@ import cat.community.nyangmunity.image.entity.Provider;
 public interface ImageRepository extends JpaRepository<Image, String> {
 
 	Page<Image> findAllByProvider(Pageable pageable, Provider provider);
+
 	List<Image> findAllByIdIn(List<String> ids);
 
 }

@@ -8,9 +8,9 @@ export interface Post {
 }
 
 export interface PostLike {
-    id: string|null;
-    postImages: Array<PostImage>|null;
-    nickname: string|null;
+    id: string | null;
+    postImages: Array<PostImage> | null;
+    nickname: string | null;
     message: string;
 }
 
@@ -38,4 +38,4 @@ export interface MemberResponse {
     id: string;
     email: string;
     nickname: string;
-};
+}

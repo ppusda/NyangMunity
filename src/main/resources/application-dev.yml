@@ -17,4 +17,4 @@ jwt:
   refresh-token-expiration: 10800000 # 3시간
 
 kakao:
-  redirect-uri: "http://localhost:8080/nm/user/kakaoLogin"
+  redirect-uri: "http://localhost:8080/user/kakaoLogin"

@@ -35,120 +35,120 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final ImageService imageService;
+	private final ImageService imageService;
 
-    private final PostRepository postRepository;
-    private final PostLikeRepository postLikeRepository;
-    private final PostImageRepository postImageRepository;
+	private final PostRepository postRepository;
+	private final PostLikeRepository postLikeRepository;
+	private final PostImageRepository postImageRepository;
 
-    public Post getBoard(Long bid) {
-        return postRepository.findById(bid).orElseThrow(PostNotFoundException::new);
-    }
+	public Post getBoard(Long bid) {
+		return postRepository.findById(bid).orElseThrow(PostNotFoundException::new);
+	}
 
-    @Transactional
-    public void write(PostWriteRequest postWriteRequest, Member member){
-        Post savedPost = postRepository.save(
-            Post.builder()
-                .content(postWriteRequest.content())
-                .member(member)
-                .createDate(LocalDateTime.now())
-                .build()
-        );
+	@Transactional
+	public void write(PostWriteRequest postWriteRequest, Member member) {
+		Post savedPost = postRepository.save(
+			Post.builder()
+				.content(postWriteRequest.content())
+				.member(member)
+				.createDate(LocalDateTime.now())
+				.build()
+		);
 
-        List<PostImage> postImages = imageService.findPostImagesByIds(postWriteRequest.postImageIds());
-        savedPost.updatePostImages(postImages);
-        postImageRepository.saveAll(postImages);
-    }
+		List<PostImage> postImages = imageService.findPostImagesByIds(postWriteRequest.postImageIds());
+		savedPost.updatePostImages(postImages);
+		postImageRepository.saveAll(postImages);
+	}
 
-    public PostResponse read(Long bid) {
-        Post post = getBoard(bid);
-        return PostResponse.from(post, convertToBoardImageResponse(post));
-    }
+	public PostResponse read(Long bid) {
+		Post post = getBoard(bid);
+		return PostResponse.from(post, convertToBoardImageResponse(post));
+	}
 
-    public Page<PostResponse> getList(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Post> boards = postRepository.findAllByOrderByCreateDateDesc(pageable);
+	public Page<PostResponse> getList(Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Post> boards = postRepository.findAllByOrderByCreateDateDesc(pageable);
 
-        return convertToBoardResponse(boards);
-    }
+		return convertToBoardResponse(boards);
+	}
 
-    @Transactional
-    public void edit(Long bid, PostEditRequest postEditRequest, Long uid) {
-        Post post = getBoard(bid);
+	@Transactional
+	public void edit(Long bid, PostEditRequest postEditRequest, Long uid) {
+		Post post = getBoard(bid);
 
-        if (!post.getMember().getId().equals(uid)) {
-            throw new ForbiddenException();
-        }
+		if (!post.getMember().getId().equals(uid)) {
+			throw new ForbiddenException();
+		}
 
-        postRepository.save(post);
+		postRepository.save(post);
 
-        PostEditor.BoardEditorBuilder boardEditorBuilder = post.toEditor();
-        PostEditor postEditor = boardEditorBuilder
-                .content(postEditRequest.content())
-                .build();
+		PostEditor.BoardEditorBuilder boardEditorBuilder = post.toEditor();
+		PostEditor postEditor = boardEditorBuilder
+			.content(postEditRequest.content())
+			.build();
 
-        post.edit(postEditor);
-    }
+		post.edit(postEditor);
+	}
 
-    @Transactional
-    public void delete(Long bid, Long uid) {
-        Post post = getBoard(bid);
+	@Transactional
+	public void delete(Long bid, Long uid) {
+		Post post = getBoard(bid);
 
-        if (!post.getMember().getId().equals(uid)) {
-            throw new ForbiddenException();
-        }
+		if (!post.getMember().getId().equals(uid)) {
+			throw new ForbiddenException();
+		}
 
-        postRepository.delete(post);
-    }
+		postRepository.delete(post);
+	}
 
-    public void like(Long bid, Member member) {
-        if(likeCheck(bid, member.getId())) {
-            postLikeRepository.deleteByPostIdAndMemberId(bid, member.getId());
-            return;
-        }
+	public void like(Long bid, Member member) {
+		if (likeCheck(bid, member.getId())) {
+			postLikeRepository.deleteByPostIdAndMemberId(bid, member.getId());
+			return;
+		}
 
-        Post post = getBoard(bid);
+		Post post = getBoard(bid);
 
-        PostLike postLike = PostLike.builder()
-                .post(post)
-                .member(member)
-                .build();
+		PostLike postLike = PostLike.builder()
+			.post(post)
+			.member(member)
+			.build();
 
-        postLikeRepository.save(postLike);
-    }
+		postLikeRepository.save(postLike);
+	}
 
-    public boolean likeCheck(Long bid, Long uid) {
-        return postLikeRepository.findByPostIdAndMemberId(bid, uid).isPresent();
-    }
+	public boolean likeCheck(Long bid, Long uid) {
+		return postLikeRepository.findByPostIdAndMemberId(bid, uid).isPresent();
+	}
 
-    public PostLikeResponse maxLikePost() {
-        try {
-            Post post = postLikeRepository.getMaxLikePost();
-            return PostLikeResponse.builder()
-                .id(post.getId())
-                .postImages(convertToBoardImageResponse(post))
-                .nickname(post.getMember().getNickname())
-                .message("가장 인기 많은 " + post.getMember().getNickname() + "님의 이미지 입니다!")
-                .build();
-        } catch (PostNotFoundException e) {
-            return PostLikeResponse.builder()
-                .message(e.getMessage())
-                .build();
-        }
-    }
+	public PostLikeResponse maxLikePost() {
+		try {
+			Post post = postLikeRepository.getMaxLikePost();
+			return PostLikeResponse.builder()
+				.id(post.getId())
+				.postImages(convertToBoardImageResponse(post))
+				.nickname(post.getMember().getNickname())
+				.message("가장 인기 많은 " + post.getMember().getNickname() + "님의 이미지 입니다!")
+				.build();
+		} catch (PostNotFoundException e) {
+			return PostLikeResponse.builder()
+				.message(e.getMessage())
+				.build();
+		}
+	}
 
-    private Page<PostResponse> convertToBoardResponse(Page<Post> boardPage) {
-        return boardPage.map(board -> PostResponse.from(board, convertToBoardImageResponse(board)));
-    }
+	private Page<PostResponse> convertToBoardResponse(Page<Post> boardPage) {
+		return boardPage.map(board -> PostResponse.from(board, convertToBoardImageResponse(board)));
+	}
 
-    private List<PostImageResponse> convertToBoardImageResponse(Post post) {
-        return post.getImages().stream()
-                .map(PostImageResponse::from)
-                .collect(Collectors.toList());
-    }
+	private List<PostImageResponse> convertToBoardImageResponse(Post post) {
+		return post.getImages().stream()
+			.map(PostImageResponse::from)
+			.collect(Collectors.toList());
+	}
 
-    private boolean isWriter(Long writerId, Long memberId) {
-        return Objects.equals(writerId, memberId);
-    }
+	private boolean isWriter(Long writerId, Long memberId) {
+		return Objects.equals(writerId, memberId);
+	}
 
 }

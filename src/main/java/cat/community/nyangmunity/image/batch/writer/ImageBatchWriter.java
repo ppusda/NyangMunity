@@ -14,12 +14,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageBatchWriter implements ItemWriter<List<Image>> {
 
-    private final ImageService imageService;
+	private final ImageService imageService;
 
-    @Override
-    public void write(Chunk<? extends List<Image>> imageChunk) {
-        for (List<Image> images : imageChunk) {
-            imageService.saveImages(images);
-        }
-    }
+	@Override
+	public void write(Chunk<? extends List<Image>> imageChunk) {
+		for (List<Image> images : imageChunk) {
+			imageService.saveImages(images);
+		}
+	}
 }

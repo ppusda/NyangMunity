@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import { infoToast } from '@/libs/toaster';
-import { useClipboard } from '@vueuse/core';
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {infoToast} from '@/libs/toaster';
+import {useClipboard} from '@vueuse/core';
 
 import type {Post} from '@/interfaces/type';
 
@@ -21,7 +21,7 @@ const handlePostScroll = (event: Event) => {
 };
 
 // 클립보드에 링크 복사
-const { copy } = useClipboard();
+const {copy} = useClipboard();
 
 const copyLink = (link: string) => {
   copy(link);
@@ -173,7 +173,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
 });
 
-defineExpose({ scrollToBottom });
+defineExpose({scrollToBottom});
 </script>
 
 <template>
@@ -237,7 +237,7 @@ defineExpose({ scrollToBottom });
           aria-label="이전 이미지"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
       </button>
 
@@ -258,7 +258,7 @@ defineExpose({ scrollToBottom });
           aria-label="다음 이미지"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
       </button>
 
@@ -269,8 +269,10 @@ defineExpose({ scrollToBottom });
             class="bg-black bg-opacity-60 text-white px-3 py-2 rounded-md flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
             aria-label="이미지 링크 복사"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
           </svg>
         </button>
 
@@ -280,8 +282,9 @@ defineExpose({ scrollToBottom });
             class="bg-black bg-opacity-60 text-white px-3 py-2 rounded-md flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
             aria-label="모달 닫기"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
@@ -391,8 +394,12 @@ button:hover svg {
 
 /* 모달 애니메이션 */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .fixed {

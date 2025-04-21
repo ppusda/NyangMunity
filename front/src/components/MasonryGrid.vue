@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, nextTick, watch } from "vue";
+import {onMounted, ref, nextTick, watch} from "vue";
 
 import Masonry from "masonry-layout";
 import imagesLoaded from "imagesloaded";
@@ -49,7 +49,7 @@ watch(
         });
       }
     },
-    { deep: true }
+    {deep: true}
 );
 
 
@@ -67,7 +67,7 @@ const selectImage = (item) => {
         class="masonry-item group relative cursor-pointer"
         @click="selectImage(item)"
     >
-      <img :src="item.url" class="w-full h-auto rounded-md" />
+      <img :src="item.url" class="w-full h-auto rounded-md"/>
       <div
           class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"
       >

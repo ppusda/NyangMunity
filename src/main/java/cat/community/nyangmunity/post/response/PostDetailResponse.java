@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record PostDetailResponse(
-        PostResponse postResponse,
-        Boolean isWriter
+	PostResponse postResponse,
+	Boolean isWriter
 ) {
 
 }
