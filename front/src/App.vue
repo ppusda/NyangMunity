@@ -18,9 +18,6 @@ onMounted(() => {
   if (isTokenExist()) {
     const memberInfo = localStorage.getItem("member");
     saveMemberInfo(JSON.parse(memberInfo!!));
-  } else {
-    logout();
-    warningToast("토큰이 만료되었습니다.")
   }
 });
 </script>
