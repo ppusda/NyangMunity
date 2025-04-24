@@ -4,6 +4,7 @@ import {computed, onMounted, reactive, ref} from "vue";
 import type {Member} from "@/interfaces/type";
 import axiosClient from "@/libs/axiosClient";
 import store from "@/stores/store";
+import {infoToast, warningToast} from "@/libs/toaster";
 
 let member = reactive<Member>({
   id: "",
@@ -51,18 +52,15 @@ const cancelUser = function () {
   formData.append("pwdCheck", pwdCheck.value);
   axiosClient.post("/members/pwdCheck", formData).then(response => {
     if (response.data) {
-      alert("냥뮤니티를 이용해주셔서 감사했습니다.");
+      infoToast("냥뮤니티를 이용해주셔서 감사했습니다.");
       axiosClient.post("/members/cancel",).then(() => {
         router.replace({name: "main"}).then(() => router.go(0));
       });
     } else {
-      alert("비밀번호가 올바르지 않습니다.");
+      warningToast("비밀번호가 올바르지 않습니다.");
     }
-  }).catch(error => {
-    if (error.response) {
-      alert(error.response.data.message);
-      router.replace({name: "main"});
-    }
+  }).catch(() => {
+    router.replace({name: "main"});
   });
 };
 
@@ -73,15 +71,10 @@ onMounted(async () => {
   } else {
     await axiosClient.get("/members/profile").then(response => {
       member = response.data;
-      console.log(member);
-    }).catch(error => {
-      if (error.response) {
-        alert(error.response.data.message);
-        router.replace({name: "main"});
-      }
+    }).catch(() => {
+      router.replace({name: "main"});
     });
   }
-
 });
 
 </script>

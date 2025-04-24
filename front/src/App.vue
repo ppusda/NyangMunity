@@ -7,11 +7,10 @@
 
 <script setup lang="ts">
 import {onMounted} from "vue";
-import {isTokenExist, logout, saveMemberInfo} from "@/utils/account";
+import {isTokenExist, saveMemberInfo} from "@/utils/account";
 
 import Header from "@/components/Header.vue";
 import "./assets/main.css";
-import {warningToast} from "@/libs/toaster";
 
 
 onMounted(() => {

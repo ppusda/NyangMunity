@@ -6,11 +6,11 @@ import router from "@/router";
 const email = ref<string>("");
 const password = ref<string>("");
 
-const loginAction = () => {
-  login(email.value, password.value);
-  router.replace({name: "main"});
+const loginAction = async () => {
+  if (await login(email.value, password.value)) {
+    await router.replace({name: "main"});
+  }
 }
-
 </script>
 
 <template>

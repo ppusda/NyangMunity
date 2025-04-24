@@ -9,22 +9,18 @@ const {cookies} = useCookies();
 
 export const login = function (email: string, password: string) {
     // 로그인 (서버 측 토큰 생성)
-    axiosClient.post("/members/login", {email: email, password: password})
+    return axiosClient.post("/members/login", {email: email, password: password})
         .then(response => {
             const memberResponse: MemberResponse = {
                 id: response.data.id,
                 email: response.data.email,
                 nickname: response.data.nickname
             };
-
             saveMemberInfo(memberResponse);
+            return true;
         })
-        .catch(error => {
-            if (error.response) {
-                warningToast(error.response.data.message);
-            } else {
-                warningToast("계정이 올바르지 않습니다.");
-            }
+        .catch(() => {
+            return false;
         });
 }
 

@@ -56,8 +56,6 @@ const getPosts = async (page: number, init: boolean) => {
       const currentScrollHeight = postContainerRef.value?.scrollHeight || 0;
       postContainerRef.value?.scrollTo(0, currentScrollHeight - prevScrollHeight);
     }
-
-    console.log(posts);
   } catch (error) {
     console.error(error);
   }
