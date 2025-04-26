@@ -11,6 +11,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import cat.community.nyangmunity.global.exception.CustomAccessDeniedHandler;
+import cat.community.nyangmunity.global.exception.CustomAuthenticationEntryPoint;
 import cat.community.nyangmunity.global.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 
@@ -20,10 +22,16 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+	private final CustomAccessDeniedHandler accessDeniedHandler;
 
 	@Bean
 	SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 		http
+			.exceptionHandling(exception -> exception
+				.accessDeniedHandler(accessDeniedHandler)
+				.authenticationEntryPoint(authenticationEntryPoint)
+			)
 			.csrf(
 				AbstractHttpConfigurer::disable
 			)
@@ -54,6 +62,10 @@ public class SecurityConfig {
 						"/members/join",
 						"/members/login",
 						"/members/logout"
+					).permitAll()
+					.requestMatchers( // Tokens - POST
+						HttpMethod.POST,
+						"/tokens"
 					).permitAll()
 
 					.anyRequest().authenticated()
