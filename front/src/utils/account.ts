@@ -3,7 +3,7 @@ import {warningToast} from "@/libs/toaster";
 
 import store from "@/stores/store";
 import axiosClient from "@/libs/axiosClient";
-import type {MemberResponse} from "@/interfaces/type";
+import type {MemberAuthenticationResponse, MemberResponse} from "@/interfaces/type";
 
 const {cookies} = useCookies();
 
@@ -29,6 +29,13 @@ export const saveMemberInfo = function (memberResponse: MemberResponse) {
     localStorage.setItem('member', JSON.stringify(memberResponse));
 }
 
+export const saveMemberAuthentication = function (memberAuthentication: MemberAuthenticationResponse) {
+    const memberTokens = memberAuthentication.memberTokens;
+
+    cookies.set("accessToken", memberTokens.accessToken);
+    cookies.set("refreshToken", memberTokens.refreshToken);
+}
+
 export const logout = function () {
     // 로그아웃 (서버 측 토큰 삭제)
     axiosClient.post("/members/logout").then(() => {
@@ -45,9 +52,9 @@ export const logout = function () {
     });
 };
 
-export const reissue = function (): Promise<MemberResponse> {
+export const reissue = function (): Promise<MemberAuthenticationResponse> {
     return axiosClient.post("/tokens").then((response) => {
-        return response.data as MemberResponse;
+        return response.data as MemberAuthenticationResponse;
     });
 }
 

@@ -39,3 +39,13 @@ export interface MemberResponse {
     email: string;
     nickname: string;
 }
+
+export interface MemberTokens {
+    accessToken: string;
+    refreshToken: string;
+}
+
+export interface MemberAuthenticationResponse {
+    memberInfoResponse: MemberResponse;
+    memberTokens: MemberTokens;
+}

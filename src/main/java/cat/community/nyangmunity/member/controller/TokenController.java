@@ -1,18 +1,13 @@
 package cat.community.nyangmunity.member.controller;
 
-import java.security.Principal;
-
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cat.community.nyangmunity.global.exception.global.UnauthorizedException;
-import cat.community.nyangmunity.global.provider.CookieProvider;
-import cat.community.nyangmunity.member.entity.Token;
 import cat.community.nyangmunity.member.response.MemberAuthenticationResponse;
-import cat.community.nyangmunity.member.response.MemberInfoResponse;
 import cat.community.nyangmunity.member.service.TokenFacadeService;
 import lombok.RequiredArgsConstructor;
 
@@ -22,26 +17,18 @@ import lombok.RequiredArgsConstructor;
 public class TokenController {
 
 	private final TokenFacadeService tokenFacadeService;
-	private final CookieProvider cookieProvider;
 
 	/**
 	 * 토큰 재갱신을 위한 API
 	 *
-	 * @param principal 접근 토큰 검증을 끝낸 인증 객체
+	 * @param refreshToken 쿠키에 저장 된 refreshToken
 	 * @return 갱신된 인증 정보
 	 */
 	@PostMapping
-	public ResponseEntity<MemberInfoResponse> reissue(Principal principal) {
-		if (principal != null) {
-			Token token = tokenFacadeService.findTokenByMemberId(principal.getName());
-			MemberAuthenticationResponse reissueResponse = tokenFacadeService.reissueToken(token);
-
-			return ResponseEntity.ok()
-				.header(HttpHeaders.SET_COOKIE, String.valueOf(
-					cookieProvider.createAccessTokenCookie(reissueResponse.memberTokens()
-						.accessToken())
-				))
-				.body(reissueResponse.memberInfoResponse());
+	public ResponseEntity<MemberAuthenticationResponse> reissue(@CookieValue("refreshToken") String refreshToken) {
+		if (refreshToken != null) {
+			MemberAuthenticationResponse reissueResponse = tokenFacadeService.reissueToken(refreshToken);
+			return ResponseEntity.ok().body(reissueResponse);
 		}
 
 		throw new UnauthorizedException();

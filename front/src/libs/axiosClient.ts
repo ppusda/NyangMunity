@@ -2,9 +2,19 @@ import axios from 'axios';
 
 import {useCookies} from "vue3-cookies";
 import {warningToast} from "@/libs/toaster";
-import {logout, reissue, saveMemberInfo} from "@/utils/account";
+import {logout, reissue, saveMemberAuthentication} from "@/utils/account";
 
 const {cookies} = useCookies();
+
+// 토큰 재발급 진행 중인지 확인하는 변수
+let isRefreshing = false;
+// 토큰 재발급 대기 중인 요청들
+let refreshSubscribers: Array<(token?: string) => void> = [];
+
+// 대기 요청 등록
+const addRefreshSubscriber = (callback: (token?: string) => void) => {
+    refreshSubscribers.push(callback);
+};
 
 // Axios 인스턴스 생성
 const axiosClient = axios.create({
@@ -38,35 +48,63 @@ axiosClient.interceptors.response.use(
     },
     async error => {
         const originalRequest = error.config;
-        // 응답 값이 401이며, 재요청 플래그가 true인 경우
-        if (error.response.status === 401 && originalRequest._retry) {
+
+        // 401 에러가 아니면 바로 에러 반환
+        if (error.response?.status !== 401) {
+            if (error.response) {
+                const errorData = error.response.data;
+                warningToast(errorData.message || "요청 중 오류가 발생했습니다.");
+            } else {
+                warningToast("네트워크 오류가 발생했습니다.");
+            }
+            return Promise.reject(error);
+        }
+
+        // 이미 재요청을 시도한 경우 (originalRequest에 직접 플래그 추가)
+        if (originalRequest._retry) {
             warningToast("재로그인 해주세요!");
             logout();
-            return;
-        }
-
-        // 응답 값이 401이며, 재요청 플래그가 false인 경우
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true; // 재요청 플래그 설정
-
-            const reissueResponse = await reissue(); // 토큰 재발급
-            if (reissueResponse) {
-                saveMemberInfo(reissueResponse);
-                return axiosClient(originalRequest); // 요청 재실행
-            }
-        }
-
-        if (error.response) {
-            // 에러 메시지 처리
-            const errorData = error.response.data;
-            warningToast(errorData.message);
             return Promise.reject(error);
-        } else {
-            // 기타 에러 발생 시
-            warningToast("예기치 못한 오류가 발생했습니다.");
         }
 
-        return Promise.reject(error);
+        // 첫 번째 401 에러이고 아직 토큰 재발급이 진행 중이 아닌 경우
+        if (!isRefreshing) {
+            isRefreshing = true;
+            originalRequest._retry = true;
+
+            try {
+                // 토큰 재발급 요청
+                const reissueResponse = await reissue();
+
+                if (reissueResponse) {
+                    // 토큰 갱신
+                    saveMemberAuthentication(reissueResponse);
+
+                    // 현재 요청 다시 시도
+                    return axiosClient(originalRequest);
+                } else {
+                    // 재발급 응답이 없는 경우
+                    warningToast("인증에 실패했습니다. 다시 로그인해주세요.");
+                    logout();
+                    return Promise.reject(error);
+                }
+            } catch (reissueError) {
+                // 재발급 실패
+                warningToast("세션이 만료되었습니다. 다시 로그인해주세요.");
+                logout();
+                return Promise.reject(reissueError);
+            } finally {
+                isRefreshing = false;
+            }
+        } else {
+            // 이미 다른 요청에서 토큰 재발급이 진행 중인 경우
+            // 현재 요청을 대기열에 추가하고 토큰이 갱신되면 자동으로 재시도
+            return new Promise((resolve) => {
+                addRefreshSubscriber(() => {
+                    resolve(axiosClient(originalRequest));
+                });
+            });
+        }
     }
 );
 
