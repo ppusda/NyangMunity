@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import axiosClient from "@/libs/axiosClient";
 import type {PostLike} from "@/interfaces/type";
 
@@ -11,13 +11,19 @@ let likePost = ref<PostLike>({
   message: ""
 });
 
-axiosClient.get("/posts/likes").then((response) => {
-  if (response.data.id !== null) {
-    likePostFlg.value = true;
-  } else {
-    likePostFlg.value = false;
-  }
-  likePost.value = response.data;
+function getMaxLikePost() {
+  axiosClient.get("/posts/likes").then((response) => {
+    if (response.data.postImages.length > 0) {
+      likePostFlg.value = true;
+    } else {
+      likePostFlg.value = false;
+    }
+    likePost.value = response.data;
+  });
+}
+
+onMounted(async () => {
+  await getMaxLikePost();
 });
 </script>
 
@@ -40,7 +46,7 @@ axiosClient.get("/posts/likes").then((response) => {
           <div>
             <div v-if="likePostFlg">
               <img
-                  v-if="likePost.postImages && likePost.postImages.length > 0"
+                  v-if="likePost.value.postImages && likePost.postImages.length > 0"
                   class="rounded"
                   id="main_img"
                   :src="likePost.postImages[0].url"
