@@ -6,65 +6,47 @@ import axiosClient from "@/libs/axiosClient";
 import store from "@/stores/store";
 import {infoToast, warningToast} from "@/libs/toaster";
 
+const router = useRouter();
+
 let member = reactive<Member>({
   id: "",
   email: "",
   password: "",
   nickname: "",
-  birthday: "",
 });
 
-const formData = new FormData();
-const pwdCheck = ref("");
+const currentPassword = ref("");
 const newPassword = ref("");
-const newPasswordChk = ref("");
-
-const router = useRouter();
-
-const email = computed(() => store.state.email);
-const nickname = computed(() => store.state.nickname);
+const newPasswordConfirm = ref("");
 
 const userEdit = function () {
-  if (newPassword.value !== newPasswordChk.value) {
-    alert("비밀번호가 다릅니다.")
+  if (newPassword.value !== newPasswordConfirm.value) {
+    warningToast("비밀번호가 다릅니다.");
   } else {
-    formData.append("pwdCheck", pwdCheck.value);
-    axiosClient.post("/members/pwdCheck", formData).then(response => {
-      if (response.data) {
-        member.password = newPassword.value;
-
-        formData.append("nickname", member.nickname);
-        formData.append("password", member.password);
-        formData.append("birthday", member.birthday);
-
-        axiosClient.post("/members/edit", formData).then(() => {
-          alert("정보 수정이 완료되었습니다.");
-          router.replace({name: "main"}).then(() => router.go(0));
-        });
-      } else {
-        alert("비밀번호가 올바르지 않습니다.");
-      }
+    axiosClient.post("/members/edit", {
+      'nickname': member.nickname,
+      'newPassword': newPassword.value,
+      'currentPassword': currentPassword.value
+    }).then(() => {
+      infoToast("정보 수정이 완료되었습니다.");
+      router.replace({name: "main"}).then(() => router.go(0));
     });
   }
 };
 
 const cancelUser = function () {
-  formData.append("pwdCheck", pwdCheck.value);
-  axiosClient.post("/members/pwdCheck", formData).then(response => {
-    if (response.data) {
-      infoToast("냥뮤니티를 이용해주셔서 감사했습니다.");
-      axiosClient.post("/members/cancel",).then(() => {
-        router.replace({name: "main"}).then(() => router.go(0));
-      });
-    } else {
-      warningToast("비밀번호가 올바르지 않습니다.");
-    }
-  }).catch(() => {
-    router.replace({name: "main"});
+  axiosClient.post("/members/cancel", {
+    'currentPassword': currentPassword.value
+  }).then(() => {
+    infoToast("냥뮤니티를 이용해주셔서 감사했습니다.");
+    router.replace({name: "main"}).then(() => router.go(0));
   });
 };
 
 onMounted(async () => {
+  const email = computed(() => store.state.email);
+  const nickname = computed(() => store.state.nickname);
+
   if (email.value && nickname.value) {
     member.email = email.value;
     member.nickname = nickname.value;
@@ -82,7 +64,7 @@ onMounted(async () => {
   <div class="w-screen rounded-2xl p-8 flex justify-center">
     <div class="bg-zinc-800 p-6 rounded-md sm:w-[30rem] w-[32rem]">
       <div class="text-center mb-6">
-        <h3 class="text-2xl font-bold text-white">User info</h3>
+        <h3 class="text-2xl font-bold text-white">Member info</h3>
         <hr class="border-gray-600 mt-3"/>
       </div>
 
@@ -124,7 +106,7 @@ onMounted(async () => {
           <label for="newPasswordChk" class="text-white w-32">비밀번호 확인 :</label>
           <input
               class="flex-1 input input-bordered border-zinc-500 bg-zinc-900 p-2 rounded-md text-white"
-              v-model="newPasswordChk"
+              v-model="newPasswordConfirm"
               id="newPasswordChk"
               type="password"/>
         </div>
@@ -134,13 +116,13 @@ onMounted(async () => {
               id="passwordCheck"
               type="password"
               placeholder="현재 비밀번호 입력"
-              v-model="pwdCheck"
+              v-model="currentPassword"
               class="input input-bordered border-zinc-500 bg-zinc-900 w-full p-2 rounded-md text-white mb-4"/>
 
           <div class="flex justify-center gap-3">
             <button
                 class="btn btn-outline btn-primary text-white px-6 py-2 rounded-md"
-                @click="userEdit()">
+                @click="userEdit">
               <i class="fa-solid fa-check"></i> 수정
             </button>
             <button
@@ -171,7 +153,7 @@ onMounted(async () => {
               </button>
               <button
                   class="btn btn-outline btn-error text-white px-4 py-2 rounded-md"
-                  @click="cancelUser()"
+                  @click="cancelUser"
                   data-bs-dismiss="modal">
                 확인
               </button>

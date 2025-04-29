@@ -31,7 +31,6 @@ export interface Member {
     email: string;
     password: string;
     nickname: string;
-    birthday: string;
 }
 
 export interface MemberResponse {
