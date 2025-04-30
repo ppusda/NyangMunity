@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cat.community.nyangmunity.member.service.MemberService;
+import cat.community.nyangmunity.member.service.MemberQueryService;
 import cat.community.nyangmunity.post.request.PostEditRequest;
 import cat.community.nyangmunity.post.request.PostWriteRequest;
 import cat.community.nyangmunity.post.request.PostsRequest;
@@ -30,8 +30,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostController {
 
-	private final MemberService memberService;
 	private final PostService postService;
+	private final MemberQueryService memberQueryService;
 
 	@GetMapping
 	public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest) {
@@ -46,7 +46,7 @@ public class PostController {
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
-		postService.write(postWriteRequest, memberService.findMemberById(Long.parseLong(principal.getName())));
+		postService.write(postWriteRequest, memberQueryService.findMemberById(Long.parseLong(principal.getName())));
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -65,7 +65,7 @@ public class PostController {
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/like/{postId}")
 	public void postLike(@PathVariable(name = "postId") Long bid, Principal principal) {
-		postService.like(bid, memberService.findMemberById(Long.parseLong(principal.getName())));
+		postService.like(bid, memberQueryService.findMemberById(Long.parseLong(principal.getName())));
 	}
 
 	@PreAuthorize("isAuthenticated()")
