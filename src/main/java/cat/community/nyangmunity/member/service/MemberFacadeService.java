@@ -51,10 +51,10 @@ public class MemberFacadeService {
 
 	/**
 	 * 로그아웃을 위한 메서드 (토큰 제거)
-	 * @param memberId 회원 아이디
+	 * @param refreshToken 갱신 토큰
 	 */
-	public void logout(String memberId) {
-		tokenFacadeService.deleteToken(memberId);
+	public void logout(String refreshToken) {
+		tokenFacadeService.deleteToken(refreshToken);
 	}
 
 	/**

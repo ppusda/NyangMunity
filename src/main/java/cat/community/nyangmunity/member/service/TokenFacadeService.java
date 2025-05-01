@@ -57,7 +57,15 @@ public class TokenFacadeService {
 				.build()
 			)
 			.build();
+	}
 
+	/**
+	 * 토큰 삭제를 위한 메서드
+	 * @param refreshToken 삭제할 갱신 토큰
+	 */
+	public void deleteToken(String refreshToken) {
+		Token token = tokenReadService.findTokenByRefreshToken(refreshToken);
+		tokenCommandService.delete(token);
 	}
 
 	private Token validateRefreshToken(String refreshToken) {
@@ -74,9 +82,5 @@ public class TokenFacadeService {
 
 	public Token findTokenByMemberId(String memberId) {
 		return tokenReadService.findTokenByMemberId(memberId);
-	}
-
-	public void deleteToken(String memberId) {
-		tokenCommandService.delete(findTokenByMemberId(memberId));
 	}
 }

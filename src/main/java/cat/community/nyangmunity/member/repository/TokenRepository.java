@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import cat.community.nyangmunity.member.entity.Token;
 
 @Repository
-public interface TokenRepository extends CrudRepository<Token, Long> {
+public interface TokenRepository extends CrudRepository<Token, String> {
 
 	Optional<Token> findByMemberId(Long memberId);
 }

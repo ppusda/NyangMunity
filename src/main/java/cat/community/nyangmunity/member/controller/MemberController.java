@@ -5,6 +5,7 @@ import java.security.Principal;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,8 +50,8 @@ public class MemberController {
 	}
 
 	@PostMapping("/logout")
-	private void logout(Principal principal) {
-		memberFacadeService.logout(principal.getName());
+	private void logout(@CookieValue("refreshToken") String refreshToken) {
+		memberFacadeService.logout(refreshToken);
 	}
 
 	@PostMapping("/join")
