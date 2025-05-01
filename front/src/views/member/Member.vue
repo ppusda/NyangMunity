@@ -7,6 +7,7 @@ import store from "@/stores/store";
 import {infoToast, warningToast} from "@/libs/toaster";
 
 const router = useRouter();
+const showCancelModal = ref(false);
 
 let member = reactive<Member>({
   id: "",
@@ -23,13 +24,13 @@ const userEdit = function () {
   if (newPassword.value !== newPasswordConfirm.value) {
     warningToast("비밀번호가 다릅니다.");
   } else {
-    axiosClient.post("/members/edit", {
+    axiosClient.patch("/members/profile", {
       'nickname': member.nickname,
       'newPassword': newPassword.value,
       'currentPassword': currentPassword.value
     }).then(() => {
       infoToast("정보 수정이 완료되었습니다.");
-      router.replace({name: "main"}).then(() => router.go(0));
+      router.replace({name: "main"});
     });
   }
 };
@@ -39,7 +40,7 @@ const cancelUser = function () {
     'currentPassword': currentPassword.value
   }).then(() => {
     infoToast("냥뮤니티를 이용해주셔서 감사했습니다.");
-    router.replace({name: "main"}).then(() => router.go(0));
+    router.replace({name: "main"});
   });
 };
 
@@ -127,8 +128,7 @@ onMounted(async () => {
             </button>
             <button
                 class="btn btn-outline btn-error text-white px-6 py-2 rounded-md"
-                data-bs-toggle="modal"
-                data-bs-target="#cancelUserModal">
+                @click="showCancelModal = true">
               <i class="fa-solid fa-user-slash"></i> 회원탈퇴
             </button>
           </div>
@@ -136,28 +136,25 @@ onMounted(async () => {
       </div>
 
       <!-- 회원탈퇴 모달 -->
-      <div class="modal fade" id="cancelUserModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content bg-zinc-700">
-            <div class="modal-header border-gray-600">
-              <h5 class="modal-title text-white font-bold">탈퇴</h5>
-            </div>
-            <div class="modal-body text-white">
-              <b>정말로 탈퇴하시겠습니까? (* 다시 되돌릴 수 없습니다.)</b>
-            </div>
-            <div class="modal-footer border-gray-600">
-              <button
-                  class="btn btn-outline btn-ghost text-white px-4 py-2 rounded-md"
-                  data-bs-dismiss="modal">
-                취소
-              </button>
-              <button
-                  class="btn btn-outline btn-error text-white px-4 py-2 rounded-md"
-                  @click="cancelUser"
-                  data-bs-dismiss="modal">
-                확인
-              </button>
-            </div>
+      <div v-if="showCancelModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="modal-content bg-zinc-800 w-[90%] sm:w-[24rem] rounded-md">
+          <div class="modal-header border-b border-gray-600 px-4 py-3">
+            <h5 class="modal-title text-white font-bold">탈퇴</h5>
+          </div>
+          <div class="modal-body text-white px-4 py-4">
+            <b>정말로 탈퇴하시겠습니까? <br>(* 다시 되돌릴 수 없습니다.)</b>
+          </div>
+          <div class="modal-footer border-t border-gray-600 px-4 py-3 flex justify-end gap-2">
+            <button
+                class="btn btn-outline btn-ghost text-white px-4 py-2 rounded-md"
+                @click="showCancelModal = false">
+              취소
+            </button>
+            <button
+                class="btn btn-outline btn-error text-white px-4 py-2 rounded-md"
+                @click="() => { cancelUser(); showCancelModal = false; }">
+              확인
+            </button>
           </div>
         </div>
       </div>
