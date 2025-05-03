@@ -5,6 +5,7 @@ import type {Member} from "@/interfaces/type";
 import axiosClient from "@/libs/axiosClient";
 import store from "@/stores/store";
 import {infoToast, warningToast} from "@/libs/toaster";
+import {logout} from "@/utils/account";
 
 const router = useRouter();
 const showCancelModal = ref(false);
@@ -36,6 +37,9 @@ const userEdit = function () {
 };
 
 const cancelUser = function () {
+  // 로그아웃 선 진행
+  logout();
+  
   axiosClient.post("/members/cancel", {
     'currentPassword': currentPassword.value
   }).then(() => {
