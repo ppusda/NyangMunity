@@ -28,10 +28,10 @@ const axiosClient = axios.create({
 // 요청 인터셉터
 axiosClient.interceptors.request.use(
     config => {
-        // 요청을 보내기 전에 수행할 로직 (예: 토큰 설정)
+        // 요청을 보내기 전에 수행할 로직
         const token = cookies.get("accessToken")
         if (token) {
-            config.headers['Authorization'] = token;
+            config.headers['Authorization'] = "Bearer " + token;
         }
         return config;
     },
@@ -79,6 +79,7 @@ axiosClient.interceptors.response.use(
                 if (reissueResponse) {
                     // 토큰 갱신
                     saveMemberAuthentication(reissueResponse);
+                    originalRequest.headers['Authorization'] = "Bearer " + reissueResponse.memberTokens.accessToken;
 
                     // 현재 요청 다시 시도
                     return axiosClient(originalRequest);

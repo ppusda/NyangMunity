@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
-		String accessToken = getTokenFromRequest(request, "accessToken");
+		String accessToken = getTokenFromRequest(request);
 
 		if (!StringUtils.hasText(accessToken)) { // AccessToken 이 존재하지 않을 때
 			filterChain.doFilter(request, response);
@@ -61,14 +61,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private static String getTokenFromRequest(HttpServletRequest request, String tokenName) {
-		Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(tokenName)) {
-					return cookie.getValue();
-				}
-			}
+	private static String getTokenFromRequest(HttpServletRequest request) {
+		String header = request.getHeader("Authorization");
+		if (header != null && header.startsWith("Bearer ")) {
+			return header.substring(7);
 		}
 		return null;
 	}
