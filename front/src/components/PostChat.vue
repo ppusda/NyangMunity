@@ -1,6 +1,5 @@
 <script setup lang="ts">
-
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 import {infoToast} from '@/libs/toaster';
 import {useClipboard} from '@vueuse/core';
 
@@ -15,8 +14,52 @@ const emit = defineEmits(['scrollTop']);
 const postContainerRef = ref<HTMLElement | null>(null);
 
 const handlePostScroll = (event: Event) => {
-  if (postContainerRef.value && postContainerRef.value.scrollTop === 0) {
-    emit('scrollTop');
+  // 현재 스크롤 위치와 요소들의 위치를 기반으로 현재 가시적인 포스트 확인
+  if (!postContainerRef.value) return;
+
+  const container = postContainerRef.value;
+  const postElements = container.querySelectorAll('li');
+
+  // 중앙에 위치한 요소 찾기
+  const containerCenter = container.scrollTop + container.clientHeight / 2;
+
+  let closestElement = null;
+  let closestDistance = Infinity;
+
+  postElements.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    const elementCenter = rect.top + rect.height / 2;
+    const distance = Math.abs(elementCenter - window.innerHeight / 2);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestElement = el;
+    }
+  });
+
+  // 가장 가까운 요소에 활성화 클래스 추가
+  if (closestElement) {
+    postElements.forEach(el => el.classList.remove('post-active'));
+    closestElement.classList.add('post-active');
+
+    // 스크롤이 맨 위에 닿았을 때 이벤트 발생
+    if (container.scrollTop === 0) {
+      emit('scrollTop');
+    }
+  }
+};
+
+const handlePostWheel = (event: WheelEvent, postId: string) => {
+  // 현재 포스트 인덱스 찾기
+  const postIndex = props.posts?.findIndex(p => p.id === postId) ?? -1;
+
+  // 스크롤 방향에 따라 이전/다음 포스트로 이동
+  if (event.deltaY > 0 && postIndex > 0) { // 아래로 스크롤
+    navigateToPost(postIndex - 1);
+    event.preventDefault();
+  } else if (event.deltaY < 0 && postIndex < (props.posts?.length ?? 0) - 1) { // 위로 스크롤
+    navigateToPost(postIndex + 1);
+    event.preventDefault();
   }
 };
 
@@ -28,77 +71,127 @@ const copyLink = (link: string) => {
   infoToast("이미지 복사 완료!");
 };
 
-// 모달 상태 관리
-const showModal = ref(false);
-const currentPostIndex = ref(-1);
-const currentImageIndex = ref(0);
+// 현재 표시 중인 이미지 인덱스 (각 포스트별로 관리)
+const currentImageIndices = ref<Record<string, number>>({});
 
-// 현재 포스트의 이미지 배열
-const currentImages = computed(() => {
-  if (currentPostIndex.value >= 0 && props.posts && props.posts[currentPostIndex.value]) {
-    return props.posts[currentPostIndex.value].postImages || [];
-  }
-  return [];
-});
+// 좋아요 상태 관리
+const likedImages = ref<Record<string, boolean>>({});
 
-// 현재 이미지 URL
-const currentImage = computed(() => {
-  if (currentImages.value.length > 0 && currentImageIndex.value < currentImages.value.length) {
-    return currentImages.value[currentImageIndex.value].url;
-  }
-  return '';
-});
-
-// 이미지 클릭 핸들러
-const openImageModal = (postIndex: number, imageIndex: number) => {
-  if (props.posts && props.posts[postIndex]) {
-    currentPostIndex.value = postIndex;
-    currentImageIndex.value = imageIndex;
-    showModal.value = true;
-  }
-};
-// 모달 닫기
-const closeModal = () => {
-  showModal.value = false;
-  currentPostIndex.value = -1;
-  currentImageIndex.value = 0;
+const toggleLike = (imageId: string) => {
+  likedImages.value[imageId] = !likedImages.value[imageId];
+  infoToast(likedImages.value[imageId] ? "좋아요를 눌렀습니다!" : "좋아요를 취소했습니다!");
 };
 
 // 이전 이미지로 이동
-const prevImage = () => {
-  if (currentImageIndex.value > 0) {
-    currentImageIndex.value--;
+const prevImage = (postId: string, imagesLength: number) => {
+  if (!currentImageIndices.value[postId]) {
+    currentImageIndices.value[postId] = 0;
+  }
+
+  if (currentImageIndices.value[postId] > 0) {
+    currentImageIndices.value[postId]--;
   } else {
     // 처음 이미지일 경우 마지막 이미지로 순환
-    currentImageIndex.value = currentImages.value.length - 1;
+    currentImageIndices.value[postId] = imagesLength - 1;
   }
+
+  // 이미지 변경 후 크기 조정
+  updateImageSize(postId);
 };
 
 // 다음 이미지로 이동
-const nextImage = () => {
-  if (currentImageIndex.value < currentImages.value.length - 1) {
-    currentImageIndex.value++;
+const nextImage = (postId: string, imagesLength: number) => {
+  if (!currentImageIndices.value[postId]) {
+    currentImageIndices.value[postId] = 0;
+  }
+
+  if (currentImageIndices.value[postId] < imagesLength - 1) {
+    currentImageIndices.value[postId]++;
   } else {
     // 마지막 이미지일 경우 첫 이미지로 순환
-    currentImageIndex.value = 0;
+    currentImageIndices.value[postId] = 0;
+  }
+
+  // 이미지 변경 후 크기 조정
+  updateImageSize(postId);
+};
+
+const handleImageWheel = (event: WheelEvent, postId: string, imagesLength: number) => {
+  if (imagesLength <= 1) return;
+
+  // 현재 포스트 인덱스 찾기
+  const postIndex = props.posts?.findIndex(p => p.id === postId) ?? -1;
+  if (postIndex === -1) return;
+
+  // 현재 포스트의 현재 이미지 인덱스
+  const currentIndex = currentImageIndices.value[postId] || 0;
+
+  // 휠 이벤트 발생 시 이미지 이동
+  if (event.deltaY > 0) { // 아래로 스크롤
+    // 마지막 이미지이고 다음 포스트가 있을 때
+    if (currentIndex === imagesLength - 1 && postIndex > 0) {
+      // 다음 포스트로 이동
+      navigateToPost(postIndex - 1); // 리스트가 역순이므로 인덱스는 감소
+    } else {
+      nextImage(postId, imagesLength); // 일반적인 다음 이미지
+    }
+  } else { // 위로 스크롤
+    // 첫 번째 이미지이고 이전 포스트가 있을 때
+    if (currentIndex === 0 && postIndex < (props.posts?.length ?? 0) - 1) {
+      // 이전 포스트로 이동
+      navigateToPost(postIndex + 1); // 리스트가 역순이므로 인덱스는 증가
+    } else {
+      prevImage(postId, imagesLength); // 일반적인 이전 이미지
+    }
+  }
+
+  // 페이지 스크롤 방지
+  event.preventDefault();
+};
+
+// 포스트 간 이동을 위한 함수
+const navigateToPost = (postIndex: number) => {
+  if (!props.posts || postIndex < 0 || postIndex >= props.posts.length) return;
+
+  const targetPost = props.posts[postIndex];
+
+  // 해당 포스트 요소 찾기
+  const postElements = postContainerRef.value?.querySelectorAll('li');
+  if (postElements && postElements[postIndex]) {
+    // 스무스한 스크롤이 아닌 즉시 이동으로 변경하여 중간에 다른 포스트가 보이지 않도록 함
+    postElements[postIndex].scrollIntoView({
+      behavior: 'auto',  // 'smooth'에서 'auto'로 변경
+      block: 'center'    // 'start'에서 'center'로 변경하여 화면 중앙에 위치
+    });
+
+    // 스크롤 후 애니메이션 효과를 위한 트랜지션 클래스 추가
+    setTimeout(() => {
+      postElements[postIndex].classList.add('post-active');
+    }, 50);
+
+    // 포커스 설정
+    setFocusedPost(targetPost.id);
+
+    // 포스트의 첫 번째 이미지부터 시작
+    if (targetPost.postImages && targetPost.postImages.length > 0) {
+      currentImageIndices.value[targetPost.id] = 0;
+    }
   }
 };
 
-// 특정 이미지로 이동
-const goToImage = (index: number) => {
-  currentImageIndex.value = index;
-};
-
 // 키보드 이벤트 처리
+const focusedPostId = ref<string | null>(null);
+
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (!showModal.value) return;
+  if (!focusedPostId.value) return;
+
+  const post = props.posts?.find(p => p.id === focusedPostId.value);
+  if (!post || !post.postImages || post.postImages.length <= 1) return;
 
   if (event.key === 'ArrowLeft') {
-    prevImage();
+    prevImage(focusedPostId.value, post.postImages.length);
   } else if (event.key === 'ArrowRight') {
-    nextImage();
-  } else if (event.key === 'Escape') {
-    closeModal();
+    nextImage(focusedPostId.value, post.postImages.length);
   }
 };
 
@@ -151,7 +244,6 @@ const scrollToBottom = (smooth = true) => {
   }
 };
 
-
 // 컴포넌트 마운트 시 키보드 이벤트 리스너 등록
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
@@ -170,8 +262,91 @@ onMounted(() => {
 
 // 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown);
+  window.addEventListener('keydown', handleKeyDown);
+
+  // 초기 로드 시 첫 번째 포스트 활성화
+  nextTick(() => {
+    if (postContainerRef.value) {
+      const firstPost = postContainerRef.value.querySelector('li');
+      if (firstPost) {
+        firstPost.classList.add('post-active');
+      }
+    }
+  });
+
+  watch(
+      () => props.posts,
+      (newPosts) => {
+        if (newPosts && newPosts.length > 0) {
+          setTimeout(() => {
+            scrollToBottom(false); // 초기 로드 시 즉시 스크롤 (애니메이션 없이)
+
+            // 스크롤 후 첫 번째 포스트 활성화
+            nextTick(() => {
+              if (postContainerRef.value) {
+                const posts = postContainerRef.value.querySelectorAll('li');
+                if (posts.length > 0) {
+                  posts.forEach(el => el.classList.remove('post-active'));
+                  posts[posts.length - 1].classList.add('post-active');
+                }
+              }
+            });
+          }, 100);
+        }
+      },
+      {deep: true, immediate: true});
 });
+
+// 현재 표시할 이미지 가져오기
+const getCurrentImage = (post: Post) => {
+  if (!post.postImages || post.postImages.length === 0) return null;
+
+  if (!currentImageIndices.value[post.id]) {
+    currentImageIndices.value[post.id] = 0;
+  }
+
+  return post.postImages[currentImageIndices.value[post.id]];
+};
+
+// 이미지 변경시 애니메이션 효과를 위한 키 관리
+const imageKeys = ref<Record<string, number>>({});
+const getImageKey = (postId: string) => {
+  if (!imageKeys.value[postId]) {
+    imageKeys.value[postId] = 0;
+  }
+  return imageKeys.value[postId];
+};
+
+// 이미지 변경시 키 업데이트
+const updateImageKey = (postId: string) => {
+  if (!imageKeys.value[postId]) {
+    imageKeys.value[postId] = 0;
+  }
+  imageKeys.value[postId]++;
+};
+
+// 이미지 변경 시 사이즈 조정 문제를 해결하기 위한 함수
+const updateImageSize = (postId: string) => {
+  // 이미지 변경 시 크기 재조정이 필요한 경우를 대비한 호출
+  nextTick(() => {
+    // DOM 업데이트 후 실행되는 코드
+    updateImageKey(postId); // 이미지 키 업데이트로 애니메이션 적용
+
+    // 이미지 로드 완료 후 포스트 컨테이너 크기 조정을 위한 이벤트
+    const imgElement = document.querySelector(`li[data-post-id="${postId}"] .shorts-image`);
+    if (imgElement) {
+      imgElement.addEventListener('load', () => {
+        // 이미지 로드 완료 후 필요한 경우 컨테이너 높이 조정
+        handlePostScroll({} as Event);
+      }, {once: true});
+    }
+  });
+};
+
+// 포스트 포커스 설정
+const setFocusedPost = (postId: string | null) => {
+  focusedPostId.value = postId;
+};
 
 defineExpose({scrollToBottom});
 </script>
@@ -179,236 +354,303 @@ defineExpose({scrollToBottom});
 <template>
   <div
       ref="postContainerRef"
-      class="border border-gray-400 border-md rounded-md overflow-auto p-4 m-4 scroll-custom h-[35rem]"
-      @scroll="handlePostScroll"
+      class="border border-gray-400 border-md rounded-md p-0 m-4"
   >
-    <ul class="w-full flex flex-col-reverse">
-      <li class="p-4 bg-zinc-800 rounded-md" v-for="post in posts" :key="post.id">
-        <div class="flex flex-row text-center items-center">
-          <p class="text-xl text-white mr-3">{{ post.writer }}</p>
-          <p class="text-xs">{{ getWriteTime(post.createDate) }}</p>
-        </div>
+    <ul class="w-full flex flex-col-reverse snap-y snap-mandatory scroll-custom" @scroll="handlePostScroll">
+      <li class="bg-zinc-800 snap-center w-full"
+          v-for="post in posts"
+          :key="post.id"
+          :data-post-id="post.id"
+          @mouseenter="setFocusedPost(post.id)"
+          @mouseleave="setFocusedPost(null)"
+          @wheel.prevent="(e) => handlePostWheel(e, post.id)">
 
-        <div class="mt-3">
-          <p class="text-white mr-3">{{ post.content }}</p>
-        </div>
+        <div class="post-content">
+          <!-- 포스트 헤더 -->
+          <div class="flex flex-row text-center items-center mb-3">
+            <p class="text-xl text-white mr-3">{{ post.writer }}</p>
+            <p class="text-xs">{{ getWriteTime(post.createDate) }}</p>
+          </div>
 
-        <!-- 이미지 섹션 -->
-        <div class="mt-3" v-if="post.postImages && post.postImages.length > 0">
-          <div :class="['grid-layout', post.postImages.length === 2 ? 'two-images' : 'three-images']">
-            <template v-for="(image, imageIndex) in post.postImages.slice(0, 3)" :key="image.id">
+          <!-- 포스트 내용 -->
+          <div class="mb-4">
+            <p class="text-white mr-3">{{ post.content }}</p>
+          </div>
+
+          <!-- 이미지 섹션 -->
+          <div class="flex-grow flex items-center justify-center" v-if="post.postImages && post.postImages.length > 0">
+            <div class="shorts-container">
+              <!-- 메인 이미지 -->
               <div
-                  :class="['relative','image-container',
-                  post.postImages.length === 2 ? `two-image-${imageIndex}`: (imageIndex === 0 ? 'first-image' : imageIndex === 1 ? 'second-image' : 'third-image')]"
-                  @click="openImageModal(props.posts?.indexOf(post) ?? 0, imageIndex)"
+                  class="shorts-image-container"
+                  @wheel.stop="(e) => handleImageWheel(e, post.id, post.postImages.length)"
               >
                 <img
-                    :src="image.url"
-                    alt="Type Image"
-                    class="absolute inset-0 w-full h-full object-cover rounded-md"
+                    :src="getCurrentImage(post)?.url"
+                    alt="Post Image"
+                    class="shorts-image"
                 />
-                <!-- 더보기 표시 -->
-                <div
-                    v-if="imageIndex === 2 && post.postImages.length > 3"
-                    class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white font-bold text-lg rounded-md"
-                >
-                  +{{ post.postImages.length - 3 }}
+                <!-- 이미지 카운터 표시 -->
+                <div v-if="post.postImages.length > 1" class="image-counter">
+                  {{ (currentImageIndices[post.id] || 0) + 1 }}/{{ post.postImages.length }}
                 </div>
               </div>
-            </template>
+
+              <!-- 오른쪽 액션 버튼들 -->
+              <div class="shorts-actions">
+                <!-- 좋아요 버튼 -->
+                <button
+                    class="action-button"
+                    @click="toggleLike(getCurrentImage(post)?.id || `img-${post.id}-0`)"
+                    :class="{ 'liked': likedImages[getCurrentImage(post)?.id || `img-${post.id}-0`] }"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       class="action-icon"
+                       :class="{ 'text-red-500 fill-red-500': likedImages[getCurrentImage(post)?.id || `img-${post.id}-0`] }">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+                  <span class="action-label">좋아요</span>
+                </button>
+
+                <!-- 이전 이미지 버튼 -->
+                <button
+                    v-if="post.postImages.length > 1"
+                    class="action-button"
+                    @click="prevImage(post.id, post.postImages.length)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       class="action-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                  </svg>
+                  <span class="action-label">이전</span>
+                </button>
+
+                <!-- 다음 이미지 버튼 -->
+                <button
+                    v-if="post.postImages.length > 1"
+                    class="action-button"
+                    @click="nextImage(post.id, post.postImages.length)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       class="action-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                  <span class="action-label">다음</span>
+                </button>
+
+                <!-- 복사 버튼 -->
+                <button
+                    class="action-button"
+                    @click="copyLink(getCurrentImage(post)?.url || '')"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       class="action-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                  </svg>
+                  <span class="action-label">복사</span>
+                </button>
+              </div>
+
+              <!-- 이미지 인디케이터 -->
+              <div v-if="post.postImages.length > 1" class="image-indicators">
+                <button
+                    v-for="(image, index) in post.postImages"
+                    :key="image.id ?? index"
+                    @click="currentImageIndices[post.id] = index"
+                    :class="['w-2', 'h-2', 'rounded-full', 'mx-1', 'transition-all', 'duration-200',
+                    index === (currentImageIndices[post.id] || 0) ? 'bg-white scale-110' : 'bg-gray-400 bg-opacity-60']"
+                    :aria-label="`이미지 ${index + 1}로 이동`"
+                ></button>
+              </div>
+            </div>
           </div>
+
+          <!-- 이미지가 없는 경우 빈 공간 채우기 -->
+          <div class="flex-grow" v-else></div>
         </div>
       </li>
     </ul>
   </div>
-
-  <!-- 이미지 케러셀 모달 -->
-  <div
-      v-if="showModal"
-      class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 transition-opacity duration-200"
-      @click="closeModal"
-  >
-    <!-- 메인 이미지 컨테이너 -->
-    <div class="relative max-w-4xl max-h-screen p-4 w-full" @click.stop>
-      <!-- 왼쪽 화살표 -->
-      <button
-          @click.stop="prevImage"
-          class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-12 h-12 rounded-full flex items-center justify-center z-10 hover:bg-opacity-70 transition-all duration-200"
-          aria-label="이전 이미지"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-      </button>
-
-      <!-- 이미지 -->
-      <div class="flex justify-center items-center h-full">
-        <img
-            :src="currentImage"
-            alt="Full size image"
-            class="max-w-full max-h-[50vh] object-contain transition-opacity duration-300"
-            :key="currentImageIndex"
-        />
-      </div>
-
-      <!-- 오른쪽 화살표 -->
-      <button
-          @click.stop="nextImage"
-          class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-12 h-12 rounded-full flex items-center justify-center z-10 hover:bg-opacity-70 transition-all duration-200"
-          aria-label="다음 이미지"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-      </button>
-
-      <!-- 컨트롤 패널 - 상단 오른쪽에 배치 -->
-      <div class="absolute top-4 right-4 flex space-x-2">
-        <button
-            @click.stop="copyLink(currentImage)"
-            class="bg-black bg-opacity-60 text-white px-3 py-2 rounded-md flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
-            aria-label="이미지 링크 복사"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-          </svg>
-        </button>
-
-        <!-- 닫기 버튼 -->
-        <button
-            @click.stop="closeModal"
-            class="bg-black bg-opacity-60 text-white px-3 py-2 rounded-md flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
-            aria-label="모달 닫기"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <!-- 인디케이터 -->
-      <div class="absolute bottom-6 left-0 right-0 flex justify-center space-x-2">
-        <button
-            v-for="(image, index) in currentImages"
-            :key="image.id ?? index"
-            @click.stop="goToImage(index)"
-            :class="['w-2.5', 'h-2.5', 'rounded-full', 'transition-all', 'duration-200',
-            index === currentImageIndex ? 'bg-white scale-110' : 'bg-gray-400 bg-opacity-60']"
-            :aria-label="`이미지 ${index + 1}로 이동`"
-        ></button>
-      </div>
-    </div>
-  </div>
 </template>
 
 <style scoped>
-/* 이미지 그리드 레이아웃 - 공통 */
-.grid-layout {
-  display: grid;
-  gap: 8px;
+/* 쇼츠 스타일 컨테이너 */
+.shorts-container {
+  position: relative;
   width: 100%;
-  max-width: 600px; /* 최대 너비 제한 */
-  margin: 0; /* 왼쪽 정렬로 변경 */
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  height: auto;
+  max-height: calc(35rem - 120px); /* 포스트 헤더와 마진 고려 */
 }
 
-/* 이미지 그리드 레이아웃 - 3개 이미지용 */
-.three-images {
-  grid-template-columns: 3fr 2fr;
-  grid-template-rows: 1fr 1fr;
-  aspect-ratio: 5/3; /* 가로:세로 비율 조정 */
-}
-
-/* 이미지 그리드 레이아웃 - 2개 이미지용 */
-.two-images {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-  aspect-ratio: 2/1; /* 가로:세로 비율 조정 */
-}
-
-/* 첫 번째, 두 번째, 세 번째 이미지 스타일 */
-.first-image {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  aspect-ratio: 1/1; /* 정사각형 비율 유지 */
-}
-
-.second-image {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.third-image {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-/* 2개 이미지일 때 스타일 */
-.two-image-0, .two-image-1 {
-  aspect-ratio: 1/1; /* 정사각형 비율 유지 */
-}
-
-.two-image-0 {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.two-image-1 {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-/* 이미지 컨테이너 공통 스타일 */
-.image-container {
+/* 이미지 전환을 위한 개선된 애니메이션 */
+.shorts-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s, opacity 0.3s;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.post-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
+}
+
+.shorts-image-container {
+  width: 100%;
+  height: 0;
+  padding-bottom: 125%; /* 4:5 비율 유지 */
   position: relative;
   overflow: hidden;
+  border-radius: 8px;
+}
+
+.shorts-image-container:hover .shorts-image {
+  transform: scale(1.03);
+}
+
+/* 이미지 카운터 */
+.image-counter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* 쇼츠 액션 버튼 컨테이너 */
+.shorts-actions {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  gap: 16px;
+}
+
+/* 액션 버튼 */
+.action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
   transition: transform 0.2s;
 }
 
-/* 호버 효과 */
-.image-container:hover {
-  transform: scale(0.98);
-}
-
-/* 이미지 정사각형으로 맞추기 */
-img {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
-/* 모달 내의 이미지는 원본 비율 유지 */
-.max-w-full.max-h-\[50vh\] {
-  object-fit: contain;
-}
-
-/* 케러셀 화살표 애니메이션 */
-button:hover svg {
+.action-button:hover {
   transform: scale(1.1);
-  transition: transform 0.2s;
 }
 
-/* 모달 애니메이션 */
+/* 액션 아이콘 */
+.action-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+/* 액션 라벨 */
+.action-label {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 좋아요 활성화 상태 */
+.liked .action-icon {
+  color: #ef4444;
+  fill: #ef4444;
+}
+
+/* 이미지 인디케이터 */
+.image-indicators {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scroll-custom {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #52525b #27272a;
+  position: relative;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: scale(1.03);
   }
   to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
     opacity: 1;
   }
 }
 
-.fixed {
-  animation: fadeIn 0.2s ease-in-out;
+.border-md {
+  height: 35rem;
+  position: relative;
+  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
 }
 
-.scroll-custom {
-  scrollbar-width: thin;
-  scrollbar-color: #52525b #27272a; /* 스크롤바 색상과 트랙 색상 */
+ul {
+  position: relative;
+  width: 100%;
+  height: auto;
 }
 
+li {
+  scroll-snap-align: start;
+  transition: transform 0.3s ease-out;
+}
+
+ul > li {
+  height: 35rem;
+  min-height: 35rem;
+  max-height: 35rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: center;
+  position: relative;
+  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
+  padding: 1rem;
+}
 </style>
