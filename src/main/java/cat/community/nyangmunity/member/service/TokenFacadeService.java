@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenFacadeService {
 
-	private final TokenReadService tokenReadService;
+	private final TokenQueryService tokenQueryService;
 	private final TokenCommandService tokenCommandService;
 
 	private final JwtTokenProvider jwtTokenProvider;
@@ -64,7 +64,7 @@ public class TokenFacadeService {
 	 * @param refreshToken 삭제할 갱신 토큰
 	 */
 	public void deleteToken(String refreshToken) {
-		Token token = tokenReadService.findTokenByRefreshToken(refreshToken);
+		Token token = tokenQueryService.findTokenByRefreshToken(refreshToken);
 		tokenCommandService.delete(token);
 	}
 
@@ -81,6 +81,6 @@ public class TokenFacadeService {
 	}
 
 	public Token findTokenByMemberId(String memberId) {
-		return tokenReadService.findTokenByMemberId(memberId);
+		return tokenQueryService.findTokenByMemberId(memberId);
 	}
 }

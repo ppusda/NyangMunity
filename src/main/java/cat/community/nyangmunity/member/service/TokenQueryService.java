@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TokenReadService {
+public class TokenQueryService {
 
 	private final TokenRepository tokenRepository;
 
