@@ -21,7 +21,8 @@ import cat.community.nyangmunity.post.request.PostWriteRequest;
 import cat.community.nyangmunity.post.request.PostsRequest;
 import cat.community.nyangmunity.post.response.PostLikeResponse;
 import cat.community.nyangmunity.post.response.PostResponse;
-import cat.community.nyangmunity.post.service.PostService;
+import cat.community.nyangmunity.post.service.PostQueryService;
+import cat.community.nyangmunity.post.service.PostCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -30,47 +31,37 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostController {
 
-	private final PostService postService;
+	private final PostCommandService postCommandService;
+	private final PostQueryService postQueryService;
 	private final MemberQueryService memberQueryService;
 
 	@GetMapping
 	public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest) {
-		return postService.getList(postsRequest.getPage(), postsRequest.getSize());
+		return postQueryService.getPosts(postsRequest.getPage(), postsRequest.getSize());
 	}
 
 	@GetMapping("/likes")
 	public PostLikeResponse maxLikePost() {
-		return postService.maxLikePost();
+		return postQueryService.maxLikePost();
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {
-		postService.write(postWriteRequest, memberQueryService.findMemberById(Long.parseLong(principal.getName())));
+		postCommandService.write(postWriteRequest,
+			memberQueryService.findMemberById(Long.parseLong(principal.getName())));
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@PatchMapping("/{postId}")
 	public void editPost(@PathVariable Long postId, @ModelAttribute @Valid PostEditRequest postEditRequest,
 		Principal principal) {
-		postService.edit(postId, postEditRequest, Long.parseLong(principal.getName()));
+		postCommandService.edit(postId, postEditRequest, Long.parseLong(principal.getName()));
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping("/{postId}")
 	public void deletePost(@PathVariable Long postId, Principal principal) {
-		postService.delete(postId, Long.parseLong(principal.getName()));
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/like/{postId}")
-	public void postLike(@PathVariable(name = "postId") Long bid, Principal principal) {
-		postService.like(bid, memberQueryService.findMemberById(Long.parseLong(principal.getName())));
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/like/check/{postId}")
-	public boolean postLikeCheck(@PathVariable(name = "postId") Long bid, Principal principal) {
-		return postService.likeCheck(bid, Long.parseLong(principal.getName()));
+		postCommandService.delete(postId, Long.parseLong(principal.getName()));
 	}
 }
