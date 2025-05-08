@@ -11,7 +11,8 @@ import cat.community.nyangmunity.image.batch.response.ImageResponse;
 import cat.community.nyangmunity.image.entity.Provider;
 import cat.community.nyangmunity.image.response.ProviderResponse;
 import cat.community.nyangmunity.image.response.UploadImageResponse;
-import cat.community.nyangmunity.image.service.ImageService;
+import cat.community.nyangmunity.image.service.ImageQueryService;
+import cat.community.nyangmunity.image.service.ImageCommandService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,11 +20,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageController {
 
-	private final ImageService imageService;
+	private final ImageQueryService imageQueryService;
+	private final ImageCommandService imageCommandService;
 
 	@GetMapping
 	public Page<ImageResponse> getImages(@RequestParam int page, @RequestParam Provider provider) {
-		return imageService.getImageList(page, provider);
+		return imageQueryService.getImageList(page, provider);
 	}
 
 	@GetMapping("/providers")
@@ -34,7 +36,7 @@ public class ImageController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/upload")
 	public UploadImageResponse getUploadURL(@RequestParam(name = "filename") String filename) {
-		return imageService.createImageInfo(filename);
+		return imageCommandService.createImageInfo(filename);
 	}
 
 }

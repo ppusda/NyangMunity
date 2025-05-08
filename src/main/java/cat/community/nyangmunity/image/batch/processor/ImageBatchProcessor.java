@@ -10,18 +10,20 @@ import org.springframework.stereotype.Component;
 import cat.community.nyangmunity.image.batch.response.TenorResponse;
 import cat.community.nyangmunity.image.entity.Image;
 import cat.community.nyangmunity.image.entity.Provider;
-import cat.community.nyangmunity.image.service.ImageService;
+import cat.community.nyangmunity.image.service.ImageQueryService;
+import cat.community.nyangmunity.image.service.ImageCommandService;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, List<Image>> {
 
-	private final ImageService imageService;
+	private final ImageQueryService imageQueryService;
+	private final ImageCommandService imageCommandService;
 
 	@Override
 	public List<Image> process(List<TenorResponse> tenorResponses) {
-		List<Image> existImages = imageService.getAllImages();
+		List<Image> existImages = imageQueryService.getAllImages();
 		Set<String> existImageIds = existImages.stream()
 			.map(Image::getId)
 			.collect(Collectors.toSet());
@@ -37,7 +39,7 @@ public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, L
 			.collect(Collectors.toSet());
 
 		List<Image> imagesToDelete = filteringForDeleteImages(existImages, newIds);
-		imageService.deleteImages(imagesToDelete);
+		imageCommandService.deleteImages(imagesToDelete);
 
 		return imagesToAdd;
 	}

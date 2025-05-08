@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import cat.community.nyangmunity.global.exception.global.ForbiddenException;
-import cat.community.nyangmunity.image.service.ImageService;
+import cat.community.nyangmunity.image.service.ImageQueryService;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.post.editor.PostEditor;
 import cat.community.nyangmunity.post.entity.Post;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PostCommandService {
 
-	private final ImageService imageService;
+	private final ImageQueryService imageQueryService;
 
 	private final PostRepository postRepository;
 	private final PostQueryService postQueryService;
@@ -40,7 +40,7 @@ public class PostCommandService {
 				.build()
 		);
 
-		List<PostImage> postImages = imageService.findPostImagesByIds(postWriteRequest.postImageIds());
+		List<PostImage> postImages = imageQueryService.findPostImagesByIds(postWriteRequest.postImageIds());
 		savedPost.updatePostImages(postImages);
 		postImageRepository.saveAll(postImages);
 	}
