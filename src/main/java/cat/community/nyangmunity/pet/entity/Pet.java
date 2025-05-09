@@ -26,10 +26,6 @@ public class Pet {
 	private String name;
 
 	@Column
-	@Enumerated(EnumType.STRING)
-	private Gender gender;
-
-	@Column
 	private LocalDate birthday;
 
 	@ManyToOne
