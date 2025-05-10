@@ -1,5 +1,6 @@
 package cat.community.nyangmunity.post.entity;
 
+import cat.community.nyangmunity.image.entity.Image;
 import cat.community.nyangmunity.member.entity.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,23 +15,23 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class PostLike {
+public class PostImageLike {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "post_id")
-	private Post post;
+	@JoinColumn(name = "post_image_id")
+	private PostImage postImage;
 
 	@ManyToOne
 	@JoinColumn(name = "member_id")
 	private Member member;
 
 	@Builder
-	public PostLike(Post post, Member member) {
-		this.post = post;
+	public PostImageLike(PostImage postImage, Member member) {
+		this.postImage = postImage;
 		this.member = member;
 	}
 }

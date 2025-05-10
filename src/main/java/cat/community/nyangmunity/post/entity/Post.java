@@ -45,7 +45,7 @@ public class Post {
 	private List<PostImage> images = new ArrayList<>();
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<PostLike> likes = new ArrayList<>();
+	private List<PostImageLike> likes = new ArrayList<>();
 
 	public BoardEditorBuilder toEditor() {
 		return PostEditor.builder()
