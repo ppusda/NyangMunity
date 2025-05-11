@@ -476,6 +476,36 @@ defineExpose({scrollToBottom});
 </template>
 
 <style scoped>
+.border-md {
+  height: 35rem;
+  position: relative;
+  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
+}
+
+ul {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+li {
+  scroll-snap-align: start;
+  transition: transform 0.3s ease-out;
+}
+
+ul > li {
+  height: 35rem;
+  min-height: 35rem;
+  max-height: 35rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: center;
+  position: relative;
+  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
+  padding: 1rem;
+}
+
 /* 쇼츠 스타일 컨테이너 */
 .shorts-container {
   position: relative;
@@ -624,33 +654,4 @@ defineExpose({scrollToBottom});
   }
 }
 
-.border-md {
-  height: 35rem;
-  position: relative;
-  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
-}
-
-ul {
-  position: relative;
-  width: 100%;
-  height: auto;
-}
-
-li {
-  scroll-snap-align: start;
-  transition: transform 0.3s ease-out;
-}
-
-ul > li {
-  height: 35rem;
-  min-height: 35rem;
-  max-height: 35rem;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  scroll-snap-align: center;
-  position: relative;
-  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
-  padding: 1rem;
-}
 </style>

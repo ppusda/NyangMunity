@@ -10,6 +10,10 @@ import type {Image, Post} from '@/interfaces/type';
 import 'vue3-toastify/dist/index.css';
 import axiosClient from "@/libs/axiosClient";
 
+// 패널 상태 관리를 위한 변수 추가
+const isImagePanelCollapsed = ref(window.innerWidth < 768);
+const isInputAreaCollapsed = ref(window.innerWidth < 768);
+
 // 이미지 제공자 상태
 const providers = reactive<string[]>([]);
 const selectedProvider = reactive({value: "Nyangmunity"});
@@ -254,6 +258,15 @@ const handleFileSelect = (event: Event) => {
   }
 };
 
+// 패널 토글 함수
+const toggleImagePanel = () => {
+  isImagePanelCollapsed.value = !isImagePanelCollapsed.value;
+};
+
+const toggleInputArea = () => {
+  isInputAreaCollapsed.value = !isInputAreaCollapsed.value;
+};
+
 // Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
 onMounted(() => {
   getImages(imagePage.value);
@@ -263,6 +276,14 @@ onMounted(() => {
   getProviders();
   getPosts(postPage.value, true);
   postContainerRef.value?.addEventListener('scroll', handlePostScroll);
+
+  // 화면 크기 변경 감지
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 768) {
+      if (!isImagePanelCollapsed.value) isImagePanelCollapsed.value = true;
+      if (!isInputAreaCollapsed.value) isInputAreaCollapsed.value = true;
+    }
+  });
 });
 
 </script>
@@ -270,30 +291,52 @@ onMounted(() => {
 
 <template>
   <div class="w-screen h-screen flex p-2">
-    <div class="flex flex-col w-1/5 bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300">
-      <div class="text-white px-4 py-2">
-        <p>고양이 짤</p>
-        <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
+    <!-- 왼쪽 이미지 패널과 토글 버튼 -->
+    <div class="flex relative">
+      <div :class="[
+        'flex flex-col bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300',
+        isImagePanelCollapsed ? 'w-0 p-0 m-0 overflow-hidden' : 'w-1/5'
+      ]">
+        <!-- 기존 이미지 패널 내용 -->
+        <div class="text-white px-4 py-2">
+          <p>고양이 짤</p>
+          <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
+        </div>
+        <div class="flex flex-row py-2">
+          <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">
+            {{ provider }}
+          </button>
+        </div>
+        <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom"
+             @scroll="handleImageScroll">
+          <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
+        </div>
       </div>
-      <div class="flex flex-row py-2">
-        <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">
-          {{ provider }}
-        </button>
-      </div>
-      <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom"
-           @scroll="handleImageScroll">
-        <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
-      </div>
+
+      <!-- 이미지 패널 토글 버튼 -->
+      <button @click="toggleImagePanel"
+              class="absolute top-1/2 -translate-y-1/2 left-0 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-r-md h-12 w-6 flex items-center justify-center">
+        <span v-if="isImagePanelCollapsed">›</span>
+        <span v-else>‹</span>
+      </button>
     </div>
 
-    <!-- 메인 게시판 섹션 -->
-    <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md">
-      <PostChat
-          ref="postChatRef"
-          :posts="posts"
-          @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
-      ></PostChat>
-      <div class="flex flex-col p-2">
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md relative">
+      <!-- 게시물 채팅 컴포넌트 -->
+      <div class="flex-1 overflow-hidden">
+        <PostChat
+            ref="postChatRef"
+            :posts="posts"
+            @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
+        ></PostChat>
+      </div>
+
+      <!-- 입력 영역과 토글 버튼 -->
+      <div :class="[
+        'flex flex-col p-2 transition-all duration-300',
+        isInputAreaCollapsed ? 'h-0 p-0 m-0 overflow-hidden' : ''
+      ]">
         <!-- 업로드 영역 -->
         <div class="h-full mx-2">
           <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative"
@@ -323,7 +366,6 @@ onMounted(() => {
               <p class="text-center text-gray-400">왼쪽에서 이미지를 선택하거나 첨부하세요!</p>
             </div>
           </div>
-
         </div>
         <div class="flex flex-row mt-2">
           <!-- 입력창 영역 -->
@@ -336,6 +378,13 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- 입력 영역 토글 버튼 -->
+      <button @click="toggleInputArea"
+              class="absolute bottom-0 right-4 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center">
+        <span v-if="isInputAreaCollapsed">↑</span>
+        <span v-else>↓</span>
+      </button>
     </div>
   </div>
 </template>
@@ -353,4 +402,15 @@ onMounted(() => {
   scrollbar-color: #52525b #27272a; /* 스크롤바 색상과 트랙 색상 */
 }
 
+@media (max-width: 768px) {
+  .w-0 {
+    width: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .h-0 {
+    height: 0 !important;
+    min-height: 0 !important;
+  }
+}
 </style>
