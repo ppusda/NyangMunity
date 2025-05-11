@@ -12,7 +12,7 @@ public record PostResponse(
 	String content,
 	List<PostImageResponse> postImages,
 	LocalDateTime createDate,
-	Long uid,
+	Long memberId,
 	String writer
 ) {
 
@@ -22,7 +22,7 @@ public record PostResponse(
 			.content(post.getContent())
 			.postImages(postImages)
 			.createDate(post.getCreateDate())
-			.uid(post.getMember().getId())
+			.memberId(post.getMember().getId())
 			.writer(post.getMember().getNickname())
 			.build();
 	}

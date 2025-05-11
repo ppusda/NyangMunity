@@ -3,7 +3,7 @@ export interface Post {
     content: string;
     postImages: Array<PostImage>;
     createDate: string;
-    uid: number;
+    memberId: number;
     writer: string;
 }
 

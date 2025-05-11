@@ -46,10 +46,10 @@ public class PostCommandService {
 	}
 
 	@Transactional
-	public void edit(Long postId, PostEditRequest postEditRequest, Long uid) {
+	public void edit(Long postId, PostEditRequest postEditRequest, Long memberId) {
 		Post post = postQueryService.findPostById(postId);
 
-		if (!post.getMember().getId().equals(uid)) {
+		if (!post.getMember().getId().equals(memberId)) {
 			throw new ForbiddenException();
 		}
 
