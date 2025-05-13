@@ -7,8 +7,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.post.entity.Post;
+import cat.community.nyangmunity.post.entity.PostImage;
 import cat.community.nyangmunity.post.entity.QPost;
-import cat.community.nyangmunity.post.entity.QPostLike;
+import cat.community.nyangmunity.post.entity.QPostImage;
+import cat.community.nyangmunity.post.entity.QPostImageLike;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -17,19 +19,19 @@ public class PostLikeRepositoryImpl implements PostLikeRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public Post getMaxLikePost() {
-		QPost post = QPost.post;
-		QPostLike postLike = QPostLike.postLike;
+	public PostImage getMaxLikePostImage() {
+		QPostImage postImage = QPostImage.postImage;
+		QPostImageLike postImageLike = QPostImageLike.postImageLike;
 
 		LocalDateTime week = LocalDateTime.now().minusWeeks(1);
 
-		Post maxLikePost = jpaQueryFactory
-			.selectFrom(post)
-			.leftJoin(post.likes, postLike)
-			.where(post.createDate.between(week, LocalDateTime.now()),
-				post.createDate.after(week))
-			.groupBy(post.id)
-			.orderBy(postLike.id.count().desc())
+		PostImage maxLikePost = jpaQueryFactory
+			.selectFrom(postImage)
+			.leftJoin(postImage.likes, postImageLike)
+			.where(postImage.post.createDate.between(week, LocalDateTime.now()),
+				postImage.post.createDate.after(week))
+			.groupBy(postImage.id)
+			.orderBy(postImageLike.id.count().desc())
 			.limit(1)
 			.fetchOne();
 

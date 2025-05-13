@@ -1,8 +1,8 @@
 package cat.community.nyangmunity.post.repository;
 
-import cat.community.nyangmunity.post.entity.Post;
+import cat.community.nyangmunity.post.entity.PostImage;
 
 public interface PostLikeRepositoryCustom {
 
-	Post getMaxLikePost();
+	PostImage getMaxLikePostImage();
 }

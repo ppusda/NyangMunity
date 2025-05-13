@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.post.entity.Post;
+import cat.community.nyangmunity.post.entity.PostImage;
 import cat.community.nyangmunity.post.repository.PostLikeRepository;
 import cat.community.nyangmunity.post.repository.PostRepository;
 import cat.community.nyangmunity.post.response.PostImageResponse;
@@ -35,18 +36,18 @@ public class PostQueryService {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Post> boards = postRepository.findAllByOrderByCreateDateDesc(pageable);
 
-		return convertToBoardResponse(boards);
+		return convertToPostResponse(boards);
 	}
 
 	@Transactional(readOnly = true)
 	public PostLikeResponse maxLikePost() {
 		try {
-			Post post = postLikeRepository.getMaxLikePost();
+			PostImage postImage = postLikeRepository.getMaxLikePostImage();
 			return PostLikeResponse.builder()
-				.id(post.getId())
-				.postImages(convertToBoardImageResponse(post))
-				.nickname(post.getMember().getNickname())
-				.message("가장 인기 많은 " + post.getMember().getNickname() + "님의 이미지 입니다!")
+				.id(postImage.getId())
+				.postImage(PostImageResponse.from(postImage))
+				.nickname(postImage.getPost().getMember().getNickname())
+				.message("가장 인기 많은 " + postImage.getPost().getMember().getNickname() + "님의 이미지 입니다!")
 				.build();
 		} catch (PostNotFoundException e) {
 			return PostLikeResponse.builder()
@@ -55,11 +56,11 @@ public class PostQueryService {
 		}
 	}
 
-	private Page<PostResponse> convertToBoardResponse(Page<Post> boardPage) {
-		return boardPage.map(board -> PostResponse.from(board, convertToBoardImageResponse(board)));
+	private Page<PostResponse> convertToPostResponse(Page<Post> boardPage) {
+		return boardPage.map(board -> PostResponse.from(board, convertToPostImageResponse(board)));
 	}
 
-	private List<PostImageResponse> convertToBoardImageResponse(Post post) {
+	private List<PostImageResponse> convertToPostImageResponse(Post post) {
 		return post.getImages().stream()
 			.map(PostImageResponse::from)
 			.collect(Collectors.toList());

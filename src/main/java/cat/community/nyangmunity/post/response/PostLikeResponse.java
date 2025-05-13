@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record PostLikeResponse(
 	Long id,
-	List<PostImageResponse> postImages,
+	PostImageResponse postImage,
 	String nickname,
 	String message
 ) {
