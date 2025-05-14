@@ -6,9 +6,7 @@ import java.util.Optional;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
-import cat.community.nyangmunity.post.entity.Post;
 import cat.community.nyangmunity.post.entity.PostImage;
-import cat.community.nyangmunity.post.entity.QPost;
 import cat.community.nyangmunity.post.entity.QPostImage;
 import cat.community.nyangmunity.post.entity.QPostImageLike;
 import lombok.RequiredArgsConstructor;

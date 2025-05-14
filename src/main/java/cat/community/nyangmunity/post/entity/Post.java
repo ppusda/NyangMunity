@@ -6,7 +6,7 @@ import java.util.List;
 
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.post.editor.PostEditor;
-import cat.community.nyangmunity.post.editor.PostEditor.BoardEditorBuilder;
+import cat.community.nyangmunity.post.editor.PostEditor.PostEditorBuilder;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,7 +44,7 @@ public class Post {
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<PostImage> images = new ArrayList<>();
 
-	public BoardEditorBuilder toEditor() {
+	public PostEditorBuilder toEditor() {
 		return PostEditor.builder()
 			.content(content);
 	}

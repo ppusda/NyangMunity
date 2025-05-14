@@ -10,17 +10,17 @@ public class PostEditor {
 		this.content = content;
 	}
 
-	public static PostEditor.BoardEditorBuilder builder() {
-		return new PostEditor.BoardEditorBuilder();
+	public static PostEditorBuilder builder() {
+		return new PostEditorBuilder();
 	}
 
-	public static class BoardEditorBuilder {
+	public static class PostEditorBuilder {
 		private String content;
 
-		BoardEditorBuilder() {
+		PostEditorBuilder() {
 		}
 
-		public PostEditor.BoardEditorBuilder content(final String content) {
+		public PostEditorBuilder content(final String content) {
 			if (content != null) {
 				this.content = content;
 			}
@@ -32,7 +32,7 @@ public class PostEditor {
 		}
 
 		public String toString() {
-			return "BoardEditor.BoardEditorBuilder(content=" + this.content + ")";
+			return "PostEditor.PostEditorBuilder(content=" + this.content + ")";
 		}
 	}
 }

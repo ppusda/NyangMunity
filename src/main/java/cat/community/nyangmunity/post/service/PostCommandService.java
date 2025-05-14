@@ -25,9 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PostCommandService {
 
 	private final ImageQueryService imageQueryService;
+	private final PostQueryService postQueryService;
 
 	private final PostRepository postRepository;
-	private final PostQueryService postQueryService;
 	private final PostImageRepository postImageRepository;
 
 	@Transactional
@@ -55,8 +55,8 @@ public class PostCommandService {
 
 		postRepository.save(post);
 
-		PostEditor.BoardEditorBuilder boardEditorBuilder = post.toEditor();
-		PostEditor postEditor = boardEditorBuilder
+		PostEditor.PostEditorBuilder postEditorBuilder = post.toEditor();
+		PostEditor postEditor = postEditorBuilder
 			.content(postEditRequest.content())
 			.build();
 

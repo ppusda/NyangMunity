@@ -34,9 +34,9 @@ public class PostQueryService {
 	@Transactional(readOnly = true)
 	public Page<PostResponse> getPosts(Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Post> boards = postRepository.findAllByOrderByCreateDateDesc(pageable);
+		Page<Post> posts = postRepository.findAllByOrderByCreateDateDesc(pageable);
 
-		return convertToPostResponse(boards);
+		return convertToPostResponse(posts);
 	}
 
 	@Transactional(readOnly = true)
@@ -56,8 +56,8 @@ public class PostQueryService {
 		}
 	}
 
-	private Page<PostResponse> convertToPostResponse(Page<Post> boardPage) {
-		return boardPage.map(board -> PostResponse.from(board, convertToPostImageResponse(board)));
+	private Page<PostResponse> convertToPostResponse(Page<Post> postPage) {
+		return postPage.map(post -> PostResponse.from(post, convertToPostImageResponse(post)));
 	}
 
 	private List<PostImageResponse> convertToPostImageResponse(Post post) {
