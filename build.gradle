@@ -1,137 +1,127 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.1'
-	id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
 
-	/**
-	 * AsciiDoctor
-	 **/
-	id "org.asciidoctor.jvm.convert" version "3.3.2"
+    /**
+     * AsciiDoctor
+     **/
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'cat.community'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    asciidoctorExt
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 
-	/* Vue build */
-	gradlePluginPortal()
+    /* Vue build */
+    gradlePluginPortal()
 }
 
 dependencies {
-	/**
-	 * Spring Framework
-	 **/
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-mustache'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-batch'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    /**
+     * Spring Framework
+     **/
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-	/**
-	 * AWS
-	 */
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-	implementation 'software.amazon.awssdk:s3:2.25.1'
+    /**
+     * AWS
+     */
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'software.amazon.awssdk:s3:2.25.1'
 
-	/**
-	 * Lombok
-	 **/
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    /**
+     * Lombok
+     **/
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	/**
-	 * scrypt
-	 **/
-	implementation 'org.springframework.security:spring-security-crypto'
-	implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    /**
+     * scrypt
+     **/
+    implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 
-	/**
-	 * File Upload
-	 **/
-	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+    /**
+     * File Upload
+     **/
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
 
-	/**
-	 * MySQL, Redis
-	 **/
-	implementation 'mysql:mysql-connector-java:8.0.26'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    /**
+     * MySQL, Redis
+     **/
+    implementation 'mysql:mysql-connector-java:8.0.26'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
-	/**
-	 * QueryDSL
-	 **/
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    /**
+     * QueryDSL
+     **/
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	/**
-	 * AsciiDOC - SpringRESTDOC
-	 **/
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.6.RELEASE'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
+    /**
+     * JWT
+     **/
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3', 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-	/**
-	 * JWT
-	 **/
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3', 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    /**
+     * GSON
+     **/
+    implementation 'com.google.code.gson:gson:2.8.9'
 
-	/**
-	 * GSON
-	 **/
-	implementation 'com.google.code.gson:gson:2.8.9'
-
-	/**
-	 * Webflux
-	 **/
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    /**
+     * Webflux
+     **/
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
-ext {
-	snippetsDir = file('build/generated-snippets')
+// QueryDSL Setting
+def generated = 'src/main/generated'
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
 }
 
-test {
-	useJUnitPlatform()
-	scanForTestClasses = false
-	include "**/*Test.class"
-	outputs.dir snippetsDir
+sourceSets {
+    main.java.srcDirs += [generated]
 }
 
-asciidoctor {
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
-	dependsOn test
+clean {
+    delete file(generated)
 }
 
-bootJar {
-	enabled = true
-	dependsOn asciidoctor
+tasks.named('test') {
+    useJUnitPlatform()
+}
 
-	copy {
-		from asciidoctor.outputDir
-		into "src/main/resources/templates/docs"
-	}
+clean {
+    delete file(generated)
 }
 
 jar {
-	enabled = false
+    enabled = false
 }

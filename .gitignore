@@ -44,3 +44,5 @@ out/
 ./ca.crt
 ./ca.key
 
+### Auto Generated ###
+/src/main/generated
