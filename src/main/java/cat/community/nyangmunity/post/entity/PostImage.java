@@ -38,7 +38,7 @@ public class PostImage {
 	@Column
 	private LocalDateTime createDate;
 
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "postImage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<PostImageLike> likes = new ArrayList<>();
 
 	public PostImage(Image image) {
