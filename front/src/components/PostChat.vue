@@ -477,7 +477,7 @@ defineExpose({scrollToBottom});
 
 <style scoped>
 .border-md {
-  height: 35rem;
+  height: 100%; /* 높이를 부모 컨테이너에 맞추도록 수정 */
   position: relative;
   overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
 }
@@ -485,18 +485,17 @@ defineExpose({scrollToBottom});
 ul {
   position: relative;
   width: 100%;
-  height: auto;
+  height: 100%; /* 높이를 부모 컨테이너에 맞추도록 수정 */
 }
 
 li {
   scroll-snap-align: start;
-  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease-in-out;
 }
 
 ul > li {
-  height: 35rem;
-  min-height: 35rem;
-  max-height: 35rem;
+  height: 100%; /* 화면 크기에 맞게 유동적으로 조정 */
+  min-height: 40rem; /* 최소 높이 설정 */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -510,14 +509,14 @@ ul > li {
 .shorts-container {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 30rem;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-grow: 1;
   height: auto;
-  max-height: calc(35rem - 120px); /* 포스트 헤더와 마진 고려 */
+  max-height: calc(100% - 120px); /* 포스트 헤더와 마진 고려하여 수정 */
 }
 
 /* 이미지 전환을 위한 개선된 애니메이션 */

@@ -10,7 +10,8 @@ import type {Image, Post} from '@/interfaces/type';
 import 'vue3-toastify/dist/index.css';
 import axiosClient from "@/libs/axiosClient";
 
-// 패널 상태 관리를 위한 변수 추가
+
+// 패널 상태 관리를 위한 변수
 const isImagePanelCollapsed = ref(window.innerWidth < 768);
 const isInputAreaCollapsed = ref(window.innerWidth < 768);
 
@@ -277,11 +278,12 @@ onMounted(() => {
   getPosts(postPage.value, true);
   postContainerRef.value?.addEventListener('scroll', handlePostScroll);
 
-  // 화면 크기 변경 감지
+  // 화면 크기 변경 감지 - 좀 더 정교하게 설정
   window.addEventListener('resize', () => {
+    // 모바일에서는 패널들을 접기
     if (window.innerWidth < 768) {
-      if (!isImagePanelCollapsed.value) isImagePanelCollapsed.value = true;
-      if (!isInputAreaCollapsed.value) isInputAreaCollapsed.value = true;
+      isImagePanelCollapsed.value = true;
+      isInputAreaCollapsed.value = true;
     }
   });
 });
@@ -290,24 +292,24 @@ onMounted(() => {
 
 
 <template>
-  <div class="w-screen h-screen flex p-2">
+  <div class="w-screen h-screen flex flex-col md:flex-row p-2 overflow-hidden">
     <!-- 왼쪽 이미지 패널과 토글 버튼 -->
-    <div class="flex relative">
+    <div class="flex relative h-full">
       <div :class="[
-        'flex flex-col bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300',
-        isImagePanelCollapsed ? 'w-0 p-0 m-0 overflow-hidden' : 'w-1/5'
+        'flex flex-col bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300 h-full',
+        isImagePanelCollapsed ? 'w-0 p-0 m-0 overflow-hidden' : 'w-64 md:w-80 lg:w-96'
       ]">
         <!-- 기존 이미지 패널 내용 -->
         <div class="text-white px-4 py-2">
           <p>고양이 짤</p>
           <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
         </div>
-        <div class="flex flex-row py-2">
-          <button v-for="provider in providers" class="btn btn-ghost mr-2" @click="handleProviderClick(provider)">
+        <div class="flex flex-row flex-wrap py-2">
+          <button v-for="provider in providers" class="btn btn-ghost mr-2 mb-2" @click="handleProviderClick(provider)">
             {{ provider }}
           </button>
         </div>
-        <div class="imageList border border-gray-400 rounded-md w-full h-[43rem] p-4 overflow-y-auto scroll-custom"
+        <div class="imageList border border-gray-400 rounded-md w-full flex-1 p-4 overflow-y-auto scroll-custom"
              @scroll="handleImageScroll">
           <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
         </div>
@@ -322,7 +324,7 @@ onMounted(() => {
     </div>
 
     <!-- 메인 콘텐츠 영역 -->
-    <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md relative">
+    <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md relative h-full overflow-hidden">
       <!-- 게시물 채팅 컴포넌트 -->
       <div class="flex-1 overflow-hidden">
         <PostChat
@@ -335,10 +337,10 @@ onMounted(() => {
       <!-- 입력 영역과 토글 버튼 -->
       <div :class="[
         'flex flex-col p-2 transition-all duration-300',
-        isInputAreaCollapsed ? 'h-0 p-0 m-0 overflow-hidden' : ''
+        isInputAreaCollapsed ? 'h-0 p-0 m-0 overflow-hidden' : 'max-h-48'
       ]">
         <!-- 업로드 영역 -->
-        <div class="h-full mx-2">
+        <div class="mx-2">
           <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative"
                @drop="handleDrop"
                @dragover.prevent
@@ -371,7 +373,7 @@ onMounted(() => {
           <!-- 입력창 영역 -->
           <div class="bg-zinc-800 rounded-md w-full h-full p-2">
             <textarea v-model:="content" placeholder="간단한 설명을 입력해주세요." maxlength="100"
-                      class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-full resize-none"></textarea>
+                      class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-16 resize-none"></textarea>
           </div>
           <div class="h-full p-2">
             <button @click="writePost" class="btn btn-ghost border h-full border-gray-400"> ↵</button>
@@ -395,6 +397,8 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  max-height: 100px;
+  overflow-y: auto;
 }
 
 .scroll-custom {
