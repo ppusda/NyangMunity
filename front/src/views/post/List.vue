@@ -295,9 +295,10 @@ onMounted(() => {
   <div class="w-screen h-screen flex flex-col md:flex-row p-2 overflow-hidden">
     <!-- 왼쪽 이미지 패널과 토글 버튼 -->
     <div class="flex relative h-full">
+      <!-- 이미지 패널 - 접히면 완전히 사라짐 -->
       <div :class="[
-        'flex flex-col bg-zinc-800 p-4 mx-2 rounded-md transition-all duration-300 h-full',
-        isImagePanelCollapsed ? 'w-0 p-0 m-0 overflow-hidden' : 'w-64 md:w-80 lg:w-96'
+        'flex flex-col bg-zinc-800 rounded-md transition-all duration-300 h-full overflow-hidden',
+        isImagePanelCollapsed ? 'w-0 p-0 opacity-0 m-0' : 'w-64 md:w-80 lg:w-96 p-4 mx-2'
       ]">
         <!-- 기존 이미지 패널 내용 -->
         <div class="text-white px-4 py-2">
@@ -336,8 +337,8 @@ onMounted(() => {
 
       <!-- 입력 영역과 토글 버튼 -->
       <div :class="[
-        'flex flex-col p-2 transition-all duration-300',
-        isInputAreaCollapsed ? 'h-0 p-0 m-0 overflow-hidden' : 'max-h-48'
+        'flex flex-col transition-all duration-300 overflow-hidden',
+        isInputAreaCollapsed ? 'h-0 max-h-0 opacity-0 p-0 m-0' : 'max-h-48 p-2'
       ]">
         <!-- 업로드 영역 -->
         <div class="mx-2">
