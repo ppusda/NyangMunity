@@ -477,35 +477,56 @@ defineExpose({scrollToBottom});
 
 <style scoped>
 .border-md {
-  height: 100%; /* 높이를 부모 컨테이너에 맞추도록 수정 */
+  height: calc(100% - 1rem); /* 패딩을 고려한 높이 조정 */
   position: relative;
-  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
+  overflow: visible; /* 넘치는 콘텐츠 표시 */
+  padding: 0.5rem 0; /* 위아래 패딩 추가 */
 }
 
 ul {
   position: relative;
   width: 100%;
-  height: 100%; /* 높이를 부모 컨테이너에 맞추도록 수정 */
+  height: 100%;
+  overflow-y: auto; /* 스크롤은 ul에서 처리 */
+  margin: 0;
+  padding: 0;
 }
 
-li {
-  scroll-snap-align: start;
-  transition: transform 0.3s ease-in-out;
+.scroll-custom {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #52525b #27272a;
+  position: relative;
+  padding: 0.5rem 0; /* 스크롤시 위아래 여백 확보 */
 }
 
+/* li 요소의 높이와 패딩 조정 */
 ul > li {
-  height: 100%; /* 화면 크기에 맞게 유동적으로 조정 */
-  min-height: 40rem; /* 최소 높이 설정 */
+  height: 100%;
+  min-height: 40rem;
   width: 100%;
   display: flex;
   flex-direction: column;
   scroll-snap-align: center;
   position: relative;
-  overflow: hidden; /* 넘치는 콘텐츠는 숨김 */
+  overflow: hidden;
   padding: 1rem;
+  box-sizing: border-box; /* 패딩을 요소 크기에 포함 */
 }
 
-/* 쇼츠 스타일 컨테이너 */
+/* 이미지와 텍스트가 늘어날 수 있도록 수정 */
+.post-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  height: 100%; /* 높이 100% 설정 */
+}
+
 .shorts-container {
   position: relative;
   width: 100%;
@@ -516,7 +537,7 @@ ul > li {
   align-items: center;
   flex-grow: 1;
   height: auto;
-  max-height: calc(100% - 120px); /* 포스트 헤더와 마진 고려하여 수정 */
+  max-height: calc(100% - 8rem); /* 헤더와 마진 고려하여 조정 */
 }
 
 /* 이미지 전환을 위한 개선된 애니메이션 */
