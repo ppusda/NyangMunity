@@ -331,6 +331,7 @@ onMounted(() => {
         <PostChat
             ref="postChatRef"
             :posts="posts"
+            :isInputAreaCollapsed="isInputAreaCollapsed"
             @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
         ></PostChat>
       </div>

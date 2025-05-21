@@ -8,6 +8,10 @@ import type {Post} from '@/interfaces/type';
 // List.vue 데이터 설정
 const props = defineProps({
   posts: Array<Post>,
+  isInputAreaCollapsed: {
+    type: Boolean,
+    default: false
+  }
 });
 const emit = defineEmits(['scrollTop']);
 
@@ -82,11 +86,17 @@ const toggleLike = (imageId: string) => {
   infoToast(likedImages.value[imageId] ? "좋아요를 눌렀습니다!" : "좋아요를 취소했습니다!");
 };
 
-// 이전 이미지로 이동
+// 이미지 전환 방향을 추적하는 상태 변수 추가
+const imageTransitionDirection = ref<Record<string, string>>({});
+
+// 이전 이미지로 이동 함수 수정
 const prevImage = (postId: string, imagesLength: number) => {
   if (!currentImageIndices.value[postId]) {
     currentImageIndices.value[postId] = 0;
   }
+
+  // 전환 방향 설정
+  imageTransitionDirection.value[postId] = 'prev';
 
   if (currentImageIndices.value[postId] > 0) {
     currentImageIndices.value[postId]--;
@@ -99,11 +109,14 @@ const prevImage = (postId: string, imagesLength: number) => {
   updateImageSize(postId);
 };
 
-// 다음 이미지로 이동
+// 다음 이미지로 이동 함수 수정
 const nextImage = (postId: string, imagesLength: number) => {
   if (!currentImageIndices.value[postId]) {
     currentImageIndices.value[postId] = 0;
   }
+
+  // 전환 방향 설정
+  imageTransitionDirection.value[postId] = 'next';
 
   if (currentImageIndices.value[postId] < imagesLength - 1) {
     currentImageIndices.value[postId]++;
@@ -366,17 +379,6 @@ defineExpose({scrollToBottom});
           @wheel.prevent="(e) => handlePostWheel(e, post.id)">
 
         <div class="post-content">
-          <!-- 포스트 헤더 -->
-          <div class="flex flex-row text-center items-center mb-3">
-            <p class="text-xl text-white mr-3">{{ post.writer }}</p>
-            <p class="text-xs">{{ getWriteTime(post.createDate) }}</p>
-          </div>
-
-          <!-- 포스트 내용 -->
-          <div class="mb-4">
-            <p class="text-white mr-3">{{ post.content }}</p>
-          </div>
-
           <!-- 이미지 섹션 -->
           <div class="flex-grow flex items-center justify-center" v-if="post.postImages && post.postImages.length > 0">
             <div class="shorts-container">
@@ -385,11 +387,28 @@ defineExpose({scrollToBottom});
                   class="shorts-image-container"
                   @wheel.stop="(e) => handleImageWheel(e, post.id, post.postImages.length)"
               >
-                <img
-                    :src="getCurrentImage(post)?.url"
-                    alt="Post Image"
-                    class="shorts-image"
-                />
+
+                <transition-group
+                    :name="imageTransitionDirection[post.id] === 'next' ? 'image' : 'prev-image'"
+                    mode="out-in"
+                >
+                  <img
+                      :key="currentImageIndices[post.id] || 0"
+                      :src="getCurrentImage(post)?.url"
+                      alt="Post Image"
+                      class="shorts-image"
+                  />
+                </transition-group>
+
+                <!-- 이미지 위에 오버레이되는 포스트 내용 -->
+                <div :class="['post-overlay', !post.content ? 'empty-content' : '']">
+                  <div class="post-header">
+                    <p class="text-xl text-white mr-3">{{ post.writer }}</p>
+                    <p class="text-xs">{{ getWriteTime(post.createDate) }}</p>
+                  </div>
+                  <p v-if="post.content" class="post-content-text">{{ post.content }}</p>
+                </div>
+
                 <!-- 이미지 카운터 표시 -->
                 <div v-if="post.postImages.length > 1" class="image-counter">
                   {{ (currentImageIndices[post.id] || 0) + 1 }}/{{ post.postImages.length }}
@@ -506,7 +525,7 @@ ul {
 /* li 요소의 높이와 패딩 조정 */
 ul > li {
   height: 100%;
-  min-height: 40rem;
+  min-height: v-bind('isInputAreaCollapsed ? "50rem" : "40rem"');
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -514,7 +533,7 @@ ul > li {
   position: relative;
   overflow: hidden;
   padding: 1rem;
-  box-sizing: border-box; /* 패딩을 요소 크기에 포함 */
+  box-sizing: border-box;
 }
 
 /* 이미지와 텍스트가 늘어날 수 있도록 수정 */
@@ -650,6 +669,32 @@ ul > li {
   scrollbar-width: thin;
   scrollbar-color: #52525b #27272a;
   position: relative;
+}
+
+.post-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7) 40%);
+  color: white;
+  z-index: 10;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.post-content-text {
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.post-overlay.empty-content {
+  padding-top: 3rem; /* 내용이 없을 때도 그라데이션 배경만 표시 */
 }
 
 @keyframes fadeIn {
