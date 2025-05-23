@@ -27,7 +27,7 @@ const handlePostScroll = (event: Event) => {
   // 중앙에 위치한 요소 찾기
   const containerCenter = container.scrollTop + container.clientHeight / 2;
 
-  let closestElement = null;
+  let closestElement: Element | null = null; // 명시적 타입 지정
   let closestDistance = Infinity;
 
   postElements.forEach((el) => {
@@ -44,7 +44,7 @@ const handlePostScroll = (event: Event) => {
   // 가장 가까운 요소에 활성화 클래스 추가
   if (closestElement) {
     postElements.forEach(el => el.classList.remove('post-active'));
-    closestElement.classList.add('post-active');
+    (closestElement as HTMLElement).classList.add('post-active'); // 타입 캐스팅 추가
 
     // 스크롤이 맨 위에 닿았을 때 이벤트 발생
     if (container.scrollTop === 0) {
