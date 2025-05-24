@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {nextTick, onMounted, reactive, ref} from 'vue';
+import {computed, nextTick, onMounted, reactive, ref} from 'vue';
 import {infoToast, warningToast} from '@/libs/toaster';
 
 import MasonryGrid from "@/components/MasonryGrid.vue";
@@ -9,7 +9,11 @@ import type {Image, Post} from '@/interfaces/type';
 
 import 'vue3-toastify/dist/index.css';
 import axiosClient from "@/libs/axiosClient";
+import router from "@/router";
+import store from "@/stores/store";
 
+// 로그인 상태 확인
+const isLogin = computed(() => store.state.isLogin);
 
 // 패널 상태 관리를 위한 변수
 const isImagePanelCollapsed = ref(window.innerWidth < 768);
@@ -68,7 +72,17 @@ const getPosts = async (page: number, init: boolean) => {
 
 // 게시물 업로드
 const writePost = async () => {
+  if (!isLogin.value) {
+    await router.replace({name: "login"});
+    return;
+  }
+
   const uploadedImageIds: string[] = await uploadImages();
+  if (uploadedImageIds.length < 0) {
+    warningToast("이미지는 필수로 선택하셔야합니다.");
+    return;
+  }
+
   axiosClient.post('/posts', {
     content: content.value,
     postImageIds: uploadedImageIds,
