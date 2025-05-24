@@ -13,7 +13,7 @@ let likePost = ref<PostLike>({
 
 function getMaxLikePost() {
   axiosClient.get("/posts/likes").then((response) => {
-    if (response.data.postImages.length > 0) {
+    if (response.data.postImages && response.data.postImages.length > 0) {
       likePostFlg.value = true;
     } else {
       likePostFlg.value = false;
@@ -46,7 +46,7 @@ onMounted(async () => {
           <div>
             <div v-if="likePostFlg">
               <img
-                  v-if="likePost.value.postImages && likePost.postImages.length > 0"
+                  v-if="likePost.postImages && likePost.postImages.length > 0"
                   class="rounded"
                   id="main_img"
                   :src="likePost.postImages[0].url"
