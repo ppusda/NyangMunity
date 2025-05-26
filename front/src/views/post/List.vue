@@ -78,8 +78,8 @@ const writePost = async () => {
   }
 
   const uploadedImageIds: string[] = await uploadImages();
-  if (uploadedImageIds.length < 0) {
-    warningToast("이미지는 필수로 선택하셔야합니다.");
+  if (uploadedImageIds.length <= 0) {
+    warningToast("이미지는 필수로 입력해야 합니다.");
     return;
   }
 

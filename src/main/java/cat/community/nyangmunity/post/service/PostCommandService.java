@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import cat.community.nyangmunity.global.exception.global.BadRequestException;
 import cat.community.nyangmunity.global.exception.global.ForbiddenException;
 import cat.community.nyangmunity.image.service.ImageQueryService;
 import cat.community.nyangmunity.member.entity.Member;
@@ -32,6 +33,10 @@ public class PostCommandService {
 
 	@Transactional
 	public void write(PostWriteRequest postWriteRequest, Member member) {
+		if (postWriteRequest.postImageIds().isEmpty()) {
+			throw new BadRequestException("이미지는 필수로 입력해야 합니다.");
+		}
+
 		Post savedPost = postRepository.save(
 			Post.builder()
 				.content(postWriteRequest.content())
