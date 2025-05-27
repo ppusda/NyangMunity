@@ -64,11 +64,6 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 
     /**
-     * File Upload
-     **/
-    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
-
-    /**
      * MySQL, Redis
      **/
     implementation 'mysql:mysql-connector-java:8.0.26'
