@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import cat.community.nyangmunity.global.config.AppConfig;
-import cat.community.nyangmunity.image.config.TenorConfig;
+import cat.community.nyangmunity.postImage.image.config.TenorConfig;
 import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
 
 @EnableScheduling

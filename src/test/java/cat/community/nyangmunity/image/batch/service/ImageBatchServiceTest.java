@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import cat.community.nyangmunity.postImage.image.batch.service.ImageBatchService;
+
 @SpringBootTest
 class ImageBatchServiceTest {
 
 	@Autowired
-	private  ImageBatchService imageBatchService;
+	private ImageBatchService imageBatchService;
 
 	@Test
 	@DisplayName("배치 작업이 정상적으로 작동한다")

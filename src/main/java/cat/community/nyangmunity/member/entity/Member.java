@@ -6,8 +6,8 @@ import java.util.List;
 
 import cat.community.nyangmunity.member.editor.MemberEditor;
 import cat.community.nyangmunity.member.editor.MemberEditor.UserEditorBuilder;
-import cat.community.nyangmunity.post.entity.Post;
-import cat.community.nyangmunity.post.entity.PostImageLike;
+import cat.community.nyangmunity.postImage.post.entity.Post;
+import cat.community.nyangmunity.postImage.entity.PostImageLike;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

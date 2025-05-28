@@ -3,7 +3,8 @@ package cat.community.nyangmunity.image.util;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import cat.community.nyangmunity.image.entity.Provider;
+import cat.community.nyangmunity.postImage.image.entity.Provider;
+import cat.community.nyangmunity.postImage.image.util.ProviderConverter;
 
 class ProviderConverterTest {
 
