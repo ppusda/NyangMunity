@@ -40,11 +40,6 @@ public class PostController {
 		return postQueryService.getPosts(postsRequest.getPage(), postsRequest.getSize());
 	}
 
-	@GetMapping("/likes")
-	public MaxLikePostImageResponse maxLikePost() {
-		return postQueryService.maxLikePost();
-	}
-
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public void writePost(@RequestBody @Validated PostWriteRequest postWriteRequest, Principal principal) {

@@ -42,9 +42,4 @@ public class ImageController {
 		return imageCommandService.createImageInfo(filename);
 	}
 
-	@PostMapping("/likes")
-	public void likeImage(@RequestBody ImageLikeRequest imageLikeRequest) {
-		return;
-	}
-
 }
