@@ -7,8 +7,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.postImage.entity.PostImage;
-import cat.community.nyangmunity.post.entity.QPostImage;
-import cat.community.nyangmunity.post.entity.QPostImageLike;
+import cat.community.nyangmunity.postImage.entity.QPostImage;
+import cat.community.nyangmunity.postImage.entity.QPostImageLike;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
