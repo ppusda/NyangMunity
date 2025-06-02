@@ -273,12 +273,30 @@ const handleFileSelect = (event: Event) => {
   }
 };
 
-// 패널 토글 함수
+// 패널 토글 함수 (모바일에서는 하나만 열리도록)
 const toggleImagePanel = () => {
+  const isMobile = window.innerWidth < 768;
+
+  if (isMobile) {
+    // 모바일에서는 이미지 패널을 열 때 입력 영역을 닫음
+    if (isImagePanelCollapsed.value) {
+      isInputAreaCollapsed.value = true;
+    }
+  }
+
   isImagePanelCollapsed.value = !isImagePanelCollapsed.value;
 };
 
 const toggleInputArea = () => {
+  const isMobile = window.innerWidth < 768;
+
+  if (isMobile) {
+    // 모바일에서는 입력 영역을 열 때 이미지 패널을 닫음
+    if (isInputAreaCollapsed.value) {
+      isImagePanelCollapsed.value = true;
+    }
+  }
+
   isInputAreaCollapsed.value = !isInputAreaCollapsed.value;
 };
 
@@ -294,8 +312,10 @@ onMounted(() => {
 
   // 화면 크기 변경 감지 - 좀 더 정교하게 설정
   window.addEventListener('resize', () => {
+    const isMobile = window.innerWidth < 768;
+
     // 모바일에서는 패널들을 접기
-    if (window.innerWidth < 768) {
+    if (isMobile) {
       isImagePanelCollapsed.value = true;
       isInputAreaCollapsed.value = true;
     }
@@ -304,44 +324,44 @@ onMounted(() => {
 
 </script>
 
-
 <template>
-  <div class="w-screen h-screen flex flex-col md:flex-row p-2 overflow-hidden">
-    <!-- 왼쪽 이미지 패널과 토글 버튼 -->
-    <div class="flex relative h-full">
-      <!-- 이미지 패널 - 접히면 완전히 사라짐 -->
-      <div :class="[
-        'flex flex-col bg-zinc-800 rounded-md transition-all duration-300 h-full overflow-hidden',
-        isImagePanelCollapsed ? 'w-0 p-0 opacity-0 m-0' : 'w-64 md:w-80 lg:w-96 p-4 mx-2'
-      ]">
-        <!-- 기존 이미지 패널 내용 -->
-        <div class="text-white px-4 py-2">
-          <p>고양이 짤</p>
-          <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
+  <div class="w-screen h-screen flex flex-col overflow-hidden">
+    <!-- 데스크톱: 가로 배치, 모바일: 세로 배치 -->
+    <div class="flex-1 flex flex-col md:flex-row p-2 overflow-hidden">
+
+      <!-- 왼쪽 이미지 패널과 토글 버튼 (데스크톱에서만 보임) -->
+      <div class="hidden md:flex relative h-full">
+        <!-- 이미지 패널 - 접히면 완전히 사라짐 -->
+        <div :class="[
+          'flex flex-col bg-zinc-800 rounded-md transition-all duration-300 h-full overflow-hidden',
+          isImagePanelCollapsed ? 'w-0 p-0 opacity-0 m-0' : 'w-64 md:w-80 lg:w-96 p-4 mx-2'
+          ]">
+          <div class="text-white px-4 py-2">
+            <p>고양이 짤</p>
+            <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
+          </div>
+          <div class="flex flex-row flex-wrap py-2">
+            <button v-for="provider in providers" class="btn btn-ghost mr-2 mb-2"
+                    @click="handleProviderClick(provider)">
+              {{ provider }}
+            </button>
+          </div>
+          <div class="imageList border border-gray-400 rounded-md w-full flex-1 p-4 overflow-y-auto scroll-custom"
+               @scroll="handleImageScroll">
+            <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
+          </div>
         </div>
-        <div class="flex flex-row flex-wrap py-2">
-          <button v-for="provider in providers" class="btn btn-ghost mr-2 mb-2" @click="handleProviderClick(provider)">
-            {{ provider }}
-          </button>
-        </div>
-        <div class="imageList border border-gray-400 rounded-md w-full flex-1 p-4 overflow-y-auto scroll-custom"
-             @scroll="handleImageScroll">
-          <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
-        </div>
+
+        <!-- 이미지 패널 토글 버튼 -->
+        <button @click="toggleImagePanel"
+                class="absolute top-1/2 -translate-y-1/2 left-0 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-r-md h-12 w-6 flex items-center justify-center">
+          <span v-if="isImagePanelCollapsed">›</span>
+          <span v-else>‹</span>
+        </button>
       </div>
 
-      <!-- 이미지 패널 토글 버튼 -->
-      <button @click="toggleImagePanel"
-              class="absolute top-1/2 -translate-y-1/2 left-0 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-r-md h-12 w-6 flex items-center justify-center">
-        <span v-if="isImagePanelCollapsed">›</span>
-        <span v-else>‹</span>
-      </button>
-    </div>
-
-    <!-- 메인 콘텐츠 영역 -->
-    <div class="flex-1 flex flex-col bg-zinc-800 p-4 mx-2 rounded-md relative h-full overflow-hidden">
-      <!-- 게시물 채팅 컴포넌트 -->
-      <div class="flex-1 overflow-hidden">
+      <!-- 메인 콘텐츠 영역 (게시물 채팅) -->
+      <div class="flex-1 bg-zinc-800 p-4 mx-2 rounded-md overflow-hidden">
         <PostChat
             ref="postChatRef"
             :posts="posts"
@@ -349,15 +369,74 @@ onMounted(() => {
             @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
         ></PostChat>
       </div>
+    </div>
 
-      <!-- 입력 영역과 토글 버튼 -->
+    <!-- 모바일 이미지 패널 (상단) -->
+    <div class="md:hidden flex flex-col relative">
+      <!-- 토글 버튼 -->
+      <div class="relative">
+        <button @click="toggleImagePanel"
+                class="absolute top-0 left-1/4 transform -translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
+          <span v-if="isImagePanelCollapsed">📷</span>
+          <span v-else>📷</span>
+        </button>
+      </div>
+
+      <!-- 이미지 패널 -->
       <div :class="[
-        'flex flex-col transition-all duration-300 overflow-hidden',
-        isInputAreaCollapsed ? 'h-0 max-h-0 opacity-0 p-0 m-0' : 'max-h-48 p-2'
+        'w-full bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2 mt-3 mb-2',
+        isImagePanelCollapsed ? 'h-0 p-0 opacity-0' : 'h-64 p-4'
+      ]">
+        <div class="flex flex-col h-full">
+          <!-- 제목 영역 -->
+          <div class="text-white mb-3">
+            <p class="font-medium">고양이 짤</p>
+            <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ</p>
+          </div>
+
+          <!-- 프로바이더 버튼들 -->
+          <div class="flex flex-row flex-wrap gap-2 mb-3">
+            <button
+                v-for="provider in providers"
+                :key="provider"
+                :class="[
+                'btn btn-sm px-3 py-1 rounded-md transition-colors text-sm',
+                selectedProvider.value === provider
+                  ? 'bg-zinc-600 text-white'
+                  : 'btn-ghost text-gray-300 hover:bg-zinc-700'
+              ]"
+                @click="handleProviderClick(provider)">
+              {{ provider }}
+            </button>
+          </div>
+
+          <!-- 이미지 그리드 -->
+          <div class="imageList border border-gray-500 rounded-md flex-1 p-3 overflow-y-auto scroll-custom">
+            <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 입력 영역 (하단) -->
+    <div class="flex flex-col relative">
+      <!-- 토글 버튼 -->
+      <div class="relative">
+        <button @click="toggleInputArea"
+                class="absolute bottom-0 right-1/4 transform translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
+          <span v-if="isInputAreaCollapsed">✏️</span>
+          <span v-else>✏️</span>
+        </button>
+      </div>
+
+      <!-- 입력 영역 -->
+      <div :class="[
+        'w-full bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden',
+        isInputAreaCollapsed ? 'h-0 p-0 opacity-0' : 'h-48 p-4'
       ]">
         <!-- 업로드 영역 -->
         <div class="mx-2">
-          <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative"
+          <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative mb-2"
                @drop="handleDrop"
                @dragover.prevent
                @click="handleClick"
@@ -374,35 +453,39 @@ onMounted(() => {
                 <img :src="img.url" class="w-full h-full object-cover rounded-md"/>
                 <button
                     @click.stop="removeUploadImage(img)"
-                    class="absolute top-0 right-0 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    class="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-colors"
                 >
                   ✕
                 </button>
               </div>
             </div>
             <div v-else class="p-4">
-              <p class="text-center text-gray-400">왼쪽에서 이미지를 선택하거나 첨부하세요!</p>
+              <p class="text-center text-gray-400 text-sm">이미지를 선택하거나 드래그해서 첨부하세요!</p>
             </div>
           </div>
         </div>
-        <div class="flex flex-row mt-2">
-          <!-- 입력창 영역 -->
-          <div class="bg-zinc-800 rounded-md w-full h-full p-2">
-            <textarea v-model:="content" placeholder="간단한 설명을 입력해주세요." maxlength="100"
-                      class="textarea textarea-bordered textarea-md bg-zinc-900 w-full h-16 resize-none"></textarea>
+
+        <!-- 텍스트 입력과 전송 버튼 -->
+        <div class="flex flex-row gap-2 mx-2">
+          <div class="flex-1">
+            <textarea
+                v-model="content"
+                placeholder="간단한 설명을 입력해주세요."
+                maxlength="100"
+                class="textarea textarea-bordered bg-zinc-900 text-white placeholder-gray-400 w-full h-16 resize-none focus:border-zinc-600 focus:outline-none"
+            ></textarea>
           </div>
-          <div class="h-full p-2">
-            <button @click="writePost" class="btn btn-ghost border h-full border-gray-400"> ↵</button>
+          <div class="flex items-end">
+            <button
+                @click="writePost"
+                class="btn btn-primary h-16 px-4 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white transition-colors"
+                :disabled="!uploadImageList.length"
+            >
+              전송
+            </button>
           </div>
         </div>
       </div>
-
-      <!-- 입력 영역 토글 버튼 -->
-      <button @click="toggleInputArea"
-              class="absolute bottom-0 right-4 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center">
-        <span v-if="isInputAreaCollapsed">↑</span>
-        <span v-else>↓</span>
-      </button>
     </div>
   </div>
 </template>
@@ -413,13 +496,36 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  min-height: 80px;
   max-height: 100px;
   overflow-y: auto;
 }
 
+.upload-area:hover {
+  border-color: #71717a;
+}
+
 .scroll-custom {
   scrollbar-width: thin;
-  scrollbar-color: #52525b #27272a; /* 스크롤바 색상과 트랙 색상 */
+  scrollbar-color: #52525b #27272a;
+}
+
+.scroll-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-custom::-webkit-scrollbar-track {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+.scroll-custom::-webkit-scrollbar-thumb {
+  background: #52525b;
+  border-radius: 3px;
+}
+
+.scroll-custom::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
 }
 
 @media (max-width: 768px) {
