@@ -355,12 +355,12 @@ onMounted(() => {
         <!-- 이미지 패널 토글 버튼 -->
         <button @click="toggleImagePanel"
                 class="absolute top-1/2 -translate-y-1/2 left-0 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-r-md h-12 w-6 flex items-center justify-center">
-          <span v-if="isImagePanelCollapsed">›</span>
-          <span v-else>‹</span>
+          <span v-if="isImagePanelCollapsed">→</span>
+          <span v-else>←</span>
         </button>
       </div>
 
-      <!-- 메인 콘텐츠 영역 (게시물 채팅) -->
+      <!-- 메인 콘텐츠 영역 -->
       <div class="flex-1 bg-zinc-800 p-4 mx-2 rounded-md overflow-hidden">
         <PostChat
             ref="postChatRef"
@@ -371,29 +371,14 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- 모바일 이미지 패널 (상단) -->
+    <!-- 모바일 이미지 패널 -->
     <div class="md:hidden flex flex-col relative">
-      <!-- 토글 버튼 -->
-      <div class="relative">
-        <button @click="toggleImagePanel"
-                class="absolute top-0 left-1/4 transform -translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
-          <span v-if="isImagePanelCollapsed">📷</span>
-          <span v-else>📷</span>
-        </button>
-      </div>
-
       <!-- 이미지 패널 -->
       <div :class="[
-        'w-full bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2 mt-3 mb-2',
+        'bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2 mb-2',
         isImagePanelCollapsed ? 'h-0 p-0 opacity-0' : 'h-64 p-4'
       ]">
         <div class="flex flex-col h-full">
-          <!-- 제목 영역 -->
-          <div class="text-white mb-3">
-            <p class="font-medium">고양이 짤</p>
-            <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ</p>
-          </div>
-
           <!-- 프로바이더 버튼들 -->
           <div class="flex flex-row flex-wrap gap-2 mb-3">
             <button
@@ -421,21 +406,21 @@ onMounted(() => {
     <!-- 입력 영역 (하단) -->
     <div class="flex flex-col relative">
       <!-- 토글 버튼 -->
-      <div class="relative">
+      <div>
         <button @click="toggleInputArea"
-                class="absolute bottom-0 right-1/4 transform translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
-          <span v-if="isInputAreaCollapsed">✏️</span>
-          <span v-else>✏️</span>
+                class="hidden md:flex absolute bottom-0 right-1/2 transform translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
+          <span v-if="isInputAreaCollapsed">↑</span>
+          <span v-else>↓️</span>
         </button>
       </div>
 
       <!-- 입력 영역 -->
       <div :class="[
-        'w-full bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden',
+        'bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2 mb-2',
         isInputAreaCollapsed ? 'h-0 p-0 opacity-0' : 'h-48 p-4'
       ]">
         <!-- 업로드 영역 -->
-        <div class="mx-2">
+        <div>
           <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative mb-2"
                @drop="handleDrop"
                @dragover.prevent
@@ -466,7 +451,7 @@ onMounted(() => {
         </div>
 
         <!-- 텍스트 입력과 전송 버튼 -->
-        <div class="flex flex-row gap-2 mx-2">
+        <div class="flex flex-row gap-2">
           <div class="flex-1">
             <textarea
                 v-model="content"
@@ -485,6 +470,35 @@ onMounted(() => {
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 모바일 하단 바 -->
+    <div class="md:hidden bg-zinc-800 mx-2 mb-2 rounded-md">
+      <div class="flex justify-end gap-1">
+        <!-- 이미지 패널 토글 버튼 -->
+        <button
+            @click="toggleImagePanel"
+            :class="[
+              'flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200',
+              !isImagePanelCollapsed
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
+                : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
+            ]">
+          <span class="text-sm">📷</span>
+        </button>
+
+        <!-- 입력 영역 토글 버튼 -->
+        <button
+            @click="toggleInputArea"
+            :class="[
+              'flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200',
+              !isInputAreaCollapsed
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
+                : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
+            ]">
+          <span class="text-sm">✏️</span>
+        </button>
       </div>
     </div>
   </div>
