@@ -360,14 +360,86 @@ onMounted(() => {
         </button>
       </div>
 
-      <!-- 메인 콘텐츠 영역 -->
-      <div class="flex-1 bg-zinc-800 p-4 mx-2 rounded-md overflow-hidden">
-        <PostChat
-            ref="postChatRef"
-            :posts="posts"
-            :isInputAreaCollapsed="isInputAreaCollapsed"
-            @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
-        ></PostChat>
+      <div class="flex flex-col overflow-hidden w-full">
+        <!-- 메인 콘텐츠 영역 -->
+        <div class="flex-1 bg-zinc-800 p-4 mx-2 rounded-md overflow-hidden">
+          <PostChat
+              ref="postChatRef"
+              :posts="posts"
+              :isInputAreaCollapsed="isInputAreaCollapsed"
+              @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
+          ></PostChat>
+        </div>
+
+        <!-- 입력 영역 (하단) -->
+        <div class="flex flex-col relative">
+          <!-- 토글 버튼 -->
+          <div>
+            <button @click="toggleInputArea"
+                    class="hidden md:flex absolute bottom-0 right-1/2 transform translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
+              <span v-if="isInputAreaCollapsed">↑</span>
+              <span v-else>↓️</span>
+            </button>
+          </div>
+
+          <!-- 입력 영역 -->
+          <div :class="[
+        'bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2',
+        isInputAreaCollapsed ? 'h-0 p-0 opacity-0' : 'h-48 p-4 mt-3'
+      ]">
+            <!-- 업로드 영역 -->
+            <div>
+              <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative mb-2"
+                   @drop="handleDrop"
+                   @dragover.prevent
+                   @click="handleClick"
+              >
+                <input
+                    type="file"
+                    ref="fileInput"
+                    class="hidden"
+                    @change="handleFileSelect"
+                    multiple
+                />
+                <div v-if="uploadImageList.length" class="flex flex-wrap gap-2">
+                  <div v-for="(img, index) in uploadImageList" :key="index" class="relative w-20 h-20">
+                    <img :src="img.url" class="w-full h-full object-cover rounded-md"/>
+                    <button
+                        @click.stop="removeUploadImage(img)"
+                        class="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                <div v-else class="p-4">
+                  <p class="text-center text-gray-400 text-sm">이미지를 선택하거나 드래그해서 첨부하세요!</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 텍스트 입력과 전송 버튼 -->
+            <div class="flex flex-row gap-2">
+              <div class="flex-1">
+            <textarea
+                v-model="content"
+                placeholder="간단한 설명을 입력해주세요."
+                maxlength="100"
+                class="textarea textarea-bordered bg-zinc-900 text-white placeholder-gray-400 w-full h-16 resize-none focus:border-zinc-600 focus:outline-none"
+            ></textarea>
+              </div>
+              <div class="flex items-end">
+                <button
+                    @click="writePost"
+                    class="btn btn-primary h-16 px-4 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white transition-colors"
+                    :disabled="!uploadImageList.length"
+                >
+                  전송
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -398,76 +470,6 @@ onMounted(() => {
           <!-- 이미지 그리드 -->
           <div class="imageList border border-gray-500 rounded-md flex-1 p-3 overflow-y-auto scroll-custom">
             <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 입력 영역 (하단) -->
-    <div class="flex flex-col relative">
-      <!-- 토글 버튼 -->
-      <div>
-        <button @click="toggleInputArea"
-                class="hidden md:flex absolute bottom-0 right-1/2 transform translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
-          <span v-if="isInputAreaCollapsed">↑</span>
-          <span v-else>↓️</span>
-        </button>
-      </div>
-
-      <!-- 입력 영역 -->
-      <div :class="[
-        'bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2 mb-2',
-        isInputAreaCollapsed ? 'h-0 p-0 opacity-0' : 'h-48 p-4'
-      ]">
-        <!-- 업로드 영역 -->
-        <div>
-          <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative mb-2"
-               @drop="handleDrop"
-               @dragover.prevent
-               @click="handleClick"
-          >
-            <input
-                type="file"
-                ref="fileInput"
-                class="hidden"
-                @change="handleFileSelect"
-                multiple
-            />
-            <div v-if="uploadImageList.length" class="flex flex-wrap gap-2">
-              <div v-for="(img, index) in uploadImageList" :key="index" class="relative w-20 h-20">
-                <img :src="img.url" class="w-full h-full object-cover rounded-md"/>
-                <button
-                    @click.stop="removeUploadImage(img)"
-                    class="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-            <div v-else class="p-4">
-              <p class="text-center text-gray-400 text-sm">이미지를 선택하거나 드래그해서 첨부하세요!</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 텍스트 입력과 전송 버튼 -->
-        <div class="flex flex-row gap-2">
-          <div class="flex-1">
-            <textarea
-                v-model="content"
-                placeholder="간단한 설명을 입력해주세요."
-                maxlength="100"
-                class="textarea textarea-bordered bg-zinc-900 text-white placeholder-gray-400 w-full h-16 resize-none focus:border-zinc-600 focus:outline-none"
-            ></textarea>
-          </div>
-          <div class="flex items-end">
-            <button
-                @click="writePost"
-                class="btn btn-primary h-16 px-4 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white transition-colors"
-                :disabled="!uploadImageList.length"
-            >
-              전송
-            </button>
           </div>
         </div>
       </div>
