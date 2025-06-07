@@ -10,53 +10,75 @@ const loginAction = async () => {
   if (await login(email.value, password.value)) {
     await router.replace({name: "main"});
   }
-}
+};
 </script>
 
 <template>
-  <div class="w-screen rounded-2xl p-12 justify-center">
-    <div class="flex flex-col justify-center items-center">
-      <img id="logo" class="h-[80px]" src="/src/images/logo.png" alt="logo">
-      <h1 class="text-3xl font-bold text-white mb-12">냥뮤니티에 로그인하세요!</h1>
-      <form class="bg-zinc-800 p-5 rounded-md sm:w-[25rem] w-[26rem]">
-        <div class="flex flex-col m-3">
-          <label for="email" class="text-white mb-1">아이디</label>
-          <input type="email" name="email" id="email" v-model="email"
-                 class="input input-bordered border-zinc-500 bg-zinc-900 w-full p-3 rounded-md text-white"
-                 placeholder="이메일을 입력해주세요.">
-        </div>
-        <div class="flex flex-col m-3">
-          <label for="password" class="text-white mb-1">비밀번호</label>
-          <input type="password" name="password" id="password" v-model="password"
-                 class="input input-bordered border-zinc-500 bg-zinc-900 w-full p-3 rounded-md text-white"
-                 placeholder="비밀번호를 입력해주세요.">
-        </div>
-        <div class="flex flex-col justify-center mt-8 m-3">
-          <a @click="loginAction" class="btn btn-outline btn-primary w-full rounded-md text-white mb-1.5"><i
-              class="fa-solid fa-door-open"></i> 로그인</a>
-          <div class="flex flex-row justify-center m-1 mb-0">
-            <a class="btn btn-outline btn-warning y-3 rounded-md w-6/12 mr-2"><i
-                class="fa-solid fa-comment fa-flip-horizontal"></i></a>
-            <a class="btn btn-outline btn-ghost p-3 rounded-md text-white w-6/12"><i
-                class="fa-brands fa-google"></i></a>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="flex flex-col justify-center items-center mt-3">
-      <div class="bg-zinc-800 px-5 py-3 rounded-md sm:w-[25rem] w-[26rem]">
-        <div class="flex flex-col m-1.5 text-center">
-          <h6 class="text-md font-bold text-white mb-3">처음 이용하시나요?</h6>
-          <router-link to="/member/join" class="btn btn-outline btn-ghost w-full p-3 rounded-md text-white"><i
-              class="fa-solid fa-member-plus"></i>회원가입
-          </router-link>
+  <div class="min-h-screen px-4 py-10 flex flex-col items-center bg-zinc-900">
+    <img id="logo" class="h-20 mb-6" src="/src/images/logo.png" alt="logo"/>
+    <h1 class="text-2xl sm:text-3xl font-bold text-white text-center mb-8">
+      냥뮤니티에 로그인하세요!
+    </h1>
+
+    <form class="bg-zinc-800 p-6 rounded-md w-full max-w-sm shadow-md">
+      <div class="flex flex-col mb-4">
+        <label for="email" class="text-white mb-1">아이디</label>
+        <input
+            type="email"
+            name="email"
+            id="email"
+            v-model="email"
+            class="border border-zinc-500 bg-zinc-900 w-full p-3 rounded-md text-white"
+            placeholder="이메일을 입력해주세요."
+        />
+      </div>
+      <div class="flex flex-col mb-6">
+        <label for="password" class="text-white mb-1">비밀번호</label>
+        <input
+            type="password"
+            name="password"
+            id="password"
+            v-model="password"
+            class="border border-zinc-500 bg-zinc-900 w-full p-3 rounded-md text-white"
+            placeholder="비밀번호를 입력해주세요."
+        />
+      </div>
+      <div class="flex flex-col space-y-2">
+        <button
+            type="button"
+            @click="loginAction"
+            class="btn btn-outline btn-primary w-full rounded-md text-white"
+        >
+          <i class="fa-solid fa-door-open mr-2"></i> 로그인
+        </button>
+        <div class="flex space-x-2">
+          <button
+              type="button"
+              class="btn btn-outline btn-warning w-1/2 rounded-md"
+          >
+            <i class="fa-solid fa-comment fa-flip-horizontal"></i>
+          </button>
+          <button
+              type="button"
+              class="btn btn-outline btn-ghost w-1/2 rounded-md text-white"
+          >
+            <i class="fa-brands fa-google"></i>
+          </button>
         </div>
       </div>
+    </form>
+
+    <div class="bg-zinc-800 px-5 py-4 mt-6 rounded-md w-full max-w-sm text-center">
+      <h6 class="text-white font-bold mb-3">처음 이용하시나요?</h6>
+      <router-link
+          to="/member/join"
+          class="btn btn-outline btn-ghost w-full rounded-md text-white"
+      >
+        <i class="fa-solid fa-user-plus mr-2"></i> 회원가입
+      </router-link>
     </div>
   </div>
-
 </template>
 
 <style scoped>
-
 </style>
