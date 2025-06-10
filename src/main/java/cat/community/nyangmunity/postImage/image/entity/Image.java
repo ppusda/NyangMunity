@@ -1,5 +1,7 @@
 package cat.community.nyangmunity.postImage.image.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,6 +29,10 @@ public class Image {
 	@Column
 	@Enumerated(EnumType.STRING)
 	private Provider provider;
+
+	@Column
+	@ColumnDefault("0")
+	private Long totalLikeCount;
 
 	@Builder
 	public Image(String id, String name, String url, Provider provider) {

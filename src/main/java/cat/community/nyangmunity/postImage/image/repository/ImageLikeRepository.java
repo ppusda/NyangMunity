@@ -1,0 +1,16 @@
+package cat.community.nyangmunity.postImage.image.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import cat.community.nyangmunity.postImage.image.entity.ImageLike;
+import cat.community.nyangmunity.postImage.repository.PostImageLikeRepositoryCustom;
+
+@Repository
+public interface ImageLikeRepository
+	extends JpaRepository<ImageLike, Long>, PostImageLikeRepositoryCustom {
+
+	Optional<ImageLike> findByImageIdAndMemberId(String imageId, Long memberId);
+}

@@ -7,7 +7,7 @@ import java.util.List;
 import cat.community.nyangmunity.member.editor.MemberEditor;
 import cat.community.nyangmunity.member.editor.MemberEditor.UserEditorBuilder;
 import cat.community.nyangmunity.postImage.post.entity.Post;
-import cat.community.nyangmunity.postImage.entity.PostImageLike;
+import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,7 +54,7 @@ public class Member {
 	private List<Post> posts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<PostImageLike> postImageLikes = new ArrayList<>();
+	private List<ImageLike> imageLikes = new ArrayList<>();
 
 	public UserEditorBuilder toEditor() {
 		return MemberEditor.builder()
