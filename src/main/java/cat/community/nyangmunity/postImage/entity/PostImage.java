@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cat.community.nyangmunity.postImage.image.entity.Image;
+import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import cat.community.nyangmunity.postImage.post.entity.Post;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,7 +41,7 @@ public class PostImage {
 	private LocalDateTime createDate;
 
 	@OneToMany(mappedBy = "postImage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<PostImageLike> likes = new ArrayList<>();
+	private List<ImageLike> likes = new ArrayList<>();
 
 	public PostImage(Image image) {
 		this.image = image;
