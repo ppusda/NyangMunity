@@ -2,11 +2,16 @@ package cat.community.nyangmunity.postImage.image.entity;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import cat.community.nyangmunity.member.entity.Member;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,9 +35,9 @@ public class Image {
 	@Enumerated(EnumType.STRING)
 	private Provider provider;
 
-	@Column
-	@ColumnDefault("0")
-	private Long totalLikeCount;
+	@JoinColumn(name = "member_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member member;
 
 	@Builder
 	public Image(String id, String name, String url, Provider provider) {

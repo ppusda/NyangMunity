@@ -6,6 +6,7 @@ import java.util.List;
 
 import cat.community.nyangmunity.member.editor.MemberEditor;
 import cat.community.nyangmunity.member.editor.MemberEditor.UserEditorBuilder;
+import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.post.entity.Post;
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import jakarta.persistence.CascadeType;
@@ -49,6 +50,9 @@ public class Member {
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Image> images = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Post> posts = new ArrayList<>();
