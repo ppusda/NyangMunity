@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
-import cat.community.nyangmunity.postImage.repository.PostImageLikeRepositoryCustom;
+import cat.community.nyangmunity.postImage.repository.ImageLikeRepositoryCustom;
 
 @Repository
 public interface ImageLikeRepository
-	extends JpaRepository<ImageLike, Long>, PostImageLikeRepositoryCustom {
+	extends JpaRepository<ImageLike, Long>, ImageLikeRepositoryCustom {
 
 	Optional<ImageLike> findByImageIdAndMemberId(String imageId, Long memberId);
 }
