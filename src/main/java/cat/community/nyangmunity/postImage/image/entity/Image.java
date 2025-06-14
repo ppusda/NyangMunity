@@ -1,6 +1,7 @@
 package cat.community.nyangmunity.postImage.image.entity;
 
-import org.hibernate.annotations.ColumnDefault;
+import java.util.ArrayList;
+import java.util.List;
 
 import cat.community.nyangmunity.member.entity.Member;
 import jakarta.persistence.CascadeType;
@@ -12,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +40,9 @@ public class Image {
 	@JoinColumn(name = "member_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Member member;
+
+	@OneToMany(mappedBy = "image", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<ImageLike> likes = new ArrayList<>();
 
 	@Builder
 	public Image(String id, String name, String url, Provider provider) {
