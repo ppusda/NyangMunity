@@ -11,11 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.postImage.post.entity.Post;
-import cat.community.nyangmunity.postImage.entity.PostImage;
-import cat.community.nyangmunity.postImage.repository.PostImageLikeRepository;
 import cat.community.nyangmunity.postImage.post.repository.PostRepository;
 import cat.community.nyangmunity.postImage.response.PostImageResponse;
-import cat.community.nyangmunity.postImage.response.MaxLikePostImageResponse;
 import cat.community.nyangmunity.postImage.post.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 public class PostQueryService {
 
 	private final PostRepository postRepository;
-	private final PostImageLikeRepository postImageLikeRepository;
 
 	@Transactional(readOnly = true)
 	public Post findPostById(Long bid) {
@@ -37,23 +33,6 @@ public class PostQueryService {
 		Page<Post> posts = postRepository.findAllByOrderByCreateDateDesc(pageable);
 
 		return convertToPostResponse(posts);
-	}
-
-	@Transactional(readOnly = true)
-	public MaxLikePostImageResponse maxLikePost() {
-		try {
-			PostImage postImage = postImageLikeRepository.getMaxLikePostImage();
-			return MaxLikePostImageResponse.builder()
-				.id(postImage.getId())
-				.postImage(PostImageResponse.from(postImage))
-				.nickname(postImage.getPost().getMember().getNickname())
-				.message("가장 인기 많은 " + postImage.getPost().getMember().getNickname() + "님의 이미지 입니다!")
-				.build();
-		} catch (PostNotFoundException e) {
-			return MaxLikePostImageResponse.builder()
-				.message(e.getMessage())
-				.build();
-		}
 	}
 
 	private Page<PostResponse> convertToPostResponse(Page<Post> postPage) {

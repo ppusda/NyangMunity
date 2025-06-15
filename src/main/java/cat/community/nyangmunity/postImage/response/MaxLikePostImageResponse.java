@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record MaxLikePostImageResponse(
-	Long id,
-	PostImageResponse postImage,
+	String id,
+	PostImageResponse imageInfo,
 	String nickname,
 	String message
 ) {

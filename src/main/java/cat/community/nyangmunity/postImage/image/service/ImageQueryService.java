@@ -9,11 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cat.community.nyangmunity.global.exception.global.BadRequestException;
+import cat.community.nyangmunity.postImage.entity.PostImage;
 import cat.community.nyangmunity.postImage.image.batch.response.ImageResponse;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.Provider;
 import cat.community.nyangmunity.postImage.image.repository.ImageRepository;
-import cat.community.nyangmunity.postImage.entity.PostImage;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,6 +22,12 @@ import lombok.RequiredArgsConstructor;
 public class ImageQueryService {
 
 	private final ImageRepository imageRepository;
+
+	@Transactional(readOnly = true)
+	public Image findImageById(String imageId) {
+		return imageRepository.findById(imageId)
+			.orElseThrow(BadRequestException::new);
+	}
 
 	@Transactional(readOnly = true)
 	public List<Image> findImagesByIds(List<String> imageIds) {
