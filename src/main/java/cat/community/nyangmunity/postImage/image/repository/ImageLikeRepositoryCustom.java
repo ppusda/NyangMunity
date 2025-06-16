@@ -1,4 +1,4 @@
-package cat.community.nyangmunity.postImage.repository;
+package cat.community.nyangmunity.postImage.image.repository;
 
 import cat.community.nyangmunity.postImage.image.entity.Image;
 

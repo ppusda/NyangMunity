@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
-import cat.community.nyangmunity.postImage.repository.ImageLikeRepositoryCustom;
 
 @Repository
 public interface ImageLikeRepository
