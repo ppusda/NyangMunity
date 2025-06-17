@@ -19,7 +19,6 @@ import cat.community.nyangmunity.member.service.MemberQueryService;
 import cat.community.nyangmunity.postImage.post.request.PostEditRequest;
 import cat.community.nyangmunity.postImage.post.request.PostWriteRequest;
 import cat.community.nyangmunity.postImage.post.request.PostsRequest;
-import cat.community.nyangmunity.postImage.response.MaxLikePostImageResponse;
 import cat.community.nyangmunity.postImage.post.response.PostResponse;
 import cat.community.nyangmunity.postImage.post.service.PostQueryService;
 import cat.community.nyangmunity.postImage.post.service.PostCommandService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cat.community.nyangmunity.member.service.MemberQueryService;
 import cat.community.nyangmunity.postImage.image.request.ImageLikeRequest;
-import cat.community.nyangmunity.postImage.response.MaxLikePostImageResponse;
+import cat.community.nyangmunity.postImage.image.response.MaxLikePostImageResponse;
 import cat.community.nyangmunity.postImage.image.service.ImageLikeCommandService;
 import cat.community.nyangmunity.postImage.image.service.ImageLikeQueryService;
 import lombok.RequiredArgsConstructor;

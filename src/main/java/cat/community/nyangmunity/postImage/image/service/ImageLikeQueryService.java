@@ -9,7 +9,7 @@ import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import cat.community.nyangmunity.postImage.image.repository.ImageLikeRepository;
-import cat.community.nyangmunity.postImage.response.MaxLikePostImageResponse;
+import cat.community.nyangmunity.postImage.image.response.MaxLikePostImageResponse;
 import cat.community.nyangmunity.postImage.response.PostImageResponse;
 import lombok.RequiredArgsConstructor;
 
