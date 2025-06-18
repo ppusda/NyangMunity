@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
 import cat.community.nyangmunity.postImage.post.entity.Post;
 import cat.community.nyangmunity.postImage.post.repository.PostRepository;
-import cat.community.nyangmunity.postImage.response.PostImageResponse;
 import cat.community.nyangmunity.postImage.post.response.PostResponse;
+import cat.community.nyangmunity.postImage.response.PostImageResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 
 import cat.community.nyangmunity.global.exception.global.BadRequestException;
 import cat.community.nyangmunity.global.exception.global.ForbiddenException;
-import cat.community.nyangmunity.postImage.image.service.ImageQueryService;
 import cat.community.nyangmunity.member.entity.Member;
+import cat.community.nyangmunity.postImage.entity.PostImage;
+import cat.community.nyangmunity.postImage.image.service.ImageQueryService;
 import cat.community.nyangmunity.postImage.post.editor.PostEditor;
 import cat.community.nyangmunity.postImage.post.entity.Post;
-import cat.community.nyangmunity.postImage.entity.PostImage;
-import cat.community.nyangmunity.postImage.repository.PostImageRepository;
 import cat.community.nyangmunity.postImage.post.repository.PostRepository;
 import cat.community.nyangmunity.postImage.post.request.PostEditRequest;
 import cat.community.nyangmunity.postImage.post.request.PostWriteRequest;
+import cat.community.nyangmunity.postImage.repository.PostImageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

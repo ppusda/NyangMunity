@@ -20,8 +20,8 @@ import cat.community.nyangmunity.postImage.post.request.PostEditRequest;
 import cat.community.nyangmunity.postImage.post.request.PostWriteRequest;
 import cat.community.nyangmunity.postImage.post.request.PostsRequest;
 import cat.community.nyangmunity.postImage.post.response.PostResponse;
-import cat.community.nyangmunity.postImage.post.service.PostQueryService;
 import cat.community.nyangmunity.postImage.post.service.PostCommandService;
+import cat.community.nyangmunity.postImage.post.service.PostQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

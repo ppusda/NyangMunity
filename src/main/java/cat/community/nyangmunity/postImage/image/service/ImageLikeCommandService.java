@@ -1,6 +1,5 @@
 package cat.community.nyangmunity.postImage.image.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;

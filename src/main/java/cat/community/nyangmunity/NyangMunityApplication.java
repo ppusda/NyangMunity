@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import cat.community.nyangmunity.global.config.AppConfig;
-import cat.community.nyangmunity.postImage.image.config.TenorConfig;
 import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
+import cat.community.nyangmunity.postImage.image.config.TenorConfig;
 
 @EnableScheduling
 @EnableJpaAuditing
