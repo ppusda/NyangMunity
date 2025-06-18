@@ -362,6 +362,59 @@ const setFocusedPost = (postId: string | null) => {
   focusedPostId.value = postId;
 };
 
+// 터치 이벤트 상태 관리
+const touchStartY = ref(0);
+const touchStartX = ref(0);
+const isTouchMove = ref(false);
+
+// 터치 시작 핸들러
+const handleTouchStart = (event: TouchEvent) => {
+  touchStartY.value = event.touches[0].clientY;
+  touchStartX.value = event.touches[0].clientX;
+  isTouchMove.value = false;
+};
+
+// 터치 이동 핸들러
+const handleTouchMove = (event: TouchEvent) => {
+  isTouchMove.value = true;
+};
+
+// 이미지 터치 엔드 핸들러
+const handleImageTouchEnd = (event: TouchEvent, postId: string, imagesLength: number) => {
+  if (!isTouchMove.value || imagesLength <= 1) return;
+
+  const touchEndY = event.changedTouches[0].clientY;
+  const touchEndX = event.changedTouches[0].clientX;
+  const deltaY = touchStartY.value - touchEndY;
+  const deltaX = touchStartX.value - touchEndX;
+
+  // 수직 스와이프가 수평 스와이프보다 클 때만 처리
+  if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
+    const postIndex = props.posts?.findIndex(p => p.id === postId) ?? -1;
+    if (postIndex === -1) return;
+
+    const currentIndex = currentImageIndices.value[postId] || 0;
+
+    if (deltaY > 0) { // 위로 스와이프
+      if (currentIndex === imagesLength - 1 && postIndex > 0) {
+        // 마지막 이미지에서 위로 스와이프 시 다음 글로
+        navigateToPost(postIndex - 1);
+      } else {
+        nextImage(postId, imagesLength);
+      }
+    } else { // 아래로 스와이프
+      if (currentIndex === 0 && postIndex < (props.posts?.length ?? 0) - 1) {
+        // 첫 번째 이미지에서 아래로 스와이프 시 이전 글로
+        navigateToPost(postIndex + 1);
+      } else {
+        prevImage(postId, imagesLength);
+      }
+    }
+
+    event.preventDefault();
+  }
+};
+
 defineExpose({scrollToBottom});
 </script>
 
@@ -387,6 +440,9 @@ defineExpose({scrollToBottom});
               <div
                   class="shorts-image-container"
                   @wheel.stop="(e) => handleImageWheel(e, post.id, post.postImages.length)"
+                  @touchstart="handleTouchStart"
+                  @touchmove="handleTouchMove"
+                  @touchend="(e) => handleImageTouchEnd(e, post.id, post.postImages.length)"
               >
 
                 <transition-group
@@ -583,10 +639,11 @@ ul > li {
 .shorts-image-container {
   width: 100%;
   height: 0;
-  padding-bottom: 125%; /* 4:5 비율 유지 */
+  padding-bottom: 125%;
   position: relative;
   overflow: hidden;
   border-radius: 8px;
+  touch-action: pan-y; /* 세로 스크롤만 허용 */
 }
 
 .shorts-image-container:hover .shorts-image {
