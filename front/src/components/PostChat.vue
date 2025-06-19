@@ -702,6 +702,16 @@ ul > li {
   white-space: nowrap;
 }
 
+.shorts-actions {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  gap: 16px;
+}
+
 /* 좋아요 활성화 상태 */
 .liked .action-icon {
   color: #ef4444;
@@ -774,6 +784,44 @@ ul > li {
   to {
     transform: translateX(0);
     opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .shorts-actions {
+    flex-direction: row;
+    position: absolute;
+    left: 50%;
+    bottom: -3rem;
+    top: auto;
+    gap: 16px;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  /* 2개 버튼일 때 (단일 이미지) */
+  .shorts-actions:has(.action-button:nth-child(2):last-child) {
+    transform: translateX(-20%);
+  }
+
+  /* 4개 버튼일 때 (다중 이미지) */
+  .shorts-actions:has(.action-button:nth-child(4)) {
+    transform: translateX(-40%);
+  }
+
+  .action-button {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .action-label {
+    display: none;
+  }
+
+  .action-icon {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 }
 
