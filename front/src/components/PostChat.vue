@@ -102,7 +102,13 @@ const prevImage = (postId: string, imagesLength: number) => {
   if (currentImageIndices.value[postId] > 0) {
     currentImageIndices.value[postId]--;
   } else {
-    // 처음 이미지일 경우 마지막 이미지로 순환
+    // 첫 번째 이미지일 경우 이전 포스트로 이동
+    const postIndex = props.posts?.findIndex(p => p.id === postId) ?? -1;
+    if (postIndex !== -1 && postIndex < (props.posts?.length ?? 0) - 1) {
+      navigateToPost(postIndex + 1); // 리스트가 역순이므로 인덱스 증가
+      return;
+    }
+    // 이전 포스트가 없으면 마지막 이미지로 순환
     currentImageIndices.value[postId] = imagesLength - 1;
   }
 
@@ -122,7 +128,13 @@ const nextImage = (postId: string, imagesLength: number) => {
   if (currentImageIndices.value[postId] < imagesLength - 1) {
     currentImageIndices.value[postId]++;
   } else {
-    // 마지막 이미지일 경우 첫 이미지로 순환
+    // 마지막 이미지일 경우 다음 포스트로 이동
+    const postIndex = props.posts?.findIndex(p => p.id === postId) ?? -1;
+    if (postIndex !== -1 && postIndex > 0) {
+      navigateToPost(postIndex - 1); // 리스트가 역순이므로 인덱스 감소
+      return;
+    }
+    // 다음 포스트가 없으면 첫 이미지로 순환
     currentImageIndices.value[postId] = 0;
   }
 
