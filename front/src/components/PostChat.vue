@@ -5,6 +5,11 @@ import {useClipboard} from '@vueuse/core';
 
 import type {Post} from '@/interfaces/type';
 import axiosClient from "@/libs/axiosClient";
+import router from "@/router";
+import store from "@/stores/store";
+
+// 로그인 상태 확인
+const isLogin = computed(() => store.state.isLogin);
 
 // List.vue 데이터 설정
 const props = defineProps({
@@ -83,6 +88,11 @@ const currentImageIndices = ref<Record<string, number>>({});
 const likedImages = ref<Record<string, boolean>>({});
 
 const toggleLike = (imageId: string) => {
+  if (!isLogin.value) {
+    router.replace({name: "login"});
+    return;
+  }
+
   likedImages.value[imageId] = !likedImages.value[imageId];
   infoToast(likedImages.value[imageId] ? "좋아요를 눌렀습니다!" : "좋아요를 취소했습니다!");
 };
