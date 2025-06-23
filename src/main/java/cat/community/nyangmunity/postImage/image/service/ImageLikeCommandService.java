@@ -9,6 +9,7 @@ import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import cat.community.nyangmunity.postImage.image.repository.ImageLikeRepository;
+import cat.community.nyangmunity.postImage.image.response.ImageLikeResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,20 +22,30 @@ public class ImageLikeCommandService {
 	private final ImageLikeRepository imageLikeRepository;
 
 	@Transactional
-	public void likeImageProcess(String imageId, Member member) {
+	public ImageLikeResponse likeImageProcess(String imageId, Member member) {
 		Optional<ImageLike> imageLike = imageQueryService.findPostImageLike(imageId, member.getId());
 
 		// 만약, 이미지 좋아요를 누른 상태라면 취소 작업
 		if (imageLike.isPresent()) {
 			unlikeImage(imageLike.get());
-		} else { // 좋아요를 누른 상태가 아니라면 좋아요 등록
-			Image image = imageService.findImageById(imageId);
-			likeImage(ImageLike.builder()
-				.member(member)
-				.image(image)
-				.build()
-			);
+			return ImageLikeResponse.builder()
+				.imageId(imageId)
+				.state(false)
+				.build();
 		}
+
+		// 좋아요를 누른 상태가 아니라면 좋아요 등록
+		Image image = imageService.findImageById(imageId);
+		likeImage(ImageLike.builder()
+			.member(member)
+			.image(image)
+			.build()
+		);
+
+		return ImageLikeResponse.builder()
+			.imageId(imageId)
+			.state(false)
+			.build();
 	}
 
 	@Transactional

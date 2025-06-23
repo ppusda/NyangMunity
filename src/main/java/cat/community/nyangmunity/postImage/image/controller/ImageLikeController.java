@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cat.community.nyangmunity.member.service.MemberQueryService;
 import cat.community.nyangmunity.postImage.image.request.ImageLikeRequest;
+import cat.community.nyangmunity.postImage.image.response.ImageLikeResponse;
 import cat.community.nyangmunity.postImage.image.response.MaxLikePostImageResponse;
 import cat.community.nyangmunity.postImage.image.service.ImageLikeCommandService;
 import cat.community.nyangmunity.postImage.image.service.ImageLikeQueryService;
@@ -33,8 +34,8 @@ public class ImageLikeController {
 
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/likes")
-	public void likeImage(@RequestBody ImageLikeRequest imageLikeRequest, Principal principal) {
-		imageCommandService.likeImageProcess(imageLikeRequest.imageId(),
+	public ImageLikeResponse likeImage(@RequestBody ImageLikeRequest imageLikeRequest, Principal principal) {
+		return imageCommandService.likeImageProcess(imageLikeRequest.imageId(),
 			memberQueryService.findMemberById(Long.parseLong(principal.getName()))
 		);
 	}
