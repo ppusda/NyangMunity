@@ -2,8 +2,9 @@
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 import {infoToast} from '@/libs/toaster';
 import {useClipboard} from '@vueuse/core';
+import {AxiosResponse} from "axios";
 
-import type {Post} from '@/interfaces/type';
+import type {Post, ImageLikeResponse} from '@/interfaces/type';
 import axiosClient from "@/libs/axiosClient";
 import router from "@/router";
 import store from "@/stores/store";
@@ -93,8 +94,12 @@ const toggleLike = (imageId: string) => {
     return;
   }
 
-  likedImages.value[imageId] = !likedImages.value[imageId];
-  infoToast(likedImages.value[imageId] ? "좋아요를 눌렀습니다!" : "좋아요를 취소했습니다!");
+  axiosClient.post<ImageLikeResponse>("/images/likes", {imageId})
+      .then((response) => {
+        const state = response.data.state;
+        likedImages.value[imageId] = state;
+        infoToast(state ? "좋아요를 눌렀습니다!" : "좋아요를 취소했습니다!");
+      });
 };
 
 // 이미지 전환 방향을 추적하는 상태 변수 추가

@@ -48,3 +48,8 @@ export interface MemberAuthenticationResponse {
     memberInfoResponse: MemberResponse;
     memberTokens: MemberTokens;
 }
+
+export interface ImageLikeResponse {
+    imageId: String;
+    state: boolean;
+}
