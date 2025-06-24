@@ -43,7 +43,7 @@ public class Post {
 	private Member member;
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<PostImage> images = new ArrayList<>();
+	private List<PostImage> postImages = new ArrayList<>();
 
 	public PostEditorBuilder toEditor() {
 		return PostEditor.builder()
@@ -59,7 +59,7 @@ public class Post {
 	}
 
 	public void addPostImage(PostImage postImage) {
-		images.add(postImage);
+		postImages.add(postImage);
 		postImage.setRelation(this);
 	}
 

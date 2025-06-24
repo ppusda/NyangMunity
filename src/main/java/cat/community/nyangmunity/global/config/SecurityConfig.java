@@ -45,12 +45,12 @@ public class SecurityConfig {
 				requests
 					.requestMatchers( // Posts - GET
 						HttpMethod.GET,
-						"/posts",
-						"/posts/likes"
+						"/posts"
 					).permitAll()
 					.requestMatchers( // Images - GET
 						HttpMethod.GET,
 						"/images",
+						"/images/likes",
 						"/images/providers"
 					).permitAll()
 					.requestMatchers( // Members - GET

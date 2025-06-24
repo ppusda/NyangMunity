@@ -35,8 +35,13 @@ public class PostController {
 	private final MemberQueryService memberQueryService;
 
 	@GetMapping
-	public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest) {
-		return postQueryService.getPosts(postsRequest.getPage(), postsRequest.getSize());
+	public Page<PostResponse> readPosts(@ModelAttribute PostsRequest postsRequest, Principal principal) {
+		if (principal != null) {
+			return postQueryService.getPosts(postsRequest.getPage(), postsRequest.getSize(),
+				memberQueryService.findMemberById(Long.parseLong(principal.getName())));
+		}
+
+		return postQueryService.getPosts(postsRequest.getPage(), postsRequest.getSize(), null);
 	}
 
 	@PreAuthorize("isAuthenticated()")

@@ -12,7 +12,7 @@ let likePost = ref<PostLike>({
 });
 
 function getMaxLikePost() {
-  axiosClient.get("/posts/likes").then((response) => {
+  axiosClient.get("/images/likes").then((response) => {
     if (response.data.postImages && response.data.postImages.length > 0) {
       likePostFlg.value = true;
     } else {

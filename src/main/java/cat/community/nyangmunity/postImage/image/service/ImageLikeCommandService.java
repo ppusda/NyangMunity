@@ -23,7 +23,7 @@ public class ImageLikeCommandService {
 
 	@Transactional
 	public ImageLikeResponse likeImageProcess(String imageId, Member member) {
-		Optional<ImageLike> imageLike = imageQueryService.findPostImageLike(imageId, member.getId());
+		Optional<ImageLike> imageLike = imageQueryService.findImageLike(imageId, member.getId());
 
 		// 만약, 이미지 좋아요를 누른 상태라면 취소 작업
 		if (imageLike.isPresent()) {
@@ -44,7 +44,7 @@ public class ImageLikeCommandService {
 
 		return ImageLikeResponse.builder()
 			.imageId(imageId)
-			.state(false)
+			.state(true)
 			.build();
 	}
 

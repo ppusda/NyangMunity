@@ -1,11 +1,13 @@
 package cat.community.nyangmunity.postImage.image.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cat.community.nyangmunity.global.exception.post.PostNotFoundException;
+import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import cat.community.nyangmunity.postImage.image.repository.ImageLikeRepository;
@@ -37,7 +39,12 @@ public class ImageLikeQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<ImageLike> findPostImageLike(String imageId, Long memberId) {
+	public Optional<ImageLike> findImageLike(String imageId, Long memberId) {
 		return imageLikeRepository.findByImageIdAndMemberId(imageId, memberId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<String> fetchLikedImageIds(List<String> imageIds, Member member) {
+		return imageLikeRepository.fetchLikedImageIds(imageIds, member);
 	}
 }

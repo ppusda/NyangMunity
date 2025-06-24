@@ -6,14 +6,17 @@ import lombok.Builder;
 
 @Builder
 public record PostImageResponse(
+
 	String id,
-	String url
+	String url,
+	boolean likeState
 ) {
 
-	public static PostImageResponse from(PostImage postImage) {
+	public static PostImageResponse from(PostImage postImage, boolean likeSate) {
 		return PostImageResponse.builder()
 			.id(postImage.getImage().getId())
 			.url(postImage.getImage().getUrl())
+			.likeState(likeSate)
 			.build();
 	}
 
