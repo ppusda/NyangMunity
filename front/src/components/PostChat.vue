@@ -289,16 +289,40 @@ const scrollToBottom = (smooth = true) => {
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
 
+  // 초기 좋아요 상태 설정 추가
+  if (props.posts && props.posts.length > 0) {
+    props.posts.forEach(post => {
+      if (post.postImages && post.postImages.length > 0) {
+        post.postImages.forEach(image => {
+          if (image.id && image.likeState !== undefined) {
+            likedImages.value[image.id] = image.likeState;
+          }
+        });
+      }
+    });
+  }
+
   watch(
       () => props.posts,
       (newPosts) => {
         if (newPosts && newPosts.length > 0) {
+          // 각 포스트의 이미지들에 대해 좋아요 상태 초기화 추가
+          newPosts.forEach(post => {
+            if (post.postImages && post.postImages.length > 0) {
+              post.postImages.forEach(image => {
+                if (image.id && image.likeState !== undefined) {
+                  likedImages.value[image.id] = image.likeState;
+                }
+              });
+            }
+          });
+
           setTimeout(() => {
             scrollToBottom(true);
           }, 100);
         }
       },
-      {deep: true, immediate: true}); // deep 옵션으로 배열 내부 변화도 감지
+      {deep: true, immediate: true});
 });
 
 // 컴포넌트 언마운트 시 키보드 이벤트 리스너 제거
@@ -347,6 +371,16 @@ const getCurrentImage = (post: Post) => {
   }
 
   return post.postImages[currentImageIndices.value[post.id]];
+};
+
+const getCurrentImageLikeState = (post: Post) => {
+  const currentImage = getCurrentImage(post);
+  if (!currentImage || !currentImage.id) return false;
+
+  // likedImages에서 상태를 확인하고, 없으면 이미지의 초기 likeState 사용
+  return likedImages.value[currentImage.id] !== undefined
+      ? likedImages.value[currentImage.id]
+      : currentImage.likeState || false;
 };
 
 // 이미지 변경시 애니메이션 효과를 위한 키 관리
@@ -505,11 +539,11 @@ defineExpose({scrollToBottom});
                 <button
                     class="action-button"
                     @click="toggleLike(getCurrentImage(post)?.id || `img-${post.id}-0`)"
-                    :class="{ 'liked': likedImages[getCurrentImage(post)?.id || `img-${post.id}-0`] }"
+                    :class="{ 'liked': getCurrentImageLikeState(post) }"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                        class="action-icon"
-                       :class="{ 'text-red-500 fill-red-500': likedImages[getCurrentImage(post)?.id || `img-${post.id}-0`] }">
+                       :class="{ 'text-red-500 fill-red-500': getCurrentImageLikeState(post) }">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                   </svg>

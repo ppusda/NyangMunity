@@ -17,6 +17,7 @@ export interface PostLike {
 export interface PostImage {
     id: string | null;
     url: string;
+    likeState: boolean;
 }
 
 export interface Image {
