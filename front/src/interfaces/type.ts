@@ -9,7 +9,7 @@ export interface Post {
 
 export interface PostLike {
     id: string | null;
-    postImages: Array<PostImage> | null;
+    imageInfo: PostImage | null;
     nickname: string | null;
     message: string;
 }
