@@ -53,10 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				default -> throw new InternalServerErrorException();
 			}
 		}
-
-		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-
+		
 		filterChain.doFilter(request, response);
 	}
 
