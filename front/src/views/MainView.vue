@@ -24,7 +24,6 @@ async function getMaxLikePost() {
 
 onMounted(async () => {
   await getMaxLikePost();
-  console.log(likePost.value);
 });
 </script>
 
@@ -37,9 +36,6 @@ onMounted(async () => {
             <div class="flex-row text-center lg:text-left">
               <h1 class="text-4xl lg:text-7xl font-bold">Nyangmunity</h1>
               <p class="py-6 text-sm lg:text-base">당신이 가진 가장 귀여운 고양이 사진을 공유해보세요!</p>
-              <router-link :to="{name: 'posts'}" class="btn btn-outline btn-ghost text-sm lg:text-base">
-                <i class="fa-solid fa-arrow-right"></i>커뮤니티로 바로가기!
-              </router-link>
             </div>
           </div>
         </div>
@@ -54,13 +50,12 @@ onMounted(async () => {
                     :src="likePost.imageInfo.url"
                 />
                 <p class="py-3 text-sm lg:text-base">{{ likePost.message }}</p>
-                <p class="btn btn-outline btn-ghost text-sm lg:text-base">
-                  구경하러 가기!
-                </p>
               </div>
               <div v-else class="w-full text-center mt-3">
                 <img class="rounded-2xl mx-auto w-full max-w-xs lg:max-w-none" src="/assets/images/cat_loading.gif"/>
                 <p class="py-3 text-sm lg:text-base">{{ likePost.message }}</p>
+              </div>
+              <div class="text-center mt-1">
                 <p class="btn btn-outline btn-ghost text-sm lg:text-base">
                   <router-link :to="{name: 'posts'}">
                     메인 페이지의 주인공에 도전해보세요!
