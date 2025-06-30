@@ -51,16 +51,16 @@ const loginAction = async () => {
         >
           <i class="fa-solid fa-door-open mr-2"></i> 로그인
         </button>
-        <div class="flex space-x-2">
+        <div class="grid grid-cols-2 gap-x-2">
           <button
               type="button"
-              class="btn btn-outline btn-warning w-1/2 rounded-md"
+              class="btn btn-outline btn-warning w-full rounded-md"
           >
             <i class="fa-solid fa-comment fa-flip-horizontal"></i>
           </button>
           <button
               type="button"
-              class="btn btn-outline btn-ghost w-1/2 rounded-md text-white"
+              class="btn btn-outline btn-ghost w-full rounded-md text-white"
           >
             <i class="fa-brands fa-google"></i>
           </button>
