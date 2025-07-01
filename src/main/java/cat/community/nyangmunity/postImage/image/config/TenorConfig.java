@@ -2,7 +2,7 @@ package cat.community.nyangmunity.postImage.image.config;
 
 import java.net.URI;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.Getter;
@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-@ConfigurationProperties("tenor")
 public class TenorConfig {
 
+	@Value("${tenor.secret-key}")
 	private final String secretKey;
+
+	@Value("${tenor.client-key}")
 	private final String clientKey;
 
 	private static final String REQUEST_URL = "https://tenor.googleapis.com/v2/search";
