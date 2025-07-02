@@ -11,21 +11,15 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 
+import cat.community.nyangmunity.member.config.KakaoAuthConfig;
 import cat.community.nyangmunity.member.response.KakaoTokenResponse;
 import cat.community.nyangmunity.member.response.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@ConfigurationProperties("kakao")
 public class KakaoAuthProvider {
 
-	private final String clientKey;
-	private final String secretKey;
-	private final String grantType;
-	private final String redirectUri;
-
-	String TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token";
-	String USER_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
+	private final KakaoAuthConfig kakaoAuthConfig;
 
 	private final RestTemplate restTemplate = new RestTemplate();
 	public final Gson gson = new Gson();
@@ -42,13 +36,13 @@ public class KakaoAuthProvider {
 		HttpHeaders headers = setDefaultHeaders();
 
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-		params.add("client_id", clientKey);
-		params.add("client_secret", secretKey);
-		params.add("redirect_uri", redirectUri);
-		params.add("grant_type", grantType);
+		params.add("client_id", kakaoAuthConfig.getClientKey());
+		params.add("client_secret", kakaoAuthConfig.getSecretKey());
+		params.add("redirect_uri", kakaoAuthConfig.getRedirectUri());
+		params.add("grant_type", kakaoAuthConfig.getGrantType());
 		params.add("code", code);
 
-		ResponseEntity<String> responseEntity = getResponse(headers, params, TOKEN_REQUEST_URL);
+		ResponseEntity<String> responseEntity = getResponse(headers, params, kakaoAuthConfig.getTOKEN_REQUEST_URL());
 
 		return gson.fromJson(responseEntity.getBody(), KakaoTokenResponse.class);
 	}
@@ -58,7 +52,7 @@ public class KakaoAuthProvider {
 		headers.add("Authorization", "Bearer " + accessToken);
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
-		ResponseEntity<String> responseEntity = getResponse(headers, USER_REQUEST_URL);
+		ResponseEntity<String> responseEntity = getResponse(headers, kakaoAuthConfig.getUSER_REQUEST_URL());
 
 		return gson.fromJson(responseEntity.getBody(), KakaoUserResponse.class);
 	}
