@@ -13,10 +13,10 @@ import lombok.RequiredArgsConstructor;
 public class TenorConfig {
 
 	@Value("${tenor.secret-key}")
-	private final String secretKey;
+	private String secretKey;
 
 	@Value("${tenor.client-key}")
-	private final String clientKey;
+	private String clientKey;
 
 	private static final String REQUEST_URL = "https://tenor.googleapis.com/v2/search";
 	private static final String FILTER = "gif";

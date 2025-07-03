@@ -5,6 +5,7 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 
 @Getter
@@ -12,13 +13,16 @@ import lombok.Getter;
 public class AppConfig {
 
 	@Value("${nyangmunity.jwt-key}")
-	private final byte[] jwtKey;
+	private String encodedJwtKey;
 
 	@Value("${nyangmunity.domain}")
-	private final String domain;
+	private String domain;
 
-	public AppConfig(String jwtKey, String domain) {
-		this.jwtKey = Base64.getDecoder().decode(jwtKey);
-		this.domain = domain;
+	private byte[] jwtKey;
+
+	@PostConstruct
+	public void init() {
+		this.jwtKey = Base64.getDecoder().decode(encodedJwtKey);
 	}
 }
+
