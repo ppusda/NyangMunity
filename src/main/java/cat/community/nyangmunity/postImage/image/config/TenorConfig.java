@@ -3,13 +3,14 @@ package cat.community.nyangmunity.postImage.image.config;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@Configuration
 public class TenorConfig {
 
 	@Value("${tenor.secret-key}")
