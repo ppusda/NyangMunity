@@ -2,7 +2,6 @@
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 import {infoToast} from '@/libs/toaster';
 import {useClipboard} from '@vueuse/core';
-import {AxiosResponse} from "axios";
 
 import type {Post, ImageLikeResponse} from '@/interfaces/type';
 import axiosClient from "@/libs/axiosClient";
