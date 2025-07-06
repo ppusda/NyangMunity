@@ -6,13 +6,13 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Getter;
 
-@Getter
-public class KakaoUserResponse {
-	private String id;
+public record KakaoUserResponse(
+	String id,
 
 	@SerializedName(value = "connected_at")
-	private String connectedAt;
+	String connectedAt,
 
 	@SerializedName(value = "kakao_account")
-	private Map<?, ?> kakaoAccount;
+	Map<?, ?> kakaoAccount
+) {
 }

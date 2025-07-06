@@ -4,8 +4,9 @@ import java.util.Map;
 
 import lombok.Getter;
 
-@Getter
-public class KakaoUserAccount {
-	private Map<String, String> profile;
-	private String email;
+public record KakaoUserAccount(
+	Map<String, String> profile,
+	String email
+) {
+
 }
