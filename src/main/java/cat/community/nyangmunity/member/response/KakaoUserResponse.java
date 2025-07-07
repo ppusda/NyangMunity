@@ -4,8 +4,6 @@ import java.util.Map;
 
 import com.google.gson.annotations.SerializedName;
 
-import lombok.Getter;
-
 public record KakaoUserResponse(
 	String id,
 

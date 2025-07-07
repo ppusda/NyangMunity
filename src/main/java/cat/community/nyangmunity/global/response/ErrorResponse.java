@@ -3,7 +3,6 @@ package cat.community.nyangmunity.global.response;
 import java.util.Map;
 
 import lombok.Builder;
-import lombok.Getter;
 
 public record ErrorResponse(
 	String code,

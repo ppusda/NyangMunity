@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				default -> throw new InternalServerErrorException();
 			}
 		}
-		
+
 		filterChain.doFilter(request, response);
 	}
 

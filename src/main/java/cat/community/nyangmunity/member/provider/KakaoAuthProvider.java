@@ -1,6 +1,5 @@
 package cat.community.nyangmunity.member.provider;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

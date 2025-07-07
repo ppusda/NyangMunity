@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record PostImageResponse(
-
 	String id,
 	String url,
 	boolean likeState

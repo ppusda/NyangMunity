@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @Configuration
