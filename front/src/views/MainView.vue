@@ -44,7 +44,7 @@ onMounted(async () => {
             <div class="w-full">
               <div v-if="likePostFlg" class="text-center">
                 <img
-                    v-if="likePost.imageInfo"
+                    v-if="likePost"
                     class="rounded-2xl mx-auto w-full max-w-xs lg:max-w-none"
                     id="main_img"
                     :src="likePost.imageInfo.url"
