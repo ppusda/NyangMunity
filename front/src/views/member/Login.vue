@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import {login} from "@/utils/account";
 import router from "@/router";
+import axiosClient from "@/libs/axiosClient";
 
 const email = ref<string>("");
 const password = ref<string>("");
@@ -11,6 +12,12 @@ const loginAction = async () => {
     await router.replace({name: "main"});
   }
 };
+
+const requestKakaoLogin = () => {
+  axiosClient.get("/auth/kakao", {}).then((result) => {
+    console.log(result.data);
+  });
+}
 </script>
 
 <template>
@@ -55,6 +62,7 @@ const loginAction = async () => {
           <button
               type="button"
               class="btn btn-outline btn-warning w-full rounded-md"
+              @click="requestKakaoLogin"
           >
             <i class="fa-solid fa-comment fa-flip-horizontal"></i>
           </button>

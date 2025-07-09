@@ -21,7 +21,7 @@ public class KakaoAuthConfig {
 	@Value("${kakao.redirect-uri}")
 	private String redirectUri;
 
-	private final String AUTHORIZATION_URL = "https://kakao.com/oauth/authorize";
+	private final String AUTHORIZATION_URL = "https://kauth.kakao.com/oauth/authorize";
 	private final String TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token";
 	private final String USER_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
 

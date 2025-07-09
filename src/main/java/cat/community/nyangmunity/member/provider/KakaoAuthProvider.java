@@ -4,6 +4,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +16,7 @@ import cat.community.nyangmunity.member.response.KakaoTokenResponse;
 import cat.community.nyangmunity.member.response.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 
+@Component
 @RequiredArgsConstructor
 public class KakaoAuthProvider {
 
@@ -22,6 +24,10 @@ public class KakaoAuthProvider {
 
 	private final RestTemplate restTemplate = new RestTemplate();
 	public final Gson gson = new Gson();
+
+	public String requestAuthorizationUrl() {
+		return kakaoAuthConfig.generateAuthorizationUrl();
+	}
 
 	public HttpHeaders setDefaultHeaders() {
 		HttpHeaders headers = new HttpHeaders();

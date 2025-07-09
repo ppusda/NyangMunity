@@ -67,6 +67,11 @@ public class SecurityConfig {
 						HttpMethod.POST,
 						"/tokens"
 					).permitAll()
+					.requestMatchers(
+						HttpMethod.GET,
+						"/auth/kakao",
+						"/auth/kakaoLogin"
+					).permitAll()
 
 					.anyRequest().authenticated()
 			)
