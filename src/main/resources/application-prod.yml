@@ -17,4 +17,4 @@ jwt:
   refresh-token-expiration: 7889280000 # 3달
 
 kakao:
-  redirect-uri: "http://52.79.200.204/nm/user/kakaoLogin"
+  redirect-uri: "https://nyangmunity.bbgk.me/auth/kakaoLogin"
