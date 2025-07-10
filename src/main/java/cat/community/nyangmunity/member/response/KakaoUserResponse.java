@@ -1,16 +1,14 @@
 package cat.community.nyangmunity.member.response;
 
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.google.gson.annotations.SerializedName;
+import java.util.Map;
 
 public record KakaoUserResponse(
 	String id,
-
-	@SerializedName(value = "connected_at")
+	@JsonProperty(value = "connected_at")
 	String connectedAt,
-
-	@SerializedName(value = "kakao_account")
-	Map<?, ?> kakaoAccount
+	@JsonProperty(value = "kakao_account")
+	Map<String, String> kakaoAccount
 ) {
 }

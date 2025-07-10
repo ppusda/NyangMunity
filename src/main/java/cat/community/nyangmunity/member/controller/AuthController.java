@@ -2,10 +2,13 @@ package cat.community.nyangmunity.member.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cat.community.nyangmunity.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
+
+import cat.community.nyangmunity.member.response.KakaoUserResponse;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,7 +23,7 @@ public class AuthController {
 	}
 
 	@GetMapping("/kakaoLogin")
-	public String redirectKakaoLogin() {
-		return "인가코드 요청 redirect 받기";
+	public KakaoUserResponse redirectKakaoLogin(@RequestParam String code) {
+		return authService.loginWithKakao(code);
 	}
 }

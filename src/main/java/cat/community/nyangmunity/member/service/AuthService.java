@@ -3,6 +3,7 @@ package cat.community.nyangmunity.member.service;
 import org.springframework.stereotype.Service;
 
 import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
+import cat.community.nyangmunity.member.response.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -15,4 +16,10 @@ public class AuthService {
 		return kakaoAuthProvider.requestAuthorizationUrl();
 	}
 
+	public KakaoUserResponse loginWithKakao(String code) {
+		return kakaoAuthProvider.getToken(code)
+			.flatMap(tokenResponse ->
+				kakaoAuthProvider.getUserInfo(tokenResponse.accessToken())
+			).block();
+	}
 }
