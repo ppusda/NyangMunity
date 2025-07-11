@@ -12,14 +12,19 @@ let likePost = ref<PostLike>({
 });
 
 async function getMaxLikePost() {
-  axiosClient.get("/images/likes").then((response) => {
-    if (response.data) {
+  try {
+    const response = await axiosClient.get("/images/likes");
+    if (response.data && response.data.imageInfo) {
+      likePost.value = response.data;
       likePostFlg.value = true;
     } else {
+      likePost.value.message = "아직 좋아요를 많이 받은 글이 없습니다!";
       likePostFlg.value = false;
     }
-    likePost.value = response.data;
-  });
+  } catch (error) {
+    likePost.value.message = "이미지를 불러오는데 실패했습니다.";
+    likePostFlg.value = false;
+  }
 }
 
 onMounted(async () => {
@@ -42,9 +47,8 @@ onMounted(async () => {
         <div class="hero min-w-min accent-neutral-900 w-full lg:w-1/2">
           <div class="hero-content flex-col lg:flex-row-reverse p-8 lg:p-36">
             <div class="w-full">
-              <div v-if="likePostFlg" class="text-center">
+              <div v-if="likePostFlg && likePost.imageInfo" class="text-center">
                 <img
-                    v-if="likePost"
                     class="rounded-2xl mx-auto w-full max-w-xs lg:max-w-none"
                     id="main_img"
                     :src="likePost.imageInfo.url"
