@@ -6,6 +6,8 @@ import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
 import cat.community.nyangmunity.member.response.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 
+import reactor.core.publisher.Mono;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -16,10 +18,8 @@ public class AuthService {
 		return kakaoAuthProvider.requestAuthorizationUrl();
 	}
 
-	public KakaoUserResponse loginWithKakao(String code) {
+	public Mono<KakaoUserResponse> loginWithKakao(String code) {
 		return kakaoAuthProvider.getToken(code)
-			.flatMap(tokenResponse ->
-				kakaoAuthProvider.getUserInfo(tokenResponse.accessToken())
-			).block();
+			.flatMap(tokenResponse -> kakaoAuthProvider.getUserInfo(tokenResponse.accessToken()));
 	}
 }

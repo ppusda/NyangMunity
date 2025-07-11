@@ -22,17 +22,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Member {
 
 	@Builder
-	public Member(String email, String password, String nickname, LocalDateTime createDate) {
+	public Member(String email, String password, String nickname, LocalDateTime createDate, String provider, String providerId) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.createDate = createDate;
+		this.provider = provider;
+		this.providerId = providerId;
 	}
 
 	@Id
@@ -42,7 +47,7 @@ public class Member {
 	@Column(nullable = false, unique = true)
 	private String email;
 
-	@Column(nullable = false)
+	@Column
 	private String password;
 
 	@Column(nullable = false)
@@ -50,6 +55,10 @@ public class Member {
 
 	@Column(nullable = false)
 	private LocalDateTime createDate;
+
+	private String provider;
+
+	private String providerId;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Image> images = new ArrayList<>();

@@ -18,6 +18,8 @@ import cat.community.nyangmunity.member.response.MemberInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import cat.community.nyangmunity.member.response.KakaoUserResponse;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,6 +49,35 @@ public class MemberFacadeService {
 			.memberInfoResponse(MemberInfoResponse.from(member))
 			.memberTokens(tokenFacadeService.createTokens(member.getId()))
 			.build();
+	}
+
+	/**
+	 * 소셜 로그인을 위한 메서드
+	 * @param provider 로그인 제공 소셜
+	 * @param kakaoUserResponse 카카오 유저 정보  TODO: 향후 변경
+	 * @return 로그인 정보
+	 */
+	public MemberAuthenticationResponse socialLogin(String provider, KakaoUserResponse kakaoUserResponse) {
+		Member member = memberQueryService.findMemberByProviderAndProviderId(provider, kakaoUserResponse.id())
+			.orElseGet(() -> joinBySocial(provider, kakaoUserResponse));
+
+		return MemberAuthenticationResponse.builder()
+			.memberInfoResponse(MemberInfoResponse.from(member))
+			.memberTokens(tokenFacadeService.createTokens(member.getId()))
+			.build();
+	}
+
+	private Member joinBySocial(String provider, KakaoUserResponse kakaoUserResponse) {
+		Member member = Member.builder()
+			.email(kakaoUserResponse.kakaoAccount().get("email"))
+			.nickname(kakaoUserResponse.kakaoAccount().get("profile"))
+			.provider(provider)
+			.providerId(kakaoUserResponse.id())
+			.createDate(LocalDateTime.now())
+			.build();
+
+		memberCommandService.saveMember(member);
+		return member;
 	}
 
 	/**

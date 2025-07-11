@@ -10,12 +10,16 @@ import lombok.RequiredArgsConstructor;
 
 import cat.community.nyangmunity.member.response.KakaoUserResponse;
 
+import cat.community.nyangmunity.member.response.MemberAuthenticationResponse;
+import cat.community.nyangmunity.member.service.MemberFacadeService;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
 	private final AuthService authService;
+	private final MemberFacadeService memberFacadeService;
 
 	@GetMapping("/kakao")
 	public String requestAuthorizationUrl() {
@@ -23,7 +27,8 @@ public class AuthController {
 	}
 
 	@GetMapping("/kakaoLogin")
-	public KakaoUserResponse redirectKakaoLogin(@RequestParam String code) {
-		return authService.loginWithKakao(code);
+	public MemberAuthenticationResponse redirectKakaoLogin(@RequestParam String code) {
+		KakaoUserResponse kakaoUserResponse = authService.loginWithKakao(code).block();
+		return memberFacadeService.socialLogin("KAKAO", kakaoUserResponse);
 	}
 }

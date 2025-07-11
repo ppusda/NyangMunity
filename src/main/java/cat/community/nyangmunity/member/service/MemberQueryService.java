@@ -30,4 +30,9 @@ public class MemberQueryService {
 	public Optional<Member> findMemberByNickname(String nickname) {
 		return memberRepository.findByNickname(nickname);
 	}
+
+	@Transactional(readOnly = true)
+	public Optional<Member> findMemberByProviderAndProviderId(String provider, String providerId) {
+		return memberRepository.findByProviderAndProviderId(provider, providerId);
+	}
 }
