@@ -6,6 +6,8 @@ const member = new Vuex.Store({
         email: null,
         nickname: null,
         isLogin: false,
+        accessToken: null,
+        refreshToken: null,
     },
     mutations: {
         setMember(state, member) {
@@ -20,7 +22,14 @@ const member = new Vuex.Store({
             state.nickname = null;
             state.isLogin = false;
         },
-
+        setTokens(state, { accessToken, refreshToken }) {
+            state.accessToken = accessToken;
+            state.refreshToken = refreshToken;
+        },
+        clearTokens(state) {
+            state.accessToken = null;
+            state.refreshToken = null;
+        },
     },
     actions: {
         login({commit}, member) {
@@ -28,7 +37,11 @@ const member = new Vuex.Store({
         },
         logout({commit}) {
             commit('clearMember');
+            commit('clearTokens');
         },
+        saveTokens({ commit }, { accessToken, refreshToken }) {
+            commit('setTokens', { accessToken, refreshToken });
+        }
     },
 });
 

@@ -5,6 +5,8 @@ import LoginView from "@/views/member/Login.vue";
 import JoinView from "@/views/member/Join.vue";
 import MemberView from "@/views/member/Member.vue";
 
+import SocialLoginCallback from "@/views/member/SocialLoginCallback.vue";
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -22,6 +24,11 @@ const router = createRouter({
             path: "/member/login",
             name: "login",
             component: LoginView,
+        },
+        {
+            path: "/auth/:provider/callback",
+            name: "social-login-callback",
+            component: SocialLoginCallback,
         },
         {
             path: "/member/join",

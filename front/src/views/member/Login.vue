@@ -14,10 +14,16 @@ const loginAction = async () => {
 };
 
 const requestKakaoLogin = () => {
-  axiosClient.get("/auth/kakao", {}).then((result) => {
-    console.log(result.data);
+  axiosClient.get("/auth/kakao/url").then((result) => {
+    window.location.href = result.data;
   });
-}
+};
+
+const requestGoogleLogin = () => {
+  axiosClient.get("/auth/google/url").then((result) => {
+    window.location.href = result.data;
+  });
+};
 </script>
 
 <template>
@@ -69,6 +75,7 @@ const requestKakaoLogin = () => {
           <button
               type="button"
               class="btn btn-outline btn-ghost w-full rounded-md text-white"
+              @click="requestGoogleLogin"
           >
             <i class="fa-brands fa-google"></i>
           </button>
