@@ -18,6 +18,7 @@ import cat.community.nyangmunity.member.response.MemberInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import cat.community.nyangmunity.member.response.GoogleUserResponse;
 import cat.community.nyangmunity.member.response.KakaoUserResponse;
 
 @Slf4j
@@ -54,12 +55,20 @@ public class MemberFacadeService {
 	/**
 	 * 소셜 로그인을 위한 메서드
 	 * @param provider 로그인 제공 소셜
-	 * @param kakaoUserResponse 카카오 유저 정보  TODO: 향후 변경
+	 * @param userResponse 소셜 유저 정보
 	 * @return 로그인 정보
 	 */
-	public MemberAuthenticationResponse socialLogin(String provider, KakaoUserResponse kakaoUserResponse) {
-		Member member = memberQueryService.findMemberByProviderAndProviderId(provider, kakaoUserResponse.id())
-			.orElseGet(() -> joinBySocial(provider, kakaoUserResponse));
+	public MemberAuthenticationResponse socialLogin(String provider, Object userResponse) {
+		String providerId = "";
+
+		if (userResponse instanceof KakaoUserResponse) {
+			providerId = ((KakaoUserResponse) userResponse).id();
+		} else if (userResponse instanceof GoogleUserResponse) {
+			providerId = ((GoogleUserResponse) userResponse).id();
+		}
+
+		Member member = memberQueryService.findMemberByProviderAndProviderId(provider, providerId)
+			.orElseGet(() -> joinBySocial(provider, userResponse));
 
 		return MemberAuthenticationResponse.builder()
 			.memberInfoResponse(MemberInfoResponse.from(member))
@@ -67,18 +76,30 @@ public class MemberFacadeService {
 			.build();
 	}
 
-	private Member joinBySocial(String provider, KakaoUserResponse kakaoUserResponse) {
-		Member member = Member.builder()
-			.email(kakaoUserResponse.kakaoAccount().get("email"))
-			.nickname(kakaoUserResponse.kakaoAccount().get("profile"))
+	private Member joinBySocial(String provider, Object userResponse) {
+		Member.MemberBuilder memberBuilder = Member.builder();
+
+		if (userResponse instanceof KakaoUserResponse kakaoUserResponse) {
+			memberBuilder
+				.email(kakaoUserResponse.kakaoAccount().get("email"))
+				.nickname(kakaoUserResponse.kakaoAccount().get("profile"))
+				.providerId(kakaoUserResponse.id());
+		} else if (userResponse instanceof GoogleUserResponse googleUserResponse) {
+			memberBuilder
+				.email(googleUserResponse.email())
+				.nickname(googleUserResponse.name())
+				.providerId(googleUserResponse.id());
+		}
+
+		Member member = memberBuilder
 			.provider(provider)
-			.providerId(kakaoUserResponse.id())
 			.createDate(LocalDateTime.now())
 			.build();
 
 		memberCommandService.saveMember(member);
 		return member;
 	}
+
 
 	/**
 	 * 로그아웃을 위한 메서드 (토큰 제거)

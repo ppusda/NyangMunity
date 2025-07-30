@@ -17,4 +17,7 @@ jwt:
   refresh-token-expiration: 10800000 # 3시간
 
 kakao:
-  redirect-uri: "http://localhost:8080/auth/kakaoLogin"
+  redirect-uri: "http://localhost:5173/auth/kakao/callback"
+
+google:
+  redirect-uri: "http://localhost:5173/auth/google/callback"

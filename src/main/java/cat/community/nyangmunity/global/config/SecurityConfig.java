@@ -69,8 +69,10 @@ public class SecurityConfig {
 					).permitAll()
 					.requestMatchers(
 						HttpMethod.GET,
-						"/auth/kakao",
-						"/auth/kakaoLogin"
+						"/auth/kakao/url",
+						"/auth/google/url",
+						"/auth/kakaoLogin",
+						"/auth/googleLogin"
 					).permitAll()
 
 					.anyRequest().authenticated()
