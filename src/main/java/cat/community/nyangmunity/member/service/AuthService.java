@@ -6,7 +6,7 @@ import cat.community.nyangmunity.member.response.GoogleUserResponse;
 import org.springframework.stereotype.Service;
 
 import cat.community.nyangmunity.member.provider.KakaoAuthProvider;
-import cat.community.nyangmunity.member.response.KakaoUserResponse;
+import cat.community.nyangmunity.member.response.kakao.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 
 import reactor.core.publisher.Mono;

@@ -9,7 +9,7 @@ import cat.community.nyangmunity.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
 
 import cat.community.nyangmunity.member.response.GoogleUserResponse;
-import cat.community.nyangmunity.member.response.KakaoUserResponse;
+import cat.community.nyangmunity.member.response.kakao.KakaoUserResponse;
 
 import cat.community.nyangmunity.member.response.MemberAuthenticationResponse;
 import cat.community.nyangmunity.member.service.MemberFacadeService;

@@ -1,4 +1,4 @@
-package cat.community.nyangmunity.member.response;
+package cat.community.nyangmunity.member.response.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

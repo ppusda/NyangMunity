@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import cat.community.nyangmunity.member.response.GoogleUserResponse;
-import cat.community.nyangmunity.member.response.KakaoUserResponse;
+import cat.community.nyangmunity.member.response.kakao.KakaoUserResponse;
 
 @Slf4j
 @Service
@@ -60,12 +60,18 @@ public class MemberFacadeService {
 	 */
 	public MemberAuthenticationResponse socialLogin(String provider, Object userResponse) {
 		String providerId = "";
+		String email = "";
 
 		if (userResponse instanceof KakaoUserResponse) {
-			providerId = ((KakaoUserResponse) userResponse).id();
+			providerId = ((KakaoUserResponse)userResponse).id();
+			email = ((KakaoUserResponse)userResponse).kakaoAccount().email();
 		} else if (userResponse instanceof GoogleUserResponse) {
-			providerId = ((GoogleUserResponse) userResponse).id();
+			providerId = ((GoogleUserResponse)userResponse).id();
+			email = ((GoogleUserResponse)userResponse).email();
 		}
+
+		if (memberQueryService.findMemberByEmail(email).isPresent())
+			throw new AlreadyExistsMemberException();
 
 		Member member = memberQueryService.findMemberByProviderAndProviderId(provider, providerId)
 			.orElseGet(() -> joinBySocial(provider, userResponse));
@@ -81,8 +87,8 @@ public class MemberFacadeService {
 
 		if (userResponse instanceof KakaoUserResponse kakaoUserResponse) {
 			memberBuilder
-				.email(kakaoUserResponse.kakaoAccount().get("email"))
-				.nickname(kakaoUserResponse.kakaoAccount().get("profile"))
+				.email(kakaoUserResponse.kakaoAccount().email())
+				.nickname(kakaoUserResponse.kakaoAccount().profile().nickname())
 				.providerId(kakaoUserResponse.id());
 		} else if (userResponse instanceof GoogleUserResponse googleUserResponse) {
 			memberBuilder
@@ -99,7 +105,6 @@ public class MemberFacadeService {
 		memberCommandService.saveMember(member);
 		return member;
 	}
-
 
 	/**
 	 * 로그아웃을 위한 메서드 (토큰 제거)
