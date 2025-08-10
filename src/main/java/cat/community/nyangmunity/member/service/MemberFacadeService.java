@@ -18,7 +18,7 @@ import cat.community.nyangmunity.member.response.MemberInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import cat.community.nyangmunity.member.response.GoogleUserResponse;
+import cat.community.nyangmunity.member.response.google.GoogleUserResponse;
 import cat.community.nyangmunity.member.response.kakao.KakaoUserResponse;
 
 @Slf4j
@@ -60,18 +60,12 @@ public class MemberFacadeService {
 	 */
 	public MemberAuthenticationResponse socialLogin(String provider, Object userResponse) {
 		String providerId = "";
-		String email = "";
 
 		if (userResponse instanceof KakaoUserResponse) {
 			providerId = ((KakaoUserResponse)userResponse).id();
-			email = ((KakaoUserResponse)userResponse).kakaoAccount().email();
 		} else if (userResponse instanceof GoogleUserResponse) {
 			providerId = ((GoogleUserResponse)userResponse).id();
-			email = ((GoogleUserResponse)userResponse).email();
 		}
-
-		if (memberQueryService.findMemberByEmail(email).isPresent())
-			throw new AlreadyExistsMemberException();
 
 		Member member = memberQueryService.findMemberByProviderAndProviderId(provider, providerId)
 			.orElseGet(() -> joinBySocial(provider, userResponse));
@@ -84,18 +78,24 @@ public class MemberFacadeService {
 
 	private Member joinBySocial(String provider, Object userResponse) {
 		Member.MemberBuilder memberBuilder = Member.builder();
+		String email = "";
 
 		if (userResponse instanceof KakaoUserResponse kakaoUserResponse) {
+			email = kakaoUserResponse.kakaoAccount().email();
 			memberBuilder
 				.email(kakaoUserResponse.kakaoAccount().email())
 				.nickname(kakaoUserResponse.kakaoAccount().profile().nickname())
 				.providerId(kakaoUserResponse.id());
 		} else if (userResponse instanceof GoogleUserResponse googleUserResponse) {
+			email = googleUserResponse.email();
 			memberBuilder
 				.email(googleUserResponse.email())
 				.nickname(googleUserResponse.name())
 				.providerId(googleUserResponse.id());
 		}
+
+		if (memberQueryService.findMemberByEmail(email).isPresent())
+			throw new AlreadyExistsMemberException();
 
 		Member member = memberBuilder
 			.provider(provider)

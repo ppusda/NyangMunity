@@ -42,7 +42,9 @@ const cancelUser = () => {
     currentPassword: currentPassword.value,
   }).then(() => {
     infoToast("냥뮤니티를 이용해주셔서 감사했습니다.");
-    router.replace({name: "main"});
+    setTimeout(() => {
+      router.replace({name: "main"});
+    }, 100);
   });
 };
 

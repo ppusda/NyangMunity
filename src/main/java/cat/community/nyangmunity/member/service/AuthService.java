@@ -1,7 +1,7 @@
 package cat.community.nyangmunity.member.service;
 
 import cat.community.nyangmunity.member.provider.GoogleAuthProvider;
-import cat.community.nyangmunity.member.response.GoogleUserResponse;
+import cat.community.nyangmunity.member.response.google.GoogleUserResponse;
 
 import org.springframework.stereotype.Service;
 

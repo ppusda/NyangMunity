@@ -1,5 +1,5 @@
 import {useCookies} from "vue3-cookies";
-import {warningToast} from "@/libs/toaster";
+import {infoToast, warningToast} from "@/libs/toaster";
 
 import store from "@/stores/store";
 import axiosClient from "@/libs/axiosClient";
@@ -39,6 +39,7 @@ export const saveMemberAuthentication = function (memberAuthentication: MemberAu
 export const logout = function () {
     // 로그아웃 (서버 측 토큰 삭제)
     axiosClient.post("/members/logout").then(() => {
+        infoToast("로그아웃 되었습니다.");
 
         // store 변수 비우기
         store.dispatch('logout');
