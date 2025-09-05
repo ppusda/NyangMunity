@@ -2,7 +2,7 @@ spring:
   config:
     import: classpath:application-secret.yml
   datasource:
-    url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: ${nyangmunity.prod-mysql-url}
     username: ${nyangmunity.prod-mysql-username}
     password: ${nyangmunity.prod-mysql-password}
   jpa:
@@ -20,4 +20,4 @@ kakao:
   redirect-uri: "https://nyangmunity.bbgk.me/auth/kakao/callback"
 
 google:
-  redirec-uri: "https://nyangmunity.bbgk.me/auth/google/callback"
+  redirect-uri: "https://nyangmunity.bbgk.me/auth/google/callback"
