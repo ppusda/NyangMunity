@@ -95,7 +95,7 @@ jobs:
           debug: true
           script:
             whoami;
-            echo $TOKEN | docker login ghcr.io -u $USERNAME --password-stdin;
+            echo ${{ secrets.TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin;
             docker rm -f nyangmunity_back;
             docker rmi ghcr.io/ppusda/nyangmunity_back:latest;
             docker pull ghcr.io/ppusda/nyangmunity_back:latest;
