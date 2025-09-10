@@ -15,7 +15,7 @@ const nickname = computed(() => store.state.nickname);
     <div class="sticky top-0 h-20 navbar bg-zinc-800 z-10">
       <div class="navbar-start">
         <router-link :to="{name: 'main'}" class="content-center btn btn-ghost">
-          <img id="logo" class="h-[60px]" src="/src/images/logo.png" alt="logo">
+          <img id="logo" class="h-[60px]" src="/src/assets/images/logo.png" alt="logo">
         </router-link>
       </div>
       <div class="navbar-center">

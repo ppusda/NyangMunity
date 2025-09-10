@@ -39,7 +39,7 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen flex items-center justify-center bg-zinc-900">
     <div class="text-center">
-      <img src="/src/images/cat_loading.gif" alt="Loading..." class="w-24 h-24 mx-auto mb-4 rounded-md">
+      <img src="/src/assets/images/cat_loading.gif" alt="Loading..." class="w-24 h-24 mx-auto mb-4 rounded-md">
       <p class="text-white text-lg">로그인 중입니다...</p>
     </div>
   </div>

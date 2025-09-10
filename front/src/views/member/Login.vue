@@ -28,7 +28,7 @@ const requestGoogleLogin = () => {
 
 <template>
   <div class="min-h-screen px-4 py-10 flex flex-col items-center bg-zinc-900">
-    <img id="logo" class="h-20 mb-6" src="/src/images/logo.png" alt="logo"/>
+    <img id="logo" class="h-20 mb-6" src="/src/assets/images/logo.png" alt="logo"/>
     <h1 class="text-2xl sm:text-3xl font-bold text-white text-center mb-8">
       냥뮤니티에 로그인하세요!
     </h1>

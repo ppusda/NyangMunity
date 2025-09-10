@@ -29,7 +29,7 @@ const joinConfirm = () => {
   <div class="px-4 py-12 bg-zinc-900 flex justify-center">
     <div class="w-full max-w-md">
       <div class="flex flex-col items-center mb-8">
-        <img id="logo" class="h-20 mb-4" src="/src/images/logo.png" alt="logo"/>
+        <img id="logo" class="h-20 mb-4" src="/src/assets/images/logo.png" alt="logo"/>
         <h1 class="text-3xl font-bold text-white text-center">냥뮤니티 회원가입</h1>
       </div>
 
