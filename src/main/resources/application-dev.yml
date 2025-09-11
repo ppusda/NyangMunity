@@ -2,7 +2,7 @@ spring:
   config:
     import: classpath:application-secret.yml
   datasource:
-    url: jdbc:mysql://localhost:3306/nyangmunity?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: ${nyangmunity.dev-mysql-url}
     username: ${nyangmunity.dev-mysql-username}
     password: ${nyangmunity.dev-mysql-password}
   jpa:
