@@ -1,23 +1,26 @@
 spring:
-  config:
-    import: classpath:application-secret.yml
   datasource:
     url: ${nyangmunity.prod-mysql-url}
     username: ${nyangmunity.prod-mysql-username}
     password: ${nyangmunity.prod-mysql-password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
+# 운영 환경 로깅 레벨 (기본 INFO, 에러는 WARN 이상으로 설정하여 관리)
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+
+# 운영 환경 변수
 nyangmunity:
   domain: nyangmunity.bbgk.me
-
 jwt:
   access-token-expiration: 1800000 # 30분
   refresh-token-expiration: 7889280000 # 3달
-
 kakao:
   redirect-uri: "https://nyangmunity.bbgk.me/auth/kakao/callback"
-
 google:
   redirect-uri: "https://nyangmunity.bbgk.me/auth/google/callback"

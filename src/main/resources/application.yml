@@ -10,8 +10,8 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        format_sql: true
-        show_sql: true
+        "hibernate.enhancer.fail_on_access_across_sessions": true
+        "hibernate.warning.fetch.NPlusOne": true
   data:
     web:
       pageable:
@@ -26,7 +26,3 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
       file-size-threshold: 0
-
-logging:
-  level:
-    org.springframework.web: DEBUG
