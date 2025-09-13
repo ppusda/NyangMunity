@@ -99,4 +99,4 @@ jobs:
             docker rm -f nyangmunity_back;
             docker rmi ghcr.io/ppusda/nyangmunity_back:latest;
             docker pull ghcr.io/ppusda/nyangmunity_back:latest;
-            docker run --name nyangmunity_back -d -p 8090:8090 -e TZ=Asia/Seoul ghcr.io/ppusda/nyangmunity_back:latest;
+            docker run --name nyangmunity_back -d -p 8080:8080 -e TZ=Asia/Seoul ghcr.io/ppusda/nyangmunity_back:latest;
