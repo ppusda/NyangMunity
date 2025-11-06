@@ -24,7 +24,7 @@ COPY src src
 RUN ./gradlew clean build -x test --no-daemon
 
 # 두 번째 스테이지: 실행 스테이지
-FROM ghcr.io/graalvm/graalvm-community:21
+FROM eclipse-temurin:21-jre-alpine
 
 # 작업 디렉토리 설정
 WORKDIR /app
