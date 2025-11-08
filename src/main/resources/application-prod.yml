@@ -4,6 +4,9 @@ spring:
     username: ${nyangmunity.prod-mysql-username}
     password: ${nyangmunity.prod-mysql-password}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${upstash.prod-redis-host}
   jpa:
     hibernate:
       ddl-auto: validate

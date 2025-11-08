@@ -4,6 +4,9 @@ spring:
     username: ${nyangmunity.dev-mysql-username}
     password: ${nyangmunity.dev-mysql-password}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${upstash.dev-redis-host}
   jpa:
     hibernate:
       ddl-auto: update
