@@ -8,6 +8,7 @@ spring:
     redis:
       host: ${upstash.prod-redis-host}
       port: ${upstash.prod-redis-port}
+      password: ${upstash.prod-redis-password}
   jpa:
     hibernate:
       ddl-auto: validate
