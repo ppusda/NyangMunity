@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cat.community.nyangmunity.member.entity.Token;
-import cat.community.nyangmunity.member.repository.TokenRepository;
+import cat.community.nyangmunity.member.redisRepository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -1,4 +1,4 @@
-package cat.community.nyangmunity.member.repository;
+package cat.community.nyangmunity.member.redisRepository;
 
 import java.util.Optional;
 

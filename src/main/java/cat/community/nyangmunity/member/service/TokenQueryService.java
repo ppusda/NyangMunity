@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import cat.community.nyangmunity.global.exception.global.InvalidRequestException;
 import cat.community.nyangmunity.global.exception.global.UnauthorizedException;
 import cat.community.nyangmunity.member.entity.Token;
-import cat.community.nyangmunity.member.repository.TokenRepository;
+import cat.community.nyangmunity.member.redisRepository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
