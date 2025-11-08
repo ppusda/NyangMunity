@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - '.github/workflows/back.yml'
-      - 'src/**'
       - 'build.gradle'
       - 'Dockerfile'
     branches:
