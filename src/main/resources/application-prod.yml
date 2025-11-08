@@ -9,6 +9,8 @@ spring:
       host: ${upstash.prod-redis-host}
       port: ${upstash.prod-redis-port}
       password: ${upstash.prod-redis-password}
+      ssl:
+        enabled: true
   jpa:
     hibernate:
       ddl-auto: validate
