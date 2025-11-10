@@ -9,6 +9,7 @@ import type {Image, Post} from '@/interfaces/type';
 
 import 'vue3-toastify/dist/index.css';
 import axiosClient from "@/libs/axiosClient";
+import s3Client from "@/libs/s3Client";
 import router from "@/router";
 import store from "@/stores/store";
 
@@ -101,27 +102,38 @@ const writePost = async () => {
 const uploadImages = async () => {
   const uploadedImageIds: string[] = [];
 
-  for (const image of uploadImageList) {
-    if (image.source === "gallery") { // 선택된 이미지
-      uploadedImageIds.push(image.id as string);
-    } else if (image.source === "upload") { // 업로드 될 이미지
-      // 직접 업로드한 이미지 -> presigned URL 요청 후 업로드
-      const response = await axiosClient.get(`/images/upload?filename=${image.filename}`);
+  try {
+    for (const image of uploadImageList) {
+      if (image.source === "gallery") {
+        uploadedImageIds.push(image.id as string);
+      } else if (image.source === "upload") {
+        // Presigned URL 받기
+        const response = await axiosClient.get(`/images/upload?filename=${image.filename}`);
+        const {id, uploadUrl} = response.data;
 
-      const {id, uploadUrl} = response.data;
-      await axiosClient.put(uploadUrl, dataUrlToBlob(image.url));
+        // S3 업로드
+        const blob = dataUrlToBlob(image.url);
+        await s3Client.put(uploadUrl, blob, {
+          headers: {
+            'Content-Type': blob.type || 'image/jpeg'
+          }
+        });
 
-      // 업로드 완료 후 서버에 저장된 이미지 ID 수집
-      uploadedImageIds.push(id);
+        uploadedImageIds.push(id);
+      }
     }
+  } catch (error) {
+    console.error('이미지 업로드 실패:', error);
+    warningToast('이미지 업로드에 실패했습니다.');
+    throw error;  // 상위에서 처리하도록
   }
 
   return uploadedImageIds;
 };
 
-const dataUrlToBlob = (dataUrl: string) => {
+const dataUrlToBlob = (dataUrl: string): Blob => {
   const arr = dataUrl.split(',');
-  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
@@ -132,7 +144,6 @@ const dataUrlToBlob = (dataUrl: string) => {
 
   return new Blob([u8arr], {type: mime});
 };
-
 
 // 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
 const handlePostScroll = (event: Event) => {
