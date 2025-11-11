@@ -21,26 +21,30 @@ public class ImageCommandService {
 	private final ImageRepository imageRepository;
 	private final ImageUtil imageUtil;
 
-	/***
+	/**
 	 * 업로드 할 URL을 반환해주는 메서드
 	 * @param filename 파일 이름을 전달 받으면 UUID 파일 이름으로 변환, 이를 DB에 저장
-	 * @return 이미지를 업로드 할 수 있는 presigned url, 변환된 이름의 filePath, 할당된 imageId를 반환
+	 * @return 이미지를 업로드 할 수 있는 presigned url, 변환된 이름의 filePath, 할당된 imageId를 반환x
 	 */
 	@Transactional
 	public UploadImageResponse createImageInfo(String filename) {
 		String uuid = imageUtil.generateRandomUUID();
 		String filePath = imageUtil.createFilepath(uuid, filename);
 
-		Image savedImage = imageRepository.save(
-			Image.builder()
-				.id(uuid)
-				.name(filename)
-				.url(imageUtil.getImageUrl() + filePath)
-				.provider(Provider.NYANGMUNITY)
-				.build()
+		Image savedImage = saveImage(Image.builder()
+			.id(uuid)
+			.name(filename)
+			.url(imageUtil.getImageUrl() + filePath)
+			.provider(Provider.NYANGMUNITY)
+			.build()
 		);
-
+		
 		return UploadImageResponse.from(imageUtil.generatePresignedUrl(filePath), savedImage.getId());
+	}
+
+	@Transactional
+	public Image saveImage(Image image) {
+		return imageRepository.save(image);
 	}
 
 	@Transactional

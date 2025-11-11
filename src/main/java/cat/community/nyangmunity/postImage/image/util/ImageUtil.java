@@ -44,10 +44,7 @@ public class ImageUtil {
 	}
 
 	public String createFilepath(String uuid, String fileName) {
-		return uuid + fileName.substring(fileName.lastIndexOf('.'));
+		return filePath + uuid + fileName.substring(fileName.lastIndexOf('.'));
 	}
 
-	public String getImageUrl() {
-		return imageUrl + filePath;
-	}
 }
