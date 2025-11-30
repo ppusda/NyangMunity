@@ -1,569 +1,509 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, reactive, ref} from 'vue';
+import {ref, onMounted, computed, onBeforeUnmount} from 'vue';
+import axiosClient from '@/libs/axiosClient';
+import type {Post} from '@/interfaces/type';
 import {infoToast, warningToast} from '@/libs/toaster';
+import {useClipboard} from '@vueuse/core';
+import store from '@/stores/store';
+import router from '@/router';
+import ImageModal from '@/components/ImageModal.vue';
+import UploadModal from '@/components/UploadModal.vue';
 
-import MasonryGrid from "@/components/MasonryGrid.vue";
-import PostChat from "@/components/PostChat.vue";
-
-import type {Image, Post} from '@/interfaces/type';
-
-import 'vue3-toastify/dist/index.css';
-import axiosClient from "@/libs/axiosClient";
-import s3Client from "@/libs/s3Client";
-import router from "@/router";
-import store from "@/stores/store";
-
-// 로그인 상태 확인
+// 로그인 상태
 const isLogin = computed(() => store.state.isLogin);
 
-// 패널 상태 관리를 위한 변수
-const isImagePanelCollapsed = ref(window.innerWidth < 768);
-const isInputAreaCollapsed = ref(window.innerWidth < 768);
+// 카테고리
+const categories = ref([
+  {id: 'all', name: '전체', icon: '🌟', type: 'post'},
+  {
+    id: 'posts',
+    name: 'Posts',
+    icon: '📝',
+    type: 'group',
+    expanded: true,
+    children: [
+      {id: 'posts-all', name: '전체', type: 'post'},
+      {id: 'posts-nyangmunity', name: 'Nyangmunity', type: 'post', provider: 'NYANGMUNITY'},
+      {id: 'posts-tenor', name: 'Tenor', type: 'post', provider: 'TENOR'}
+    ]
+  },
+  {
+    id: 'images',
+    name: 'Images',
+    icon: '🖼️',
+    type: 'group',
+    expanded: false,
+    children: [
+      {id: 'images-nyangmunity', name: 'Nyangmunity', type: 'image', provider: 'NYANGMUNITY'},
+      {id: 'images-tenor', name: 'Tenor', type: 'image', provider: 'TENOR'}
+    ]
+  }
+]);
 
-// 이미지 제공자 상태
-const providers = reactive<string[]>([]);
-const selectedProvider = reactive({value: "Nyangmunity"});
+const selectedCategory = ref('all');
 
-// 게시물 및 페이지네이션 상태
-const posts = reactive<Post[]>([]);
-const postPage = reactive({value: 1});
-const postTotalPage = reactive({value: 0});
-const postContainerRef = ref<HTMLElement | null>(null);
-const postChatRef = ref(null);
+// 상태 관리
+const posts = ref<Post[]>([]);
+const page = ref(0);
+const hasMore = ref(true);
+const isLoading = ref(false);
 
-// 게시물 작성
-const content = ref<string>("");
+// 모달 상태
+const showImageModal = ref(false);
+const showUploadModal = ref(false);
+const selectedPost = ref<Post | null>(null);
 
-// 이미지 및 페이지네이션 상태
-const images = reactive<Image[]>([]);
-const imagePage = reactive({value: 0});
-const imageTotalPage = reactive({value: 0});
+// 좋아요 상태
+const likedImages = ref<Record<string, boolean>>({});
 
-// 업로드 이미지
-const uploadImageList = reactive<Image[]>([]);
-const selectedPreviewImage = ref<string | null>(null);
-const fileInput = ref<HTMLInputElement | null>(null);
-const MAX_UPLOAD_IMAGES = 5;
+// URL 복사
+const {copy} = useClipboard();
+
+// 카테고리 토글
+const toggleCategory = (categoryId: string) => {
+  const category = categories.value.find(c => c.id === categoryId);
+  if (category && category.type === 'group') {
+    category.expanded = !category.expanded;
+  }
+};
 
 // 게시물 가져오기
-const getPosts = async (page: number, init: boolean) => {
-  if (postTotalPage.value !== 0 && page >= postTotalPage.value) return;
+const fetchPosts = async (pageNum: number) => {
+  if (isLoading.value || !hasMore.value) return;
 
+  isLoading.value = true;
   try {
-    const response = await axiosClient.get(`/posts?page=${page - 1}&size=10`);
-    postTotalPage.value = response.data.totalPages;
+    const selected = findSelectedCategory(selectedCategory.value);
+    let url = '';
 
-    if (init) {
-      posts.splice(0, posts.length, ...response.data.content);
-      await nextTick();
-      setTimeout(() => {
-        scrollToPostBottom(true);
-      }, 50);
+    if (selected?.type === 'image') {
+      // Images 갤러리
+      url = `/images?page=${pageNum}&size=20&gallery=true`;
+      if (selected.provider) {
+        url += `&provider=${selected.provider}`;
+      }
     } else {
-      const prevScrollHeight = postContainerRef.value?.scrollHeight || 0;
-      posts.push(...response.data.content);
-      await nextTick();
-      const currentScrollHeight = postContainerRef.value?.scrollHeight || 0;
-      postContainerRef.value?.scrollTo(0, currentScrollHeight - prevScrollHeight);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-// 게시물 업로드
-const writePost = async () => {
-  if (!isLogin.value) {
-    await router.replace({name: "login"});
-    return;
-  }
-
-  const uploadedImageIds: string[] = await uploadImages();
-  if (uploadedImageIds.length <= 0) {
-    warningToast("이미지는 필수로 입력해야 합니다.");
-    return;
-  }
-
-  axiosClient.post('/posts', {
-    content: content.value,
-    postImageIds: uploadedImageIds,
-  }).then(() => {
-    uploadImageList.splice(0, uploadImageList.length);  // 업로드 후 초기화
-    content.value = "";  // 내용 초기화
-    getPosts(postPage.value, true).then(() => {
-      setTimeout(() => {
-        scrollToPostBottom(true);
-      }, 50);
-    });
-  });
-};
-
-// 이미지 업로드
-const uploadImages = async () => {
-  const uploadedImageIds: string[] = [];
-
-  try {
-    for (const image of uploadImageList) {
-      if (image.source === "gallery") {
-        uploadedImageIds.push(image.id as string);
-      } else if (image.source === "upload") {
-        // Presigned URL 받기
-        const response = await axiosClient.get(`/images/upload?filename=${image.filename}`);
-        const {id, uploadUrl} = response.data;
-
-        // S3 업로드
-        const blob = dataUrlToBlob(image.url);
-        await s3Client.put(uploadUrl, blob, {
-          headers: {
-            'Content-Type': blob.type || 'image/jpeg'
-          }
-        });
-
-        uploadedImageIds.push(id);
+      // Posts
+      url = `/posts?page=${pageNum}&size=20`;
+      if (selected?.provider) {
+        url += `&provider=${selected.provider}`;
       }
     }
-  } catch (error) {
-    console.error('이미지 업로드 실패:', error);
-    warningToast('이미지 업로드에 실패했습니다.');
-    throw error;  // 상위에서 처리하도록
-  }
 
-  return uploadedImageIds;
-};
+    const response = await axiosClient.get(url);
 
-const dataUrlToBlob = (dataUrl: string): Blob => {
-  const arr = dataUrl.split(',');
-  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
+    if (pageNum === 0) {
+      posts.value = response.data.content;
+    } else {
+      posts.value.push(...response.data.content);
+    }
 
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-
-  return new Blob([u8arr], {type: mime});
-};
-
-// 스크롤 이벤트 핸들러 (위로 스크롤시 이전 페이지 로드)
-const handlePostScroll = (event: Event) => {
-  const element = event.target as HTMLElement;
-  if (element.scrollTop === 0) {
-    postPage.value += 1;
-    getPosts(postPage.value, false);
-  }
-};
-
-const scrollToPostBottom = (smooth = true) => {
-  if (postContainerRef.value) {
-    postContainerRef.value.scrollTo({
-      top: postContainerRef.value.scrollHeight,
-      behavior: smooth ? 'smooth' : 'auto'
+    // 좋아요 상태 초기화
+    response.data.content.forEach((post: Post) => {
+      const image = getImage(post);
+      if (image?.id) {
+        likedImages.value[image.id] = image.likeState || false;
+      }
     });
+
+    hasMore.value = !response.data.last;
+  } catch (error) {
+    warningToast('게시물을 불러오는데 실패했습니다.');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 선택된 카테고리 찾기
+const findSelectedCategory = (id: string) => {
+  for (const cat of categories.value) {
+    if (cat.id === id) return cat;
+    if (cat.children) {
+      const found = cat.children.find((child: any) => child.id === id);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
+// 카테고리 변경
+const changeCategory = (categoryId: string) => {
+  const selected = findSelectedCategory(categoryId);
+  if (!selected || selected.type === 'group') return;
+
+  selectedCategory.value = categoryId;
+  page.value = 0;
+  hasMore.value = true;
+  posts.value = [];
+  fetchPosts(0);
+};
+
+// 무한 스크롤
+const handleScroll = () => {
+  if (!mainRef.value) return;
+
+  const element = mainRef.value;
+  const scrollTop = element.scrollTop;
+  const scrollHeight = element.scrollHeight;
+  const clientHeight = element.clientHeight;
+
+  if (scrollTop + clientHeight >= scrollHeight - 500 && !isLoading.value && hasMore.value) {
+    page.value += 1;
+    fetchPosts(page.value);
   }
 };
 
 
-// Provider 가져오기
-const getProviders = async () => {
-  const response = await axiosClient.get(`/images/providers`);
-  response.data.Provider.forEach((item: string) => {  // Change String to string
-    providers.push(item);
-  });
+// 이미지 클릭 - 상세보기 모달
+const openImageModal = (post: Post) => {
+  selectedPost.value = post;
+  showImageModal.value = true;
 };
 
-const handleProviderClick = (provider: string) => {
-  selectedProvider.value = provider;
-
-  images.splice(0, images.length);
-  imagePage.value = 0;
-
-  getImages(imagePage.value);
-};
-
-// MasonryGrid에서 이미지 선택 시 업로드 리스트에 추가
-const selectImageFromMasonry = (item: Image) => {
-  if (uploadImageList.length >= MAX_UPLOAD_IMAGES) {
-    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장 까지 업로드할 수 있습니다.`);
+// 업로드 버튼 클릭
+const openUploadModal = () => {
+  if (!isLogin.value) {
+    warningToast('로그인이 필요합니다.');
+    router.push({name: 'login'});
     return;
   }
+  showUploadModal.value = true;
+};
 
-  // 이미 선택된 이미지인지 확인
-  if (!uploadImageList.some(image => image.url === item.url)) {
-    uploadImageList.push({
-      id: item.id,
-      url: item.url,
-      filename: null,
-      source: "gallery",
-    });
-    infoToast("이미지가 선택되었습니다.")
-  } else {
-    warningToast("이미 선택된 이미지 입니다.")
-  }
+// 업로드 완료 후
+const handleUploaded = () => {
+  page.value = 0;
+  hasMore.value = true;
+  fetchPosts(0);
 };
 
 // 이미지 가져오기
-const getImages = async (pageValue: number) => {
-  if (imageTotalPage.value !== 0 && pageValue >= imageTotalPage.value) return;
-
-  const response = await axiosClient.get(`/images?page=${pageValue}&provider=${selectedProvider.value}`);
-  imageTotalPage.value = response.data.totalPages;
-
-  const newImages = response.data.content.filter((newImage: Image) => !images.some(image => image.id === newImage.id));
-  images.push(...newImages);
+const getImage = (item: any) => {
+  // Images 갤러리인 경우 (url이 직접 있음)
+  if (item.url) {
+    return {
+      id: item.id,
+      url: item.url,
+      likeState: item.likeState || false
+    };
+  }
+  // Posts인 경우 (postImages 배열에서 첫 이미지)
+  return item.postImages?.[0];
 };
 
-// 이미지 제거 함수 (업로드 리스트에서 제거)
-const removeUploadImage = (removeImage: Image) => {
-  const index = uploadImageList.findIndex(img => img.url === removeImage.url);
-  if (index > -1) {
-    uploadImageList.splice(index, 1);
-  }
-  if (selectedPreviewImage.value === removeImage.url) {
-    selectedPreviewImage.value = null;
-  }
+// 작성자 이름 가져오기
+const getWriter = (item: any) => {
+  // Images 갤러리는 writer 없음
+  if (item.url) return 'Gallery';
+  // Posts는 writer 있음
+  return item.writer || 'Unknown';
 };
 
-// 스크롤 이벤트 감지 후 다음 페이지 로드
-const handleImageScroll = (event: Event) => {
-  const element = event.target as HTMLElement;
-  if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-    getImages(imagePage.value++);
-  }
+// 좋아요 상태 확인
+const isLiked = (post: Post) => {
+  const imageId = getImage(post)?.id;
+  return imageId ? likedImages.value[imageId] || false : false;
 };
 
-// 이미지 드래그 앤 드롭 업로드 핸들러
-const handleDrop = (event: DragEvent) => {
-  event.preventDefault();
-  const files = event.dataTransfer?.files;
-  if (files) {
-    const filesArray = Array.from(files);
-    if (uploadImageList.length + filesArray.length > MAX_UPLOAD_IMAGES) {
-      warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
-      return;
-    }
-    filesArray.forEach(processFile);
-  }
-};
-
-const processFile = (file: File) => {
-  if (uploadImageList.length >= MAX_UPLOAD_IMAGES) {
-    warningToast(`최대 ${MAX_UPLOAD_IMAGES}장 까지 업로드할 수 있습니다.`);
+// 좋아요 토글
+const toggleLike = async (post: Post) => {
+  if (!isLogin.value) {
+    warningToast('로그인이 필요합니다.');
+    await router.push({name: 'login'});
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = (e: ProgressEvent<FileReader>) => {
-    const resultString = e.target?.result as string;
-    if (resultString) {
-      uploadImageList.push({
-        id: null,
-        url: resultString,
-        filename: file.name,
-        source: "upload"
-      });
-    }
-  };
-  reader.readAsDataURL(file);
-};
+  const imageId = getImage(post)?.id;
+  if (!imageId) return;
 
-const handleClick = () => {
-  (fileInput.value as HTMLInputElement).click();
-};
-
-// 이미지 파일 선택 핸들러
-const handleFileSelect = (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
-  if (files) {
-    const filesArray = Array.from(files);
-    if (uploadImageList.length + filesArray.length > MAX_UPLOAD_IMAGES) {
-      warningToast(`최대 ${MAX_UPLOAD_IMAGES}장까지만 업로드할 수 있습니다.`);
-      return;
-    }
-    filesArray.forEach(processFile);
+  try {
+    const response = await axiosClient.post('/images/likes', {imageId});
+    likedImages.value[imageId] = response.data.state;
+    infoToast(response.data.state ? '좋아요!' : '좋아요 취소');
+  } catch (error) {
+    warningToast('좋아요 처리에 실패했습니다.');
   }
 };
 
-// 패널 토글 함수 (모바일에서는 하나만 열리도록)
-const toggleImagePanel = () => {
-  const isMobile = window.innerWidth < 768;
-
-  if (isMobile) {
-    // 모바일에서는 이미지 패널을 열 때 입력 영역을 닫음
-    if (isImagePanelCollapsed.value) {
-      isInputAreaCollapsed.value = true;
-    }
+// URL 복사
+const copyImageUrl = (post: Post) => {
+  const url = getImage(post)?.url;
+  if (url) {
+    copy(url);
+    infoToast('이미지 URL이 복사되었습니다!');
   }
-
-  isImagePanelCollapsed.value = !isImagePanelCollapsed.value;
 };
 
-const toggleInputArea = () => {
-  const isMobile = window.innerWidth < 768;
+// main 영역 ref
+const mainRef = ref<HTMLElement | null>(null);
 
-  if (isMobile) {
-    // 모바일에서는 입력 영역을 열 때 이미지 패널을 닫음
-    if (isInputAreaCollapsed.value) {
-      isImagePanelCollapsed.value = true;
-    }
-  }
-
-  isInputAreaCollapsed.value = !isInputAreaCollapsed.value;
-};
-
-// Vue 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
 onMounted(() => {
-  getImages(imagePage.value);
-  const imageListElement = document.querySelector('.imageList');
-  imageListElement?.addEventListener('scroll', handleImageScroll);
+  fetchPosts(0);
+  // main 영역에 스크롤 이벤트 등록
+  if (mainRef.value) {
+    mainRef.value.addEventListener('scroll', handleScroll);
+  }
+});
 
-  getProviders();
-  getPosts(postPage.value, true);
-  postContainerRef.value?.addEventListener('scroll', handlePostScroll);
-
-  // 화면 크기 변경 감지 - 좀 더 정교하게 설정
-  window.addEventListener('resize', () => {
-    const isMobile = window.innerWidth < 768;
-
-    // 모바일에서는 패널들을 접기
-    if (isMobile) {
-      isImagePanelCollapsed.value = true;
-      isInputAreaCollapsed.value = true;
-    }
-  });
+onBeforeUnmount(() => {
+  // 이벤트 리스너 제거
+  if (mainRef.value) {
+    mainRef.value.removeEventListener('scroll', handleScroll);
+  }
 });
 
 </script>
 
 <template>
-  <div class="w-screen h-screen flex flex-col overflow-hidden">
-    <!-- 데스크톱: 가로 배치, 모바일: 세로 배치 -->
-    <div class="flex-1 flex flex-col md:flex-row p-2 overflow-hidden">
+  <div class="min-h-screen bg-zinc-900 flex h-screen overflow-hidden">
+    <!-- 왼쪽 사이드바 (데스크톱) - 스크롤 가능 -->
+    <aside class="hidden md:block w-64 bg-zinc-900 border-r border-zinc-800 p-6 overflow-y-auto">
+      <div class="space-y-1">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">카테고리</h2>
 
-      <!-- 왼쪽 이미지 패널과 토글 버튼 (데스크톱에서만 보임) -->
-      <div class="hidden md:flex relative h-full">
-        <!-- 이미지 패널 - 접히면 완전히 사라짐 -->
-        <div :class="[
-          'flex flex-col bg-zinc-800 rounded-md transition-all duration-300 h-full overflow-hidden',
-          isImagePanelCollapsed ? 'w-0 p-0 opacity-0 m-0' : 'w-64 md:w-80 lg:w-96 p-4 mx-2'
-          ]">
-          <div class="text-white px-4 py-2">
-            <p>고양이 짤</p>
-            <p class="text-xs text-gray-400">나만 고양이 없어... ᓚᘏᗢ<br>고양이가 없는 분들을 위해 준비했습니다!</p>
-          </div>
-          <div class="flex flex-row flex-wrap py-2">
-            <button v-for="provider in providers" class="btn btn-ghost mr-2 mb-2"
-                    @click="handleProviderClick(provider)">
-              {{ provider }}
-            </button>
-          </div>
-          <div class="imageList border border-gray-400 rounded-md w-full flex-1 p-4 overflow-y-auto scroll-custom"
-               @scroll="handleImageScroll">
-            <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
-          </div>
-        </div>
+        <template v-for="category in categories" :key="category.id">
+          <!-- 단일 카테고리 또는 그룹 헤더 -->
+          <button
+              v-if="category.type !== 'group'"
+              @click="changeCategory(category.id)"
+              :class="[
+              'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200',
+              selectedCategory === category.id
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
+            ]"
+          >
+            <span class="text-xl">{{ category.icon }}</span>
+            <span class="font-medium">{{ category.name }}</span>
+          </button>
 
-        <!-- 이미지 패널 토글 버튼 -->
-        <button @click="toggleImagePanel"
-                class="absolute top-1/2 -translate-y-1/2 left-0 z-10 bg-zinc-700 hover:bg-zinc-600 text-white rounded-r-md h-12 w-6 flex items-center justify-center">
-          <span v-if="isImagePanelCollapsed">→</span>
-          <span v-else>←</span>
-        </button>
-      </div>
-
-      <div class="flex flex-col overflow-hidden w-full">
-        <!-- 메인 콘텐츠 영역 -->
-        <div class="flex-1 bg-zinc-800 p-4 mx-2 rounded-md overflow-hidden">
-          <PostChat
-              ref="postChatRef"
-              :posts="posts"
-              :isInputAreaCollapsed="isInputAreaCollapsed"
-              @scrollTop="() => { postPage.value += 1; getPosts(postPage.value, false); }"
-          ></PostChat>
-        </div>
-
-        <!-- 입력 영역 (하단) -->
-        <div class="flex flex-col relative">
-          <!-- 토글 버튼 -->
-          <div>
-            <button @click="toggleInputArea"
-                    class="hidden md:flex absolute bottom-0 right-1/2 transform translate-x-1/2 z-20 bg-zinc-700 hover:bg-zinc-600 text-white rounded-t-md h-6 w-12 flex items-center justify-center transition-colors">
-              <span v-if="isInputAreaCollapsed">↑</span>
-              <span v-else>↓️</span>
-            </button>
-          </div>
-
-          <!-- 입력 영역 -->
-          <div :class="[
-        'bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2',
-        isInputAreaCollapsed ? 'h-0 p-0 opacity-0' : 'h-48 p-4 mt-3'
-      ]">
-            <!-- 업로드 영역 -->
-            <div>
-              <div class="upload-area border border-dashed rounded-md border-gray-500 p-2 relative mb-2"
-                   @drop="handleDrop"
-                   @dragover.prevent
-                   @click="handleClick"
-              >
-                <input
-                    type="file"
-                    ref="fileInput"
-                    class="hidden"
-                    @change="handleFileSelect"
-                    multiple
-                />
-                <div v-if="uploadImageList.length" class="flex flex-wrap gap-2">
-                  <div v-for="(img, index) in uploadImageList" :key="index" class="relative w-20 h-20">
-                    <img :src="img.url" class="w-full h-full object-cover rounded-md"/>
-                    <button
-                        @click.stop="removeUploadImage(img)"
-                        class="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-                <div v-else class="p-4">
-                  <p class="text-center text-gray-400 text-sm">이미지를 선택하거나 드래그해서 첨부하세요!</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- 텍스트 입력과 전송 버튼 -->
-            <div class="flex flex-row gap-2">
-              <div class="flex-1">
-            <textarea
-                v-model="content"
-                placeholder="간단한 설명을 입력해주세요."
-                maxlength="100"
-                class="textarea textarea-bordered bg-zinc-900 text-white placeholder-gray-400 w-full h-16 resize-none focus:border-zinc-600 focus:outline-none"
-            ></textarea>
-              </div>
-              <div class="flex items-end">
-                <button
-                    @click="writePost"
-                    class="btn btn-primary h-16 px-4 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white transition-colors"
-                    :disabled="!uploadImageList.length"
-                >
-                  전송
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 모바일 이미지 패널 -->
-    <div class="md:hidden flex flex-col relative">
-      <!-- 이미지 패널 -->
-      <div :class="[
-        'bg-zinc-800 rounded-md transition-all duration-300 overflow-hidden mx-2 mb-2',
-        isImagePanelCollapsed ? 'h-0 p-0 opacity-0' : 'h-64 p-4'
-      ]">
-        <div class="flex flex-col h-full">
-          <!-- 프로바이더 버튼들 -->
-          <div class="flex flex-row flex-wrap gap-2 mb-3">
+          <!-- 그룹 카테고리 -->
+          <div v-else class="space-y-1">
             <button
-                v-for="provider in providers"
-                :key="provider"
-                :class="[
-                'btn btn-sm px-3 py-1 rounded-md transition-colors text-sm',
-                selectedProvider.value === provider
-                  ? 'bg-zinc-600 text-white'
-                  : 'btn-ghost text-gray-300 hover:bg-zinc-700'
-              ]"
-                @click="handleProviderClick(provider)">
-              {{ provider }}
+                @click="toggleCategory(category.id)"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:bg-zinc-800 hover:text-white transition-all duration-200"
+            >
+              <div class="flex items-center gap-3">
+                <span class="text-xl">{{ category.icon }}</span>
+                <span class="font-medium">{{ category.name }}</span>
+              </div>
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 transition-transform duration-200"
+                  :class="{ 'rotate-180': category.expanded }"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
             </button>
-          </div>
 
-          <!-- 이미지 그리드 -->
-          <div class="imageList border border-gray-500 rounded-md flex-1 p-3 overflow-y-auto scroll-custom">
-            <MasonryGrid :images="images" @select-image="selectImageFromMasonry"/>
+            <!-- 하위 카테고리 -->
+            <div v-if="category.expanded" class="ml-4 space-y-1">
+              <button
+                  v-for="child in category.children"
+                  :key="child.id"
+                  @click="changeCategory(child.id)"
+                  :class="[
+                  'w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-all duration-200 text-sm',
+                  selectedCategory === child.id
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
+                ]"
+              >
+                {{ child.name }}
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 - 스크롤 영역 -->
+    <main ref="mainRef" class="flex-1 overflow-y-auto">
+      <!-- 헤더 (모바일) - sticky -->
+      <div class="md:hidden sticky top-0 z-40 backdrop-blur-md bg-zinc-900/90 border-b border-zinc-800 p-4">
+        <select
+            v-model="selectedCategory"
+            @change="changeCategory(selectedCategory)"
+            class="w-full px-4 py-2 bg-zinc-800 text-white rounded-lg border border-zinc-700 focus:border-blue-500 focus:outline-none"
+        >
+          <option value="all">🌟 전체</option>
+          <optgroup label="📝 Posts">
+            <option value="posts-all">전체</option>
+            <option value="posts-nyangmunity">Nyangmunity</option>
+            <option value="posts-tenor">Tenor</option>
+          </optgroup>
+          <optgroup label="🖼️ Images">
+            <option value="images-nyangmunity">Nyangmunity</option>
+            <option value="images-tenor">Tenor</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- 그리드 -->
+      <div class="p-4 md:p-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div
+              v-for="post in posts"
+              :key="post.id"
+              @click="openImageModal(post)"
+              class="group relative aspect-square rounded-2xl overflow-hidden bg-zinc-800 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
+          >
+            <!-- 이미지 -->
+            <img
+                :src="getImage(post)?.url"
+                class="w-full h-full object-cover"
+            />
+
+            <!-- 모바일: 항상 보이는 액션 버튼 -->
+            <div class="md:hidden absolute bottom-3 right-3 flex gap-2" @click.stop>
+              <!-- 좋아요 -->
+              <button
+                  @click="toggleLike(post)"
+                  class="w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center transition-all shadow-lg"
+                  :class="isLiked(post)
+                  ? 'bg-red-500/90 text-white'
+                  : 'bg-black/40 text-white'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :fill="isLiked(post) ? 'currentColor' : 'none'"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+              </button>
+
+              <!-- 복사 -->
+              <button
+                  @click="copyImageUrl(post)"
+                  class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md text-white flex items-center justify-center shadow-lg"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- 데스크톱: 호버 시 보이는 오버레이 -->
+            <div
+                class="hidden md:block absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div class="absolute bottom-0 left-0 right-0 p-4 pointer-events-auto" @click.stop>
+                <!-- 업로더 -->
+                <div class="flex items-center gap-2 mb-3">
+                  <div
+                      class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                    {{ getWriter(post).charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="text-white text-sm font-medium">{{ getWriter(post) }}</span>
+                </div>
+
+                <!-- Content (Posts만) -->
+                <p v-if="post.content" class="text-gray-300 text-xs line-clamp-2 mb-3">{{ post.content }}</p>
+
+                <!-- 액션 버튼 -->
+                <div class="flex gap-2">
+                  <button
+                      @click="toggleLike(post)"
+                      class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                      :class="isLiked(post)
+                      ? 'bg-red-500 text-white'
+                      : 'bg-white/20 text-white hover:bg-white/30'"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                         :fill="isLiked(post) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    <span class="text-xs font-medium">좋아요</span>
+                  </button>
+
+                  <button
+                      @click="copyImageUrl(post)"
+                      class="flex-1 flex items-center justify-center gap-2 py-2 bg-white/20 text-white hover:bg-white/30 rounded-lg transition-all"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="text-xs font-medium">복사</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 모바일 하단 바 -->
-    <div class="md:hidden bg-zinc-800 mx-2 mb-2 rounded-md">
-      <div class="flex justify-end gap-1">
-        <!-- 이미지 패널 토글 버튼 -->
-        <button
-            @click="toggleImagePanel"
-            :class="[
-              'flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200',
-              !isImagePanelCollapsed
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
-                : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
-            ]">
-          <span class="text-sm">📷</span>
-        </button>
+        <!-- 로딩 -->
+        <div v-if="isLoading" class="flex justify-center py-12">
+          <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
 
-        <!-- 입력 영역 토글 버튼 -->
-        <button
-            @click="toggleInputArea"
-            :class="[
-              'flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200',
-              !isInputAreaCollapsed
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
-                : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
-            ]">
-          <span class="text-sm">✏️</span>
-        </button>
+        <!-- 더 이상 없음 -->
+        <div v-if="!hasMore && posts.length > 0" class="text-center py-12">
+          <p class="text-gray-500">더 이상 게시물이 없습니다 🐱</p>
+        </div>
+
+        <!-- 빈 상태 -->
+        <div v-if="!isLoading && posts.length === 0" class="text-center py-20">
+          <div class="text-6xl mb-4">😿</div>
+          <p class="text-gray-400 text-lg">아직 게시물이 없습니다</p>
+          <p class="text-gray-600 text-sm mt-2">첫 번째 고양이 사진을 공유해보세요!</p>
+        </div>
       </div>
-    </div>
+    </main>
+
+    <!-- 플로팅 업로드 버튼 -->
+    <button
+        @click="openUploadModal"
+        class="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 z-50"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+    </button>
+
+    <!-- 모달들 -->
+    <ImageModal
+        v-if="showImageModal"
+        :post="selectedPost"
+        @close="showImageModal = false"
+    />
+    <UploadModal
+        v-if="showUploadModal"
+        @close="showUploadModal = false"
+        @uploaded="handleUploaded"
+    />
   </div>
 </template>
 
 <style scoped>
-.upload-area {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  min-height: 80px;
-  max-height: 100px;
-  overflow-y: auto;
+/* 텍스트 말줄임 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.upload-area:hover {
-  border-color: #71717a;
+/* 스크롤바 커스텀 */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.scroll-custom {
-  scrollbar-width: thin;
-  scrollbar-color: #52525b #27272a;
+::-webkit-scrollbar-track {
+  background: #18181b;
 }
 
-.scroll-custom::-webkit-scrollbar {
-  width: 6px;
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
 }
 
-.scroll-custom::-webkit-scrollbar-track {
-  background: #27272a;
-  border-radius: 3px;
-}
-
-.scroll-custom::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb:hover {
   background: #52525b;
-  border-radius: 3px;
-}
-
-.scroll-custom::-webkit-scrollbar-thumb:hover {
-  background: #71717a;
-}
-
-@media (max-width: 768px) {
-  .w-0 {
-    width: 0 !important;
-    min-width: 0 !important;
-  }
-
-  .h-0 {
-    height: 0 !important;
-    min-height: 0 !important;
-  }
 }
 </style>
