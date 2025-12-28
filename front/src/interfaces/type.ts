@@ -54,3 +54,22 @@ export interface ImageLikeResponse {
     imageId: String;
     state: boolean;
 }
+
+// CategoryChild 타입 (하위 카테고리용)
+interface CategoryChild {
+    id: string;
+    name: string;
+    type: 'post' | 'image';
+    provider?: 'NYANGMUNITY' | 'TENOR';  // 선택적 속성
+}
+
+// Category 타입 (최상위 카테고리용)
+interface Category {
+    id: string;
+    name: string;
+    icon?: string;
+    type: 'post' | 'image' | 'group';
+    provider?: 'NYANGMUNITY' | 'TENOR';
+    expanded?: boolean;
+    children?: CategoryChild[];
+}

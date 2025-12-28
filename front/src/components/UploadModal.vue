@@ -296,8 +296,8 @@ onMounted(() => {
             <div class="border border-zinc-800 rounded-xl p-4 max-h-96 overflow-y-auto">
               <div class="grid grid-cols-3 gap-3">
                 <div
-                    v-for="image in galleryImages"
-                    :key="image.id"
+                    v-for="(image, index) in galleryImages"
+                    :key="image.id || `temp-${index}`"
                     @click="selectGalleryImage(image)"
                     :class="['relative aspect-square rounded-lg overflow-hidden cursor-pointer group',
                     selectedImage?.id === image.id ? 'ring-4 ring-blue-500' : '']"

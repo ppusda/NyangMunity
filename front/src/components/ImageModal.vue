@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import {ref, computed} from 'vue';
+import {ref, computed, watch} from 'vue';
 import {useClipboard} from '@vueuse/core';
 import {infoToast, warningToast} from '@/libs/toaster';
 import axiosClient from '@/libs/axiosClient';
 import type {Post} from '@/interfaces/type';
 import store from '@/stores/store';
-import router from '@/router';
 
 const props = defineProps<{
   post: Post | null;
@@ -16,114 +15,89 @@ const emit = defineEmits(['close']);
 // 로그인 상태
 const isLogin = computed(() => store.state.isLogin);
 
-const image = computed(() => {
-  // Images 갤러리인 경우
-  if (props.post?.url) {
-    return {
-      id: props.post.id,
-      url: props.post.url,
-      likeState: props.post.likeState || false
-    };
+// 현재 이미지 인덱스
+const currentIndex = ref(0);
+
+// 현재 이미지
+const currentImage = computed(() => {
+  if (!props.post?.postImages || props.post.postImages.length === 0) return null;
+  return props.post.postImages[currentIndex.value];
+});
+
+// 좋아요 상태
+const likedImages = ref<Record<string, boolean>>({});
+
+// 초기화 함수
+const initializeLikes = () => {
+  if (props.post?.postImages) {
+    props.post.postImages.forEach(img => {
+      if (img.id) {
+        likedImages.value[img.id] = img.likeState;
+      }
+    });
   }
-  // Posts인 경우
-  return props.post?.postImages?.[0];
+  currentIndex.value = 0;
+};
+
+// props.post가 변경될 때마다 초기화
+watch(() => props.post, () => {
+  if (props.post) {
+    initializeLikes();
+  }
+}, {immediate: true});
+
+// 현재 이미지 좋아요 상태
+const isLiked = computed(() => {
+  const imageId = currentImage.value?.id;
+  return imageId ? likedImages.value[imageId] || false : false;
 });
 
-// 작성자 (Images는 없음)
-const writer = computed(() => {
-  if (props.post?.url) return 'Gallery';
-  return props.post?.writer || 'Unknown';
-});
+// 이전 이미지
+const prevImage = () => {
+  if (currentIndex.value > 0) {
+    currentIndex.value--;
+  }
+};
 
-// 좋아요 상태 (메인)
-const isLiked = ref(image.value?.likeState || false);
-
-// 이모지 반응 상태 (추가)
-const emojiReactions = ref<Record<string, number>>({});
-const myEmojiReactions = ref<Set<string>>(new Set()); // 내가 누른 이모지
-const availableEmojis = [
-  {emoji: '😂', label: '웃김'},
-  {emoji: '❤️', label: '사랑'},
-  {emoji: '🔥', label: '멋짐'},
-  {emoji: '😱', label: '놀람'},
-  {emoji: '😻', label: '귀여움'}
-];
+// 다음 이미지
+const nextImage = () => {
+  if (props.post?.postImages && currentIndex.value < props.post.postImages.length - 1) {
+    currentIndex.value++;
+  }
+};
 
 // 좋아요 토글
 const toggleLike = async () => {
   if (!isLogin.value) {
     warningToast('로그인이 필요합니다.');
-    await router.push({name: 'login'});
     return;
   }
 
-  const imageId = image.value?.id;
-  if (!imageId) return;
+  const imageId = currentImage.value?.id;
+  if (!imageId) {
+    warningToast('이미지 정보를 찾을 수 없습니다.');
+    return;
+  }
 
   try {
     const response = await axiosClient.post('/images/likes', {imageId});
-    isLiked.value = response.data.state;
-    infoToast(response.data.state ? '좋아요!' : '좋아요 취소');
+    likedImages.value[imageId] = response.data.state;
+    infoToast(response.data.state ? '좋아요를 눌렀습니다!' : '좋아요를 취소했습니다!');
   } catch (error) {
     warningToast('좋아요 처리에 실패했습니다.');
   }
 };
 
-// 이모지 반응 추가/제거
-const toggleEmojiReaction = async (emoji: string) => {
-  if (!isLogin.value) {
-    warningToast('로그인이 필요합니다.');
-    await router.push({name: 'login'});
-    return;
-  }
-
-  const imageId = image.value?.id;
-  if (!imageId) return;
-
-  try {
-    // TODO: 실제 API 연결 시 사용
-    // const response = await axiosClient.post('/images/reactions', { imageId, emoji });
-
-    // 임시: 로컬 상태만 업데이트
-    const hasReacted = myEmojiReactions.value.has(emoji);
-
-    if (hasReacted) {
-      // 이미 반응했으면 제거
-      myEmojiReactions.value.delete(emoji);
-      if (emojiReactions.value[emoji]) {
-        emojiReactions.value[emoji]--;
-        if (emojiReactions.value[emoji] <= 0) {
-          delete emojiReactions.value[emoji];
-        }
-      }
-      infoToast('반응 취소');
-    } else {
-      // 새로 반응 추가
-      myEmojiReactions.value.add(emoji);
-      if (!emojiReactions.value[emoji]) {
-        emojiReactions.value[emoji] = 0;
-      }
-      emojiReactions.value[emoji]++;
-      infoToast(`${emoji} 반응 추가!`);
-    }
-  } catch (error) {
-    warningToast('반응 처리에 실패했습니다.');
-  }
-};
-
-// 이모지 반응 여부 확인
-const hasEmojiReaction = (emoji: string) => {
-  return myEmojiReactions.value.has(emoji);
-};
-
 // URL 복사
 const {copy} = useClipboard();
 const copyImageUrl = () => {
-  const url = image.value?.url;
-  if (url) {
-    copy(url);
-    infoToast('이미지 URL이 복사되었습니다!');
+  const url = currentImage.value?.url;
+  if (!url) {
+    warningToast('이미지 URL을 찾을 수 없습니다.');
+    return;
   }
+  copy(url);
+  infoToast('이미지 URL이 복사되었습니다!');
 };
 
 // 모달 닫기
@@ -134,6 +108,8 @@ const closeModal = () => {
 // 키보드 이벤트
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowLeft') prevImage();
+  if (e.key === 'ArrowRight') nextImage();
 };
 
 // 작성 시간 포맷
@@ -141,7 +117,8 @@ const formatTime = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
-  const minutes = Math.floor(diff / 60000);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
@@ -154,123 +131,123 @@ const formatTime = (dateString: string) => {
 
 <template>
   <Teleport to="body">
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
-         @click.self="closeModal"
-         @keydown="handleKeydown"
-         tabindex="0">
-
+    <div
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        @click.self="closeModal"
+        @keydown="handleKeydown"
+        tabindex="0"
+    >
+      <!-- 모달 컨테이너 -->
       <div
-          class="relative w-full max-w-6xl h-full max-h-[90vh] flex flex-col md:flex-row bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl animate-fadeIn">
+          class="relative w-full max-w-5xl h-full max-h-[90vh] flex flex-col md:flex-row bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl animate-fadeIn">
 
         <!-- 왼쪽: 이미지 영역 -->
         <div class="relative flex-1 bg-black flex items-center justify-center">
-          <img v-if="image" :src="image.url" class="max-w-full max-h-full object-contain"/>
+          <img
+              v-if="currentImage"
+              :src="currentImage.url"
+              class="max-w-full max-h-full object-contain"
+          />
+
+          <!-- 이미지 네비게이션 -->
+          <div v-if="post && post.postImages && post.postImages.length > 1"
+               class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
+            <button
+                v-if="currentIndex > 0"
+                @click="prevImage"
+                class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/70 transition-all pointer-events-auto"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button
+                v-if="post.postImages && currentIndex < post.postImages.length - 1"
+                @click="nextImage"
+                class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/70 transition-all pointer-events-auto"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 이미지 카운터 -->
+          <div v-if="post && post.postImages && post.postImages.length > 1"
+               class="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-sm rounded-full">
+            {{ currentIndex + 1 }} / {{ post.postImages.length }}
+          </div>
+
+          <!-- 닫기 버튼 -->
+          <button
+              @click="closeModal"
+              class="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/70 transition-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
 
         <!-- 오른쪽: 정보 영역 -->
-        <div class="w-full md:w-96 bg-zinc-900 flex flex-col">
+        <div class="w-full md:w-96 flex flex-col bg-zinc-900">
           <!-- 헤더 -->
-          <div class="p-4 border-b border-zinc-800 flex items-center justify-between">
+          <div class="p-6 border-b border-zinc-800">
             <div class="flex items-center gap-3">
               <div
-                  class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
-                {{ writer.charAt(0).toUpperCase() }}
+                  class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-lg font-bold">
+                {{ post?.writer?.charAt(0).toUpperCase() }}
               </div>
               <div>
-                <p class="text-white font-medium">{{ writer }}</p>
-                <p class="text-gray-400 text-xs">{{ formatTime(post?.createDate || new Date().toISOString()) }}</p>
-              </div>
-            </div>
-            <button @click="closeModal" class="text-gray-400 hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- 내용 (Posts만) -->
-          <div class="flex-1 p-4 overflow-y-auto">
-            <p v-if="post?.content" class="text-white mb-6">{{ post.content }}</p>
-            <p v-else-if="!post?.url" class="text-gray-500 italic mb-6">설명이 없습니다.</p>
-            
-            <!-- 반응 통계 -->
-            <div v-if="Object.keys(emojiReactions).length > 0 || isLiked" class="mb-6">
-              <p class="text-gray-400 text-xs mb-3">반응</p>
-              <div class="flex flex-wrap gap-2">
-                <!-- 좋아요 (메인) -->
-                <div
-                    v-if="isLiked"
-                    class="flex items-center gap-1 bg-red-500/20 text-red-500 px-3 py-1 rounded-full"
-                >
-                  <span class="text-lg">❤️</span>
-                  <span class="text-sm font-medium">좋아요</span>
-                </div>
-
-                <!-- 이모지 반응들 -->
-                <div
-                    v-for="(count, emoji) in emojiReactions"
-                    :key="emoji"
-                    class="flex items-center gap-1 bg-zinc-800 px-3 py-1 rounded-full"
-                >
-                  <span class="text-lg">{{ emoji }}</span>
-                  <span class="text-gray-300 text-sm">{{ count }}</span>
-                </div>
+                <p class="text-white font-semibold">{{ post?.writer }}</p>
+                <p class="text-gray-400 text-sm">{{ formatTime(post?.createDate || '') }}</p>
               </div>
             </div>
           </div>
 
-          <!-- 좋아요 버튼 (메인) -->
-          <div class="p-4 border-t border-zinc-800">
-            <button
-                @click="toggleLike"
-                class="w-full flex items-center justify-center gap-2 py-3 rounded-xl transition-all"
-                :class="isLiked
-                ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white'"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :fill="isLiked ? 'currentColor' : 'none'"
-                   viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
-              <span class="font-medium">{{ isLiked ? '좋아요 취소' : '좋아요' }}</span>
-            </button>
+          <!-- 본문 -->
+          <div class="flex-1 overflow-y-auto p-6">
+            <div class="mb-6">
+              <h3 class="text-white font-semibold mb-2">설명</h3>
+              <p v-if="post?.content" class="text-gray-300">{{ post.content }}</p>
+              <p v-else class="text-gray-500 italic">설명이 없습니다.</p>
+            </div>
           </div>
 
-          <!-- 추가 이모지 반응 선택 -->
-          <div class="p-4 border-t border-zinc-800">
-            <p class="text-gray-400 text-xs mb-2">추가 반응</p>
-            <div class="flex gap-1.5">
+          <!-- 액션 버튼 -->
+          <div class="p-6 border-t border-zinc-800">
+            <div class="flex gap-3">
               <button
-                  v-for="item in availableEmojis"
-                  :key="item.emoji"
-                  @click="toggleEmojiReaction(item.emoji)"
+                  @click="toggleLike"
                   :class="[
-                    'flex-1 h-10 rounded-lg flex items-center justify-center text-lg transition-all hover:scale-110',
-                    hasEmojiReaction(item.emoji)
-                      ? 'bg-blue-600 text-white ring-2 ring-blue-400'
-                      : 'bg-zinc-800 hover:bg-zinc-700'
-                  ]"
-                  :title="item.label">
-                {{ item.emoji }}
+                  'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all font-medium',
+                  isLiked
+                    ? 'bg-red-500 text-white hover:bg-red-600'
+                    : 'bg-zinc-800 text-white hover:bg-zinc-700'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :fill="isLiked ? 'currentColor' : 'none'"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                좋아요
+              </button>
+              <button
+                  @click="copyImageUrl"
+                  class="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-800 text-white hover:bg-zinc-700 rounded-xl transition-all font-medium"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                URL 복사
               </button>
             </div>
-          </div>
-
-          <!-- URL 복사 -->
-          <div class="p-4 border-t border-zinc-800">
-            <button
-                @click="copyImageUrl"
-                class="w-full flex items-center justify-center gap-2 py-3 bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white rounded-xl transition-all"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-              </svg>
-              <span class="font-medium">이미지 URL 복사</span>
-            </button>
           </div>
         </div>
       </div>
@@ -292,5 +269,23 @@ const formatTime = (dateString: string) => {
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
+}
+
+/* 스크롤바 커스텀 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 </style>

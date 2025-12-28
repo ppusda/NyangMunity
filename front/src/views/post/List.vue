@@ -12,32 +12,27 @@ import UploadModal from '@/components/UploadModal.vue';
 // 로그인 상태
 const isLogin = computed(() => store.state.isLogin);
 
-// 카테고리
-const categories = ref([
-  {id: 'all', name: '전체', icon: '🌟', type: 'post'},
-  {
-    id: 'posts',
-    name: 'Posts',
-    icon: '📝',
-    type: 'group',
-    expanded: true,
-    children: [
-      {id: 'posts-all', name: '전체', type: 'post'},
-      {id: 'posts-nyangmunity', name: 'Nyangmunity', type: 'post', provider: 'NYANGMUNITY'},
-      {id: 'posts-tenor', name: 'Tenor', type: 'post', provider: 'TENOR'}
-    ]
-  },
-  {
-    id: 'images',
-    name: 'Images',
-    icon: '🖼️',
-    type: 'group',
-    expanded: false,
-    children: [
-      {id: 'images-nyangmunity', name: 'Nyangmunity', type: 'image', provider: 'NYANGMUNITY'},
-      {id: 'images-tenor', name: 'Tenor', type: 'image', provider: 'TENOR'}
-    ]
-  }
+// 카테고리 타입 정의 (더 유연하게)
+interface CategoryChild {
+  id: string;
+  name: string;
+  type: 'post' | 'image';
+  provider?: string;  // 모든 provider를 받을 수 있도록 string으로 변경
+}
+
+interface Category {
+  id: string;
+  name: string;
+  icon?: string;
+  type: 'post' | 'image' | 'group';
+  provider?: string;
+  expanded?: boolean;
+  children?: CategoryChild[];
+}
+
+// 카테고리 (동적으로 생성될 예정)
+const categories = ref<Category[]>([
+  {id: 'all', name: '전체', icon: '🌟', type: 'post'}
 ]);
 
 const selectedCategory = ref('all');
@@ -47,6 +42,7 @@ const posts = ref<Post[]>([]);
 const page = ref(0);
 const hasMore = ref(true);
 const isLoading = ref(false);
+const isCategoriesLoading = ref(true);
 
 // 모달 상태
 const showImageModal = ref(false);
@@ -58,6 +54,91 @@ const likedImages = ref<Record<string, boolean>>({});
 
 // URL 복사
 const {copy} = useClipboard();
+
+// Provider 목록 가져오기 (백엔드에서)
+const fetchProviders = async (): Promise<string[]> => {
+  try {
+    const response = await axiosClient.get('/images/providers');
+    return response.data.Provider || [];
+  } catch (error) {
+    console.error('Provider 로드 실패:', error);
+    return [];
+  }
+};
+
+// 카테고리 동적 생성
+const initializeCategories = async () => {
+  isCategoriesLoading.value = true;
+  
+  try {
+    const providers = await fetchProviders();
+    
+    // Posts 하위 카테고리 생성
+    const postsChildren: CategoryChild[] = [
+      {id: 'posts-all', name: '전체', type: 'post'}
+    ];
+    
+    providers.forEach(provider => {
+      postsChildren.push({
+        id: `posts-${provider.toLowerCase()}`,
+        name: provider,
+        type: 'post',
+        provider: provider
+      });
+    });
+    
+    // Images 하위 카테고리 생성
+    const imagesChildren: CategoryChild[] = [];
+    
+    providers.forEach(provider => {
+      imagesChildren.push({
+        id: `images-${provider.toLowerCase()}`,
+        name: provider,
+        type: 'image',
+        provider: provider
+      });
+    });
+    
+    // 전체 카테고리 구성
+    categories.value = [
+      {id: 'all', name: '전체', icon: '🌟', type: 'post'},
+      {
+        id: 'posts',
+        name: 'Posts',
+        icon: '📝',
+        type: 'group',
+        expanded: true,
+        children: postsChildren
+      },
+      {
+        id: 'images',
+        name: 'Images',
+        icon: '🖼️',
+        type: 'group',
+        expanded: false,
+        children: imagesChildren
+      }
+    ];
+  } catch (error) {
+    console.error('카테고리 초기화 실패:', error);
+    // 실패 시 기본 카테고리 사용
+    categories.value = [
+      {id: 'all', name: '전체', icon: '🌟', type: 'post'},
+      {
+        id: 'posts',
+        name: 'Posts',
+        icon: '📝',
+        type: 'group',
+        expanded: true,
+        children: [
+          {id: 'posts-all', name: '전체', type: 'post'}
+        ]
+      }
+    ];
+  } finally {
+    isCategoriesLoading.value = false;
+  }
+};
 
 // 카테고리 토글
 const toggleCategory = (categoryId: string) => {
@@ -115,11 +196,11 @@ const fetchPosts = async (pageNum: number) => {
 };
 
 // 선택된 카테고리 찾기
-const findSelectedCategory = (id: string) => {
+const findSelectedCategory = (id: string): Category | CategoryChild | null => {
   for (const cat of categories.value) {
     if (cat.id === id) return cat;
     if (cat.children) {
-      const found = cat.children.find((child: any) => child.id === id);
+      const found = cat.children.find((child) => child.id === id);
       if (found) return found;
     }
   }
@@ -153,7 +234,6 @@ const handleScroll = () => {
   }
 };
 
-
 // 이미지 클릭 - 상세보기 모달
 const openImageModal = (post: Post) => {
   selectedPost.value = post;
@@ -179,7 +259,6 @@ const handleUploaded = () => {
 
 // 이미지 가져오기
 const getImage = (item: any) => {
-  // Images 갤러리인 경우 (url이 직접 있음)
   if (item.url) {
     return {
       id: item.id,
@@ -187,15 +266,12 @@ const getImage = (item: any) => {
       likeState: item.likeState || false
     };
   }
-  // Posts인 경우 (postImages 배열에서 첫 이미지)
   return item.postImages?.[0];
 };
 
 // 작성자 이름 가져오기
 const getWriter = (item: any) => {
-  // Images 갤러리는 writer 없음
   if (item.url) return 'Gallery';
-  // Posts는 writer 있음
   return item.writer || 'Unknown';
 };
 
@@ -237,16 +313,20 @@ const copyImageUrl = (post: Post) => {
 // main 영역 ref
 const mainRef = ref<HTMLElement | null>(null);
 
-onMounted(() => {
-  fetchPosts(0);
-  // main 영역에 스크롤 이벤트 등록
+onMounted(async () => {
+  // 카테고리 초기화 먼저
+  await initializeCategories();
+  
+  // 게시물 로드
+  await fetchPosts(0);
+  
+  // 스크롤 이벤트 등록
   if (mainRef.value) {
     mainRef.value.addEventListener('scroll', handleScroll);
   }
 });
 
 onBeforeUnmount(() => {
-  // 이벤트 리스너 제거
   if (mainRef.value) {
     mainRef.value.removeEventListener('scroll', handleScroll);
   }
@@ -261,8 +341,14 @@ onBeforeUnmount(() => {
       <div class="space-y-1">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">카테고리</h2>
 
-        <template v-for="category in categories" :key="category.id">
-          <!-- 단일 카테고리 또는 그룹 헤더 -->
+        <!-- 카테고리 로딩 중 -->
+        <div v-if="isCategoriesLoading" class="flex justify-center py-8">
+          <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <!-- 카테고리 목록 -->
+        <template v-else v-for="category in categories" :key="category.id">
+          <!-- 단일 카테고리 -->
           <button
               v-if="category.type !== 'group'"
               @click="changeCategory(category.id)"
@@ -328,17 +414,16 @@ onBeforeUnmount(() => {
             v-model="selectedCategory"
             @change="changeCategory(selectedCategory)"
             class="w-full px-4 py-2 bg-zinc-800 text-white rounded-lg border border-zinc-700 focus:border-blue-500 focus:outline-none"
+            :disabled="isCategoriesLoading"
         >
           <option value="all">🌟 전체</option>
-          <optgroup label="📝 Posts">
-            <option value="posts-all">전체</option>
-            <option value="posts-nyangmunity">Nyangmunity</option>
-            <option value="posts-tenor">Tenor</option>
-          </optgroup>
-          <optgroup label="🖼️ Images">
-            <option value="images-nyangmunity">Nyangmunity</option>
-            <option value="images-tenor">Tenor</option>
-          </optgroup>
+          <template v-for="category in categories.filter(c => c.type === 'group')" :key="category.id">
+            <optgroup :label="`${category.icon} ${category.name}`">
+              <option v-for="child in category.children" :key="child.id" :value="child.id">
+                {{ child.name }}
+              </option>
+            </optgroup>
+          </template>
         </select>
       </div>
 
