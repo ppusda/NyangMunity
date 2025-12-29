@@ -7,9 +7,11 @@ import router from "./router";
 import store from "./stores/store";
 
 import ElementPlus from "element-plus";
-import "element-plus/dist/index.css";
 
 import "./assets/main.css";
+import "element-plus/dist/index.css";
+import 'vue3-toastify/dist/index.css';
+
 import "@fortawesome/fontawesome-free/js/all.js";
 
 const app = createApp(App);
