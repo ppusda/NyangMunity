@@ -8,6 +8,7 @@ import store from '@/stores/store';
 import router from '@/router';
 import ImageModal from '@/components/ImageModal.vue';
 import UploadModal from '@/components/UploadModal.vue';
+import TagFilter from '@/components/TagFilter.vue';
 
 // 로그인 상태
 const isLogin = computed(() => store.state.isLogin);
@@ -51,6 +52,9 @@ const selectedPost = ref<Post | null>(null);
 
 // 좋아요 상태
 const likedImages = ref<Record<string, boolean>>({});
+
+// 태그 필터
+const selectedTags = ref<string[]>([]);
 
 // URL 복사
 const {copy} = useClipboard();
@@ -163,11 +167,19 @@ const fetchPosts = async (pageNum: number) => {
       if (selected.provider) {
         url += `&provider=${selected.provider}`;
       }
+      // 태그 필터 추가
+      if (selectedTags.value.length > 0) {
+        url += `&tags=${selectedTags.value.join(',')}`;
+      }
     } else {
       // Posts
       url = `/posts?page=${pageNum}&size=20`;
       if (selected?.provider) {
         url += `&provider=${selected.provider}`;
+      }
+      // 태그 필터 추가
+      if (selectedTags.value.length > 0) {
+        url += `&tags=${selectedTags.value.join(',')}`;
       }
     }
 
@@ -254,6 +266,14 @@ const openUploadModal = () => {
 const handleUploaded = () => {
   page.value = 0;
   hasMore.value = true;
+  fetchPosts(0);
+};
+
+// 태그 필터 변경
+const handleTagFilter = (tags: string[]) => {
+  page.value = 0;
+  hasMore.value = true;
+  posts.value = [];
   fetchPosts(0);
 };
 
@@ -429,6 +449,11 @@ onBeforeUnmount(() => {
 
       <!-- 그리드 -->
       <div class="p-4 md:p-8">
+        <!-- 태그 필터 -->
+        <div class="mb-6">
+          <TagFilter v-model="selectedTags" @change="handleTagFilter" :limit="20" />
+        </div>
+
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           <div
               v-for="post in posts"

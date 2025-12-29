@@ -4,6 +4,7 @@ import {infoToast, warningToast} from '@/libs/toaster';
 import axiosClient from '@/libs/axiosClient';
 import s3Client from '@/libs/s3Client';
 import type {Image} from '@/interfaces/type';
+import TagInput from '@/components/TagInput.vue';
 
 const emit = defineEmits(['close', 'uploaded']);
 
@@ -22,6 +23,9 @@ const selectedProvider = ref('Nyangmunity');
 
 // 게시물 내용
 const content = ref('');
+
+// 태그
+const tags = ref<string[]>([]);
 
 // 업로드 상태
 const isUploading = ref(false);
@@ -157,13 +161,14 @@ const handleUpload = async () => {
       imageId = id;
     }
 
-    // 게시물 생성
-    await axiosClient.post('/posts', {
-      content: content.value || null,
-      postImageIds: [imageId]
+    // 단일 이미지 업로드 (태그 포함)
+    await axiosClient.post('/images', {
+      imageId: imageId,
+      description: content.value || null,
+      tags: tags.value
     });
 
-    infoToast('게시물이 업로드되었습니다!');
+    infoToast('이미지가 업로드되었습니다!');
     emit('uploaded');
     emit('close');
   } catch (error) {
@@ -185,11 +190,11 @@ onMounted(() => {
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
         @click.self="$emit('close')"
     >
-      <!-- 모달 -->
-      <div class="w-full max-w-3xl bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl animate-fadeIn">
+      <!-- 모달 - 고정 높이 및 스크롤 -->
+      <div class="w-full max-w-3xl h-[90vh] bg-zinc-900 rounded-2xl shadow-2xl animate-fadeIn flex flex-col">
         <!-- 헤더 -->
-        <div class="p-6 border-b border-zinc-800 flex items-center justify-between">
-          <h2 class="text-xl font-bold text-white">새 게시물</h2>
+        <div class="p-6 border-b border-zinc-800 flex items-center justify-between flex-shrink-0">
+          <h2 class="text-xl font-bold text-white">이미지 업로드</h2>
           <button
               @click="$emit('close')"
               class="text-gray-400 hover:text-white transition-colors"
@@ -202,7 +207,7 @@ onMounted(() => {
         </div>
 
         <!-- 탭 -->
-        <div class="flex border-b border-zinc-800">
+        <div class="flex border-b border-zinc-800 flex-shrink-0">
           <button
               @click="activeTab = 'upload'"
               :class="['flex-1 py-3 text-sm font-medium transition-all',
@@ -223,8 +228,8 @@ onMounted(() => {
           </button>
         </div>
 
-        <!-- 본문 -->
-        <div class="p-6">
+        <!-- 본문 - 스크롤 가능 영역 -->
+        <div class="flex-1 overflow-y-auto p-6">
           <!-- 업로드 탭 -->
           <div v-if="activeTab === 'upload'">
             <!-- 선택된 이미지 없을 때 -->
@@ -328,10 +333,15 @@ onMounted(() => {
             ></textarea>
             <p class="text-gray-500 text-sm mt-1 text-right">{{ content.length }}/100</p>
           </div>
+
+          <!-- 태그 입력 -->
+          <div class="mt-6">
+            <TagInput v-model="tags" :max-tags="5" />
+          </div>
         </div>
 
         <!-- 푸터 -->
-        <div class="p-6 border-t border-zinc-800 flex gap-3">
+        <div class="p-6 border-t border-zinc-800 flex gap-3 flex-shrink-0">
           <button
               @click="$emit('close')"
               class="flex-1 py-3 bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors font-medium"
@@ -343,7 +353,7 @@ onMounted(() => {
               :disabled="!selectedImage || isUploading"
               class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ isUploading ? '업로드 중...' : '게시하기' }}
+            {{ isUploading ? '업로드 중...' : '업로드' }}
           </button>
         </div>
       </div>
@@ -365,5 +375,23 @@ onMounted(() => {
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
+}
+
+/* 스크롤바 스타일링 */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 </style>
