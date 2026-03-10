@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import axios from 'axios';
+import axiosClient from '@/libs/axiosClient';
 import type { Tag } from '@/interfaces/Tag';
 
 interface Props {
@@ -110,7 +110,7 @@ const handleInput = () => {
 
   debounceTimer = setTimeout(async () => {
     try {
-      const response = await axios.get<Tag[]>('/api/tags/autocomplete', {
+      const response = await axiosClient.get<Tag[]>('/api/tags/autocomplete', {
         params: { keyword },
       });
       suggestions.value = response.data;

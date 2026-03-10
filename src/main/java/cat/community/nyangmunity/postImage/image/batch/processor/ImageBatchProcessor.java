@@ -10,20 +10,20 @@ import org.springframework.stereotype.Component;
 import cat.community.nyangmunity.postImage.image.batch.response.TenorResponse;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.Provider;
+import cat.community.nyangmunity.postImage.image.repository.ImageRepository;
 import cat.community.nyangmunity.postImage.image.service.ImageCommandService;
-import cat.community.nyangmunity.postImage.image.service.ImageQueryService;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, List<Image>> {
 
-	private final ImageQueryService imageQueryService;
+	private final ImageRepository imageRepository;
 	private final ImageCommandService imageCommandService;
 
 	@Override
 	public List<Image> process(List<TenorResponse> tenorResponses) {
-		List<Image> existImages = imageQueryService.getAllImages();
+		List<Image> existImages = imageRepository.findAll();
 		Set<String> existImageIds = existImages.stream()
 			.map(Image::getId)
 			.collect(Collectors.toSet());

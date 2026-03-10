@@ -24,7 +24,6 @@ interface CategoryChild {
 interface Category {
   id: string;
   name: string;
-  icon?: string;
   type: 'post' | 'image' | 'group';
   provider?: string;
   expanded?: boolean;
@@ -33,7 +32,7 @@ interface Category {
 
 // 카테고리 (동적으로 생성될 예정)
 const categories = ref<Category[]>([
-  {id: 'all', name: '전체', icon: '🌟', type: 'post'}
+  {id: 'all', name: '전체', type: 'post'}
 ]);
 
 const selectedCategory = ref('all');
@@ -44,6 +43,7 @@ const page = ref(0);
 const hasMore = ref(true);
 const isLoading = ref(false);
 const isCategoriesLoading = ref(true);
+const sortBy = ref('latest');
 
 // 모달 상태
 const showImageModal = ref(false);
@@ -73,15 +73,15 @@ const fetchProviders = async (): Promise<string[]> => {
 // 카테고리 동적 생성
 const initializeCategories = async () => {
   isCategoriesLoading.value = true;
-  
+
   try {
     const providers = await fetchProviders();
-    
+
     // Posts 하위 카테고리 생성
     const postsChildren: CategoryChild[] = [
       {id: 'posts-all', name: '전체', type: 'post'}
     ];
-    
+
     providers.forEach(provider => {
       postsChildren.push({
         id: `posts-${provider.toLowerCase()}`,
@@ -90,10 +90,10 @@ const initializeCategories = async () => {
         provider: provider
       });
     });
-    
+
     // Images 하위 카테고리 생성
     const imagesChildren: CategoryChild[] = [];
-    
+
     providers.forEach(provider => {
       imagesChildren.push({
         id: `images-${provider.toLowerCase()}`,
@@ -102,14 +102,13 @@ const initializeCategories = async () => {
         provider: provider
       });
     });
-    
+
     // 전체 카테고리 구성
     categories.value = [
-      {id: 'all', name: '전체', icon: '🌟', type: 'post'},
+      {id: 'all', name: '전체', type: 'post'},
       {
         id: 'posts',
         name: 'Posts',
-        icon: '📝',
         type: 'group',
         expanded: true,
         children: postsChildren
@@ -117,7 +116,6 @@ const initializeCategories = async () => {
       {
         id: 'images',
         name: 'Images',
-        icon: '🖼️',
         type: 'group',
         expanded: false,
         children: imagesChildren
@@ -127,11 +125,10 @@ const initializeCategories = async () => {
     console.error('카테고리 초기화 실패:', error);
     // 실패 시 기본 카테고리 사용
     categories.value = [
-      {id: 'all', name: '전체', icon: '🌟', type: 'post'},
+      {id: 'all', name: '전체', type: 'post'},
       {
         id: 'posts',
         name: 'Posts',
-        icon: '📝',
         type: 'group',
         expanded: true,
         children: [
@@ -330,16 +327,25 @@ const copyImageUrl = (post: Post) => {
   }
 };
 
+// 정렬 변경
+const changeSortBy = (newSort: string) => {
+  sortBy.value = newSort;
+  page.value = 0;
+  hasMore.value = true;
+  posts.value = [];
+  fetchPosts(0);
+};
+
 // main 영역 ref
 const mainRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   // 카테고리 초기화 먼저
   await initializeCategories();
-  
+
   // 게시물 로드
   await fetchPosts(0);
-  
+
   // 스크롤 이벤트 등록
   if (mainRef.value) {
     mainRef.value.addEventListener('scroll', handleScroll);
@@ -379,7 +385,10 @@ onBeforeUnmount(() => {
                 : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
             ]"
           >
-            <span class="text-xl">{{ category.icon }}</span>
+            <!-- 전체 버튼: Squares-2x2 -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+            </svg>
             <span class="font-medium">{{ category.name }}</span>
           </button>
 
@@ -390,7 +399,14 @@ onBeforeUnmount(() => {
                 class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:bg-zinc-800 hover:text-white transition-all duration-200"
             >
               <div class="flex items-center gap-3">
-                <span class="text-xl">{{ category.icon }}</span>
+                <!-- Posts 그룹: Document-text -->
+                <svg v-if="category.id === 'posts'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                <!-- Images 그룹: Photo -->
+                <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
                 <span class="font-medium">{{ category.name }}</span>
               </div>
               <svg
@@ -436,9 +452,9 @@ onBeforeUnmount(() => {
             class="w-full px-4 py-2 bg-zinc-800 text-white rounded-lg border border-zinc-700 focus:border-blue-500 focus:outline-none"
             :disabled="isCategoriesLoading"
         >
-          <option value="all">🌟 전체</option>
+          <option value="all">전체</option>
           <template v-for="category in categories.filter(c => c.type === 'group')" :key="category.id">
-            <optgroup :label="`${category.icon} ${category.name}`">
+            <optgroup :label="category.name">
               <option v-for="child in category.children" :key="child.id" :value="child.id">
                 {{ child.name }}
               </option>
@@ -451,7 +467,7 @@ onBeforeUnmount(() => {
       <div class="p-4 md:p-8">
         <!-- 태그 필터 -->
         <div class="mb-6">
-          <TagFilter v-model="selectedTags" @change="handleTagFilter" :limit="20" />
+          <TagFilter v-model="selectedTags" @change="handleTagFilter" :limit="20"/>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -554,12 +570,16 @@ onBeforeUnmount(() => {
 
         <!-- 더 이상 없음 -->
         <div v-if="!hasMore && posts.length > 0" class="text-center py-12">
-          <p class="text-gray-500">더 이상 게시물이 없습니다 🐱</p>
+          <p class="text-gray-500">더 이상 게시물이 없습니다</p>
         </div>
 
         <!-- 빈 상태 -->
         <div v-if="!isLoading && posts.length === 0" class="text-center py-20">
-          <div class="text-6xl mb-4">😿</div>
+          <div class="mb-4 flex justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-20 h-20 text-gray-600">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
+            </svg>
+          </div>
           <p class="text-gray-400 text-lg">아직 게시물이 없습니다</p>
           <p class="text-gray-600 text-sm mt-2">첫 번째 고양이 사진을 공유해보세요!</p>
         </div>

@@ -34,7 +34,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 	 * 태그 이름에 특정 문자열이 포함된 태그를 조회합니다. (자동완성용)
 	 *
 	 * @param keyword 검색 키워드
-	 * @param limit 조회할 최대 개수
+	 * @param pageable 조회할 최대 개수
 	 * @return 매칭되는 태그 목록
 	 */
 	@Query("SELECT t FROM Tag t WHERE t.name LIKE %:keyword% ORDER BY t.usageCount DESC")

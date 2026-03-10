@@ -51,7 +51,7 @@ public class TagService {
 			tagNames.stream()
 				.map(this::normalizeTagName)
 				.distinct()
-				.collect(Collectors.toList());
+				.toList();
 
 		for (String tagName : normalizedTagNames) {
 			Tag tag = tagRepository.findByName(tagName).orElseGet(() -> createNewTag(tagName));

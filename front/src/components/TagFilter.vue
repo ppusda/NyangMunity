@@ -2,13 +2,22 @@
   <div class="tag-filter-container">
     <div class="filter-header">
       <h3 class="filter-title">인기 태그</h3>
-      <button
-        v-if="selectedTags.length > 0"
-        class="clear-button"
-        @click="clearAll"
-      >
-        전체 해제
-      </button>
+      <div class="header-actions">
+        <button
+            v-if="popularTags.length > displayLimit"
+            class="toggle-button"
+            @click="toggleExpanded"
+        >
+          {{ isExpanded ? '접기 ▲' : `더보기 (${popularTags.length - displayLimit}개) ▼` }}
+        </button>
+        <button
+            v-if="selectedTags.length > 0"
+            class="clear-button"
+            @click="clearAll"
+        >
+          전체 해제
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="loading-state">
@@ -19,63 +28,75 @@
       <p>아직 태그가 없습니다.</p>
     </div>
 
-    <div v-else class="tags-grid">
-      <!-- 전체 버튼 -->
-      <button
-        class="tag-button"
-        :class="{ active: selectedTags.length === 0 }"
-        @click="clearAll"
-      >
-        <span class="tag-icon">🏠</span>
-        <span class="tag-text">전체</span>
-      </button>
+    <div v-else>
+      <!-- 태그 그리드 - 높이 제한 & 스크롤 -->
+      <div class="tags-grid-wrapper" :class="{ expanded: isExpanded }">
+        <div class="tags-grid">
+          <!-- 전체 버튼 -->
+          <button
+              class="tag-button"
+              :class="{ active: selectedTags.length === 0 }"
+              @click="clearAll"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="tag-icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            <span class="tag-text">전체</span>
+          </button>
 
-      <!-- 인기 태그 버튼들 -->
-      <button
-        v-for="tag in popularTags"
-        :key="tag.id"
-        class="tag-button"
-        :class="{ active: isSelected(tag.name) }"
-        @click="toggleTag(tag.name)"
-      >
-        <span class="tag-text">#{{ tag.name }}</span>
-        <span class="tag-badge">{{ tag.usageCount }}</span>
-      </button>
-    </div>
+          <!-- 인기 태그 버튼들 -->
+          <button
+              v-for="tag in displayedTags"
+              :key="tag.id"
+              class="tag-button"
+              :class="{ active: isSelected(tag.name) }"
+              @click="toggleTag(tag.name)"
+          >
+            <span class="tag-text">#{{ tag.name }}</span>
+            <span class="tag-badge">{{ tag.usageCount }}</span>
+          </button>
+        </div>
+      </div>
 
-    <!-- 선택된 태그 표시 -->
-    <div v-if="selectedTags.length > 0" class="selected-tags">
-      <span class="selected-label">선택된 태그:</span>
-      <div class="selected-chips">
-        <span
-          v-for="tag in selectedTags"
-          :key="tag"
-          class="selected-chip"
-        >
-          #{{ tag }}
-        </span>
+      <!-- 선택된 태그 표시 -->
+      <div v-if="selectedTags.length > 0" class="selected-tags">
+        <span class="selected-label">선택된 태그:</span>
+        <div class="selected-chips">
+          <span
+              v-for="tag in selectedTags"
+              :key="tag"
+              class="selected-chip"
+              @click="toggleTag(tag)"
+          >
+            #{{ tag }}
+            <span class="chip-remove">×</span>
+          </span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import axios from 'axios';
-import type { Tag } from '@/interfaces/Tag';
+import {ref, onMounted, watch, computed} from 'vue';
+import axiosClient from '@/libs/axiosClient';
+import type {Tag} from '@/interfaces/Tag';
 
 interface Props {
   modelValue: string[];
   limit?: number;
+  displayLimit?: number; // 기본 표시 개수
 }
 
 interface Emits {
   (e: 'update:modelValue', tags: string[]): void;
+
   (e: 'change', tags: string[]): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  limit: 20,
+  limit: 50,
+  displayLimit: 15, // 기본 15개만 표시
 });
 
 const emit = defineEmits<Emits>();
@@ -83,6 +104,15 @@ const emit = defineEmits<Emits>();
 const popularTags = ref<Tag[]>([]);
 const selectedTags = ref<string[]>([...props.modelValue]);
 const loading = ref(false);
+const isExpanded = ref(false); // 확장 상태
+
+// 표시할 태그 목록 (접기/펼치기)
+const displayedTags = computed(() => {
+  if (isExpanded.value) {
+    return popularTags.value;
+  }
+  return popularTags.value.slice(0, props.displayLimit);
+});
 
 // 컴포넌트 마운트 시 인기 태그 로드
 onMounted(async () => {
@@ -93,8 +123,8 @@ onMounted(async () => {
 const loadPopularTags = async () => {
   loading.value = true;
   try {
-    const response = await axios.get<Tag[]>('/api/tags/popular', {
-      params: { limit: props.limit },
+    const response = await axiosClient.get<Tag[]>('/api/tags/popular', {
+      params: {limit: props.limit},
     });
     popularTags.value = response.data;
   } catch (error) {
@@ -102,6 +132,11 @@ const loadPopularTags = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+// 확장/접기 토글
+const toggleExpanded = () => {
+  isExpanded.value = !isExpanded.value;
 };
 
 // 태그 선택/해제 토글
@@ -138,10 +173,10 @@ const emitChanges = () => {
 
 // 외부에서 modelValue가 변경되면 동기화
 watch(
-  () => props.modelValue,
-  (newValue) => {
-    selectedTags.value = [...newValue];
-  }
+    () => props.modelValue,
+    (newValue) => {
+      selectedTags.value = [...newValue];
+    }
 );
 </script>
 
@@ -168,6 +203,12 @@ watch(
   margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.toggle-button,
 .clear-button {
   padding: 6px 12px;
   background-color: transparent;
@@ -179,10 +220,20 @@ watch(
   transition: all 0.2s;
 }
 
+.toggle-button:hover,
 .clear-button:hover {
   background-color: #27272a;
   border-color: #52525b;
   color: #ffffff;
+}
+
+.toggle-button {
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+.toggle-button:hover {
+  background-color: #1e3a8a;
 }
 
 .loading-state,
@@ -191,6 +242,37 @@ watch(
   padding: 40px 20px;
   color: #9ca3af;
   font-size: 14px;
+}
+
+.tags-grid-wrapper {
+  max-height: 280px; /* 약 3줄 */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  position: relative;
+}
+
+.tags-grid-wrapper.expanded {
+  max-height: 600px; /* 확장 시 더 많이 */
+  overflow-y: auto;
+}
+
+/* 스크롤바 스타일 */
+.tags-grid-wrapper.expanded::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tags-grid-wrapper.expanded::-webkit-scrollbar-track {
+  background: #18181b;
+  border-radius: 4px;
+}
+
+.tags-grid-wrapper.expanded::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+.tags-grid-wrapper.expanded::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 
 .tags-grid {
@@ -235,7 +317,9 @@ watch(
 }
 
 .tag-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .tag-text {
@@ -243,6 +327,8 @@ watch(
   font-weight: 600;
   color: #ffffff;
   transition: color 0.2s;
+  word-break: break-word;
+  text-align: center;
 }
 
 .tag-badge {
@@ -275,19 +361,57 @@ watch(
 }
 
 .selected-chip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 10px;
   background-color: #3b82f6;
   color: white;
   border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selected-chip:hover {
+  background-color: #2563eb;
+}
+
+.chip-remove {
+  font-size: 16px;
+  font-weight: bold;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.selected-chip:hover .chip-remove {
+  opacity: 1;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .tag-filter-container {
     padding: 16px;
+  }
+
+  .filter-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .tags-grid-wrapper {
+    max-height: 240px;
+  }
+
+  .tags-grid-wrapper.expanded {
+    max-height: 500px;
   }
 
   .tags-grid {

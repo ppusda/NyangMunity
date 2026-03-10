@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import axiosClient from '@/libs/axiosClient';
 import TagFilter from '@/components/TagFilter.vue';
 import ImageCard from '@/components/ImageCard.vue';
 import type { ImageTag } from '@/interfaces/Tag';
@@ -102,6 +102,7 @@ interface ImageData {
   likesCount: number;
   viewsCount: number;
   tags?: ImageTag[];
+  likeState?: boolean;
 }
 
 interface PageResponse {
@@ -142,10 +143,19 @@ const loadImages = async () => {
       params.tags = selectedTags.value.join(',');
     }
 
-    const response = await axios.get<PageResponse>('/api/images', { params });
+    const response = await axiosClient.get<PageResponse>('/images', { params });
 
     images.value = response.data.content;
     totalPages.value = response.data.totalPages;
+    
+    // API 응답의 likeState를 바탕으로 좋아요 상태 초기화
+    response.data.content.forEach((img) => {
+      if (img.likeState) {
+        likedImages.value.add(img.id);
+      } else {
+        likedImages.value.delete(img.id);
+      }
+    });
   } catch (error) {
     console.error('이미지 로드 실패:', error);
   } finally {
@@ -171,10 +181,10 @@ const handleTagClick = (tagName: string) => {
 const handleLike = async (imageId: string) => {
   try {
     if (likedImages.value.has(imageId)) {
-      await axios.delete(`/api/images/${imageId}/like`);
+      await axiosClient.delete(`/api/images/${imageId}/like`);
       likedImages.value.delete(imageId);
     } else {
-      await axios.post(`/api/images/${imageId}/like`);
+      await axiosClient.post(`/api/images/${imageId}/like`);
       likedImages.value.add(imageId);
     }
 
@@ -192,10 +202,10 @@ const handleLike = async (imageId: string) => {
 const handleSave = async (imageId: string) => {
   try {
     if (savedImages.value.has(imageId)) {
-      await axios.delete(`/api/collections/${imageId}`);
+      await axiosClient.delete(`/api/collections/${imageId}`);
       savedImages.value.delete(imageId);
     } else {
-      await axios.post(`/api/collections/${imageId}`);
+      await axiosClient.post(`/api/collections/${imageId}`);
       savedImages.value.add(imageId);
     }
   } catch (error) {

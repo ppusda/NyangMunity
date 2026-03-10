@@ -2,6 +2,7 @@ package cat.community.nyangmunity.postImage.image.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,5 +47,21 @@ public class ImageLikeQueryService {
 	@Transactional(readOnly = true)
 	public List<String> fetchLikedImageIds(List<String> imageIds, Member member) {
 		return imageLikeRepository.fetchLikedImageIds(imageIds, member);
+	}
+
+	/**
+	 * 회원이 특정 이미지를 좋아요 했는지 확인
+	 */
+	public boolean isLiked(Member member, Image image) {
+		return imageLikeRepository.existsByMemberAndImage(member, image);
+	}
+
+	/**
+	 * 회원이 좋아요한 이미지 ID 목록 조회
+	 */
+	public List<String> getLikedImageIds(Member member, List<String> imageIds) {
+		return imageLikeRepository.findByMemberAndImageIdIn(member, imageIds).stream()
+			.map(like -> like.getImage().getId())
+			.collect(Collectors.toList());
 	}
 }

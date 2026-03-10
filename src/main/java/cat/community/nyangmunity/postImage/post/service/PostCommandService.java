@@ -2,6 +2,7 @@ package cat.community.nyangmunity.postImage.post.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -9,7 +10,7 @@ import cat.community.nyangmunity.global.exception.global.BadRequestException;
 import cat.community.nyangmunity.global.exception.global.ForbiddenException;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.postImage.entity.PostImage;
-import cat.community.nyangmunity.postImage.image.service.ImageQueryService;
+import cat.community.nyangmunity.postImage.image.repository.ImageRepository;
 import cat.community.nyangmunity.postImage.post.editor.PostEditor;
 import cat.community.nyangmunity.postImage.post.entity.Post;
 import cat.community.nyangmunity.postImage.post.repository.PostRepository;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PostCommandService {
 
-	private final ImageQueryService imageQueryService;
+	private final ImageRepository imageRepository;
 	private final PostQueryService postQueryService;
 
 	private final PostRepository postRepository;
@@ -45,7 +46,8 @@ public class PostCommandService {
 				.build()
 		);
 
-		List<PostImage> postImages = imageQueryService.findPostImagesByIds(postWriteRequest.postImageIds());
+		List<PostImage> postImages = imageRepository.findAllByIdIn(postWriteRequest.postImageIds())
+			.stream().map(PostImage::new).collect(Collectors.toList());
 		savedPost.updatePostImages(postImages);
 		postImageRepository.saveAll(postImages);
 	}

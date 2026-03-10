@@ -5,10 +5,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cat.community.nyangmunity.global.exception.global.BadRequestException;
 import cat.community.nyangmunity.member.entity.Member;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.ImageLike;
 import cat.community.nyangmunity.postImage.image.repository.ImageLikeRepository;
+import cat.community.nyangmunity.postImage.image.repository.ImageRepository;
 import cat.community.nyangmunity.postImage.image.response.ImageLikeResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class ImageLikeCommandService {
 
 	private final ImageLikeQueryService imageQueryService;
-	private final ImageQueryService imageService;
+	private final ImageRepository imageRepository;
 
 	private final ImageLikeRepository imageLikeRepository;
 
@@ -35,7 +37,7 @@ public class ImageLikeCommandService {
 		}
 
 		// 좋아요를 누른 상태가 아니라면 좋아요 등록
-		Image image = imageService.findImageById(imageId);
+		Image image = imageRepository.findById(imageId).orElseThrow(BadRequestException::new);
 		likeImage(ImageLike.builder()
 			.member(member)
 			.image(image)
