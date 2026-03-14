@@ -33,37 +33,37 @@ const member = new Vuex.Store<MemberState>({
     refreshToken: null,
   },
   mutations: {
-    setMember(state, member: Member) {
+    setMember(state: MemberState, member: Member) {
       state.memberId = member.id;
       state.email = member.email;
       state.nickname = member.nickname;
       state.isLogin = true;
     },
-    clearMember(state) {
+    clearMember(state: MemberState) {
       state.memberId = null;
       state.email = null;
       state.nickname = null;
       state.isLogin = false;
     },
-    setTokens(state, {accessToken, refreshToken}: Tokens) {
+    setTokens(state: MemberState, { accessToken, refreshToken }: Tokens) {
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
     },
-    clearTokens(state) {
+    clearTokens(state: MemberState) {
       state.accessToken = null;
       state.refreshToken = null;
     },
   },
   actions: {
-    login({commit}, member: Member) {
+    login({ commit }: { commit: any }, member: Member) {
       commit('setMember', member);
     },
-    logout({commit}) {
+    logout({ commit }: { commit: any }) {
       commit('clearMember');
       commit('clearTokens');
     },
-    saveTokens({commit}, {accessToken, refreshToken}: Tokens) {
-      commit('setTokens', {accessToken, refreshToken});
+    saveTokens({ commit }: { commit: any }, { accessToken, refreshToken }: Tokens) {
+      commit('setTokens', { accessToken, refreshToken });
     }
   },
 });
