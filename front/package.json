@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",
-    "axios": "1.12.0",
+    "axios": "1.13.5",
     "dotenv": "^16.3.1",
     "element-plus": "2.11.3",
     "imagesloaded": "^5.0.0",
@@ -33,7 +33,7 @@
     "@types/jsdom": "^20.0.0",
     "@types/masonry-layout": "^4.2.8",
     "@types/node": "^16.11.68",
-    "@vitejs/plugin-vue": "^3.1.2",
+    "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^2.0.1",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.0",
