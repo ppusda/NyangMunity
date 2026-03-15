@@ -10,13 +10,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "image_like")
 @Getter
 @NoArgsConstructor
 public class ImageLike {
@@ -26,11 +30,11 @@ public class ImageLike {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "image_id")
+	@JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Image image;
 
 	@ManyToOne
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Member member;
 
 	@CreatedDate

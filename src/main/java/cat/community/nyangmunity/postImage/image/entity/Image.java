@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
@@ -64,7 +66,7 @@ public class Image {
 	@Column(name = "expires_at")
 	private LocalDateTime expiresAt;
 
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Member member;
 
