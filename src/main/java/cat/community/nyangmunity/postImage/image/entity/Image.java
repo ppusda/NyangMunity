@@ -47,6 +47,9 @@ public class Image {
 	@Column
 	private String url;
 
+	@Column(name = "thumbnail_url")
+	private String thumbnailUrl;
+
 	@Column(length = 500)
 	private String description;
 
@@ -77,10 +80,11 @@ public class Image {
 	private List<ImageTag> imageTags = new ArrayList<>();
 
 	@Builder
-	public Image(String id, String name, String url, String description, Provider provider, Member member) {
+	public Image(String id, String name, String url, String thumbnailUrl, String description, Provider provider, Member member) {
 		this.id = id;
 		this.name = name;
 		this.url = url;
+		this.thumbnailUrl = thumbnailUrl;
 		this.description = description;
 		this.provider = provider;
 		this.member = member;

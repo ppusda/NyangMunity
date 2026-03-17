@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
+import cat.community.nyangmunity.postImage.image.batch.response.Media;
 import cat.community.nyangmunity.postImage.image.batch.response.TenorResponse;
 import cat.community.nyangmunity.postImage.image.entity.Image;
 import cat.community.nyangmunity.postImage.image.entity.Provider;
@@ -45,9 +46,12 @@ public class ImageBatchProcessor implements ItemProcessor<List<TenorResponse>, L
 	}
 
 	private Image convertTenorResponseToImages(TenorResponse tenorResponse) {
+		Media media = tenorResponse.media_formats();
+		String thumbnailUrl = media.tinygif() != null ? media.tinygif().url() : media.gif().url();
 		return Image.builder()
 			.id(tenorResponse.id())
-			.url(tenorResponse.media_formats().gif().url())
+			.url(media.gif().url())
+			.thumbnailUrl(thumbnailUrl)
 			.provider(Provider.TENOR)
 			.build();
 	}

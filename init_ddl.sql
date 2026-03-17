@@ -30,6 +30,7 @@ CREATE TABLE `image` (
   `id` varchar(255) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `url` varchar(255) DEFAULT NULL,
+  `thumbnail_url` varchar(255) DEFAULT NULL,
   `description` varchar(500) DEFAULT NULL,
   `provider` enum('NYANGMUNITY','TENOR') DEFAULT NULL,
   `upload_date` datetime(6) NOT NULL,

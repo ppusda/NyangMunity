@@ -313,7 +313,7 @@ onMounted(() => {
                     :class="['relative aspect-square rounded-lg overflow-hidden cursor-pointer group',
                     selectedImage?.id === image.id ? 'ring-4 ring-blue-500' : '']"
                 >
-                  <img :src="image.url" class="w-full h-full object-cover"/>
+                  <img :src="(image as any).thumbnailUrl || image.url" class="w-full h-full object-cover"/>
                   <div
                       class="absolute inset-0 bg-blue-600/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >

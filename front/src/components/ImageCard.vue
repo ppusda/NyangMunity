@@ -3,7 +3,7 @@
     <!-- 이미지 영역 -->
     <div class="image-wrapper" @click="$emit('image-click', image.id)">
       <img
-        :src="image.url"
+        :src="image.thumbnailUrl || image.url"
         :alt="image.name || '고양이 이미지'"
         class="image"
         loading="lazy"
@@ -81,6 +81,7 @@ interface ImageData {
   id: string;
   name?: string;
   url: string;
+  thumbnailUrl?: string;
   likesCount: number;
   viewsCount: number;
   tags?: ImageTag[];

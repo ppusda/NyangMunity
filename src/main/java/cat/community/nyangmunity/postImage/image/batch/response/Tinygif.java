@@ -1,8 +1,7 @@
 package cat.community.nyangmunity.postImage.image.batch.response;
 
-public record Media(
-	Gif gif,
-	Tinygif tinygif
+public record Tinygif(
+	String url
 ) {
 
 }

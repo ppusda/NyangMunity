@@ -18,6 +18,7 @@ public class ImageDetailResponse {
   private String id;
   private String name;
   private String url;
+  private String thumbnailUrl;
   private String description;
   private String provider;
   private LocalDateTime uploadDate;
@@ -47,6 +48,7 @@ public class ImageDetailResponse {
         .id(image.getId())
         .name(image.getName())
         .url(image.getUrl())
+        .thumbnailUrl(image.getThumbnailUrl())
         .description(image.getDescription())
         .provider(image.getProvider().name())
         .uploadDate(image.getUploadDate())

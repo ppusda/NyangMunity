@@ -19,7 +19,7 @@ public class TenorConfig {
 	private String clientKey;
 
 	private static final String REQUEST_URL = "https://tenor.googleapis.com/v2/search";
-	private static final String FILTER = "gif";
+	private static final String FILTER = "gif,tinygif";
 	private static final Integer LIMIT = 50;
 
 	public URI generateRequestUri(String searchTerm) {
