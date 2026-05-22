@@ -1,8 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { imagesApi } from '@/api/images';
 import { useAuthStore } from '@/stores/authStore';
-import type { ImageItem, ImageLikeResponse, ImagePage } from '@/types';
+import { useUIStore } from '@/stores/uiStore';
+import type {
+  ImageDetailResponse,
+  ImageItem,
+  ImageLikeResponse,
+  ImagePage,
+} from '@/types';
 
 function buildSetter(imageId: string, nextLiked: boolean | null) {
   return (img: ImageItem): ImageItem => {
@@ -51,16 +56,32 @@ function applyToCaches(
       imageInfo: setter(topLike.imageInfo),
     });
   }
+
+  qc.getQueriesData<ImageDetailResponse>({
+    queryKey: ['images', 'detail'],
+    exact: false,
+  }).forEach(([key, data]) => {
+    if (!data || data.id !== imageId) return;
+    const wasLiked = data.likeState;
+    const target = nextLiked ?? !wasLiked;
+    if (wasLiked === target) return;
+    qc.setQueryData(key, {
+      ...data,
+      likeState: target,
+      likesCount: data.likesCount + (target ? 1 : -1),
+    });
+  });
 }
 
 export function useLikeToggle() {
   const qc = useQueryClient();
   const isLogin = useAuthStore((s) => s.isLogin);
+  const openAuthPrompt = useUIStore((s) => s.openAuthPrompt);
 
   return useMutation<ImageLikeResponse, Error, string>({
     mutationFn: (imageId) => {
       if (!isLogin) {
-        toast.warning('로그인이 필요해요.');
+        openAuthPrompt('좋아요는 로그인 후 이용할 수 있어요.');
         return Promise.reject(new Error('UNAUTHENTICATED'));
       }
       return imagesApi.toggleLike(imageId);

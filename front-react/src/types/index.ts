@@ -56,3 +56,36 @@ export interface TopLikeResponse {
 }
 
 export type SortKey = 'latest' | 'likes' | 'views';
+
+export interface TagSummary {
+  id: string;
+  name: string;
+  usageCount?: number;
+}
+
+export interface ImageDetailResponse {
+  id: string;
+  name: string | null;
+  url: string;
+  thumbnailUrl: string | null;
+  description: string | null;
+  provider: Provider;
+  uploadDate: string;
+  likesCount: number;
+  viewsCount: number;
+  uploader: string | null;
+  tags: TagSummary[];
+  likeState: boolean;
+  expiresAt?: string | null;
+}
+
+export interface UploadUrlResponse {
+  id: string;
+  uploadUrl: string;
+}
+
+export interface ImageUploadCompleteRequest {
+  imageId: string;
+  description?: string;
+  tags?: string[];
+}

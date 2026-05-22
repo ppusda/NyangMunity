@@ -1,11 +1,15 @@
+import axios from 'axios';
 import { axiosClient } from '@/lib/axios';
 import type {
+  ImageDetailResponse,
   ImageItem,
   ImageLikeResponse,
   ImagePage,
+  ImageUploadCompleteRequest,
   Provider,
   SortKey,
   TopLikeResponse,
+  UploadUrlResponse,
 } from '@/types';
 
 export interface ListImagesParams {
@@ -60,4 +64,23 @@ export const imagesApi = {
     axiosClient
       .get<ImagePage>('/images', { params: { page: 0, size, sort: 'popular' } })
       .then((r) => r.data.content),
+
+  getById: (imageId: string): Promise<ImageDetailResponse> =>
+    axiosClient.get<ImageDetailResponse>(`/images/${imageId}`).then((r) => r.data),
+
+  requestUploadUrl: (filename: string): Promise<UploadUrlResponse> =>
+    axiosClient
+      .get<UploadUrlResponse>('/images/upload', { params: { filename } })
+      .then((r) => r.data),
+
+  completeUpload: (payload: ImageUploadCompleteRequest): Promise<ImageDetailResponse> =>
+    axiosClient.post<ImageDetailResponse>('/images', payload).then((r) => r.data),
+
+  // S3 presigned URL 에 PUT 으로 직접 업로드한다. 인증 헤더가 안 가도록 별도 axios 인스턴스 사용.
+  uploadToS3: (uploadUrl: string, file: File): Promise<void> =>
+    axios
+      .put(uploadUrl, file, {
+        headers: { 'Content-Type': 'application/octet-stream' },
+      })
+      .then(() => undefined),
 };

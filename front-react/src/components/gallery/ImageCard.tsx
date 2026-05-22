@@ -1,4 +1,5 @@
 import { Heart, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useLikeToggle } from '@/hooks/useLikeToggle';
 import type { ImageItem } from '@/types';
@@ -16,8 +17,9 @@ export function ImageCard({ image, aspectRatio, showViews }: Props) {
   const title = image.name ?? '이름 없음';
 
   return (
-    <div
-      className="cat-card"
+    <Link
+      to={`/images/${image.id}`}
+      className="cat-card block"
       style={aspectRatio ? { aspectRatio: `1 / ${aspectRatio}` } : undefined}
     >
       <img src={thumbnail} alt={title} loading="lazy" />
@@ -55,7 +57,7 @@ export function ImageCard({ image, aspectRatio, showViews }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

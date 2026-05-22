@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { NmLogo, NmLogoMark } from '@/components/icons/NmLogoMark';
 import { useAuthStore } from '@/stores/authStore';
+import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -27,6 +28,17 @@ const navItems = [
 
 export function Sidebar({ collapsed, onToggle }: Props) {
   const member = useAuthStore((s) => s.member);
+  const isLogin = useAuthStore((s) => s.isLogin);
+  const openUpload = useUIStore((s) => s.openUpload);
+  const openAuthPrompt = useUIStore((s) => s.openAuthPrompt);
+
+  const handleUploadClick = () => {
+    if (!isLogin) {
+      openAuthPrompt('사진 업로드는 로그인 후 이용할 수 있어요.');
+      return;
+    }
+    openUpload();
+  };
 
   return (
     <aside
@@ -55,6 +67,7 @@ export function Sidebar({ collapsed, onToggle }: Props) {
       <div className="px-3 pt-4">
         <button
           type="button"
+          onClick={handleUploadClick}
           className={cn(
             'nm-btn nm-btn--primary w-full',
             collapsed && 'nm-btn--icon',
