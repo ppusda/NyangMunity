@@ -1,10 +1,12 @@
 package cat.community.nyangmunity.postImage.image.controller;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cat.community.nyangmunity.member.entity.Member;
+import cat.community.nyangmunity.member.service.MemberQueryService;
 import cat.community.nyangmunity.postImage.image.entity.Provider;
 import cat.community.nyangmunity.postImage.image.request.ImageUploadRequest;
 import cat.community.nyangmunity.postImage.image.response.ImageDetailResponse;
@@ -33,6 +35,7 @@ public class ImageController {
 
 	private final ImageQueryService imageQueryService;
 	private final ImageCommandService imageCommandService;
+	private final MemberQueryService memberQueryService;
 
 	/**
 	 * 이미지 목록 조회 (태그 필터링 및 정렬 지원)
@@ -44,7 +47,7 @@ public class ImageController {
 		@RequestParam(required = false) Provider provider,
 		@RequestParam(required = false) String tags,
 		@RequestParam(defaultValue = "latest") String sort,
-		@AuthenticationPrincipal Member member) {
+		Principal principal) {
 
 		List<String> tagList = null;
 		if (tags != null && !tags.trim().isEmpty()) {
@@ -55,6 +58,7 @@ public class ImageController {
 					.collect(Collectors.toList());
 		}
 
+		Member member = resolveMember(principal);
 		return imageQueryService.getImages(page, size, provider, tagList, sort, member);
 	}
 
@@ -87,8 +91,25 @@ public class ImageController {
 	@GetMapping("/{imageId}")
 	public ResponseEntity<ImageDetailResponse> getImage(
 		@PathVariable String imageId,
-		@AuthenticationPrincipal Member member) {
+		Principal principal) {
+		Member member = resolveMember(principal);
 		ImageDetailResponse response = imageQueryService.getImage(imageId, member);
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * JwtTokenProvider 가 Principal 로 Spring Security User 객체를 박기 때문에
+	 * @AuthenticationPrincipal Member 로는 null 이 들어온다.
+	 * Principal.getName() 이 JWT subject(=memberId) 이므로 이를 통해 Member 를 조회한다.
+	 */
+	private Member resolveMember(Principal principal) {
+		if (principal == null) {
+			return null;
+		}
+		try {
+			return memberQueryService.findMemberById(Long.parseLong(principal.getName()));
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 }
