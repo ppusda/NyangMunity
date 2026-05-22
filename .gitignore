@@ -40,6 +40,14 @@ out/
 ./front/.env
 /src/main/resources/application-secret.yml
 
+### front-react ###
+front-react/node_modules
+front-react/dist
+front-react/dist-ssr
+front-react/.env
+front-react/.env.local
+front-react/.env.*.local
+
 ### Server Connect ###
 ./ca.crt
 ./ca.key

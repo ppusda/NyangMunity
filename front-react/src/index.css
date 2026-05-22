@@ -1,0 +1,19 @@
+@import './styles/tokens.css';
+@import './styles/atoms.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    margin: 0;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-kr);
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+  button { font-family: inherit; }
+  .font-display { font-family: var(--font-kr); letter-spacing: -0.02em; }
+}
