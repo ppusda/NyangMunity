@@ -144,7 +144,7 @@ export function ImageDetailPage() {
           <button
             type="button"
             className="nm-btn nm-btn--ghost nm-btn--sm"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/posts')}
           >
             <ChevronLeft size={16} /> 갤러리로
           </button>
