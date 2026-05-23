@@ -25,11 +25,13 @@ public class ImageLikeCommandService {
 
 	@Transactional
 	public ImageLikeResponse likeImageProcess(String imageId, Member member) {
-		Optional<ImageLike> imageLike = imageQueryService.findImageLike(imageId, member.getId());
+		Image image = imageRepository.findById(imageId).orElseThrow(BadRequestException::new);
+		Optional<ImageLike> existing = imageQueryService.findImageLike(imageId, member.getId());
 
-		// 만약, 이미지 좋아요를 누른 상태라면 취소 작업
-		if (imageLike.isPresent()) {
-			unlikeImage(imageLike.get());
+		// 이미 좋아요를 누른 상태라면 취소 작업
+		if (existing.isPresent()) {
+			unlikeImage(existing.get());
+			image.decrementLikes();
 			return ImageLikeResponse.builder()
 				.imageId(imageId)
 				.state(false)
@@ -37,12 +39,12 @@ public class ImageLikeCommandService {
 		}
 
 		// 좋아요를 누른 상태가 아니라면 좋아요 등록
-		Image image = imageRepository.findById(imageId).orElseThrow(BadRequestException::new);
 		likeImage(ImageLike.builder()
 			.member(member)
 			.image(image)
 			.build()
 		);
+		image.incrementLikes();
 
 		return ImageLikeResponse.builder()
 			.imageId(imageId)
