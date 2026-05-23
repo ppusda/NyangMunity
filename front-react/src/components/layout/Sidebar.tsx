@@ -8,9 +8,11 @@ import {
   PanelLeftOpen,
   Upload,
   ChevronsUpDown,
+  LogIn,
 } from 'lucide-react';
-import { NmLogo, NmLogoMark } from '@/components/icons/NmLogoMark';
+import { NmLogo } from '@/components/icons/NmLogoMark';
 import { useAuthStore } from '@/stores/authStore';
+import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -27,21 +29,32 @@ const navItems = [
 
 export function Sidebar({ collapsed, onToggle }: Props) {
   const member = useAuthStore((s) => s.member);
+  const isLogin = useAuthStore((s) => s.isLogin);
+  const openUpload = useUIStore((s) => s.openUpload);
+  const openAuthPrompt = useUIStore((s) => s.openAuthPrompt);
+
+  const handleUploadClick = () => {
+    if (!isLogin) {
+      openAuthPrompt('사진 업로드는 로그인 후 이용할 수 있어요.');
+      return;
+    }
+    openUpload();
+  };
 
   return (
     <aside
       className={cn(
-        'h-screen flex flex-col border-r border-[var(--border-subtle)] bg-surface transition-[width] duration-200 ease-out',
-        collapsed ? 'w-[64px]' : 'w-[244px]',
+        'h-screen flex flex-col border-r border-[var(--border-subtle)] bg-surface transition-[width] duration-200 ease-out shrink-0',
+        collapsed ? 'w-[60px]' : 'w-[244px]',
       )}
     >
       <div
         className={cn(
-          'flex items-center px-3 h-[60px] border-b border-[var(--border-subtle)] shrink-0',
-          collapsed ? 'justify-center' : 'justify-between',
+          'flex items-center h-[60px] border-b border-[var(--border-subtle)] shrink-0',
+          collapsed ? 'justify-center' : 'justify-between px-3',
         )}
       >
-        {collapsed ? <NmLogoMark /> : <NmLogo />}
+        {!collapsed && <NmLogo />}
         <button
           type="button"
           onClick={onToggle}
@@ -52,14 +65,13 @@ export function Sidebar({ collapsed, onToggle }: Props) {
         </button>
       </div>
 
-      <div className="px-3 pt-4">
+      <div className={cn('pt-4', collapsed ? 'px-0 flex justify-center' : 'px-3')}>
         <button
           type="button"
-          className={cn(
-            'nm-btn nm-btn--primary w-full',
-            collapsed && 'nm-btn--icon',
-          )}
+          onClick={handleUploadClick}
           title="사진 올리기"
+          aria-label="사진 올리기"
+          className={cn('nm-btn nm-btn--primary', collapsed ? 'nm-btn--icon' : 'w-full')}
         >
           <Upload size={16} />
           {!collapsed && <span>사진 올리기</span>}
@@ -74,9 +86,10 @@ export function Sidebar({ collapsed, onToggle }: Props) {
               <span
                 key={item.label}
                 title={item.label}
+                aria-label={item.label}
                 className={cn(
-                  'flex items-center gap-3 rounded-md px-3 h-9 text-sm text-text-tertiary cursor-not-allowed',
-                  collapsed && 'justify-center px-0',
+                  'flex items-center rounded-md h-9 text-sm text-text-tertiary cursor-not-allowed',
+                  collapsed ? 'justify-center' : 'gap-3 px-3',
                 )}
               >
                 <Icon size={18} />
@@ -98,10 +111,11 @@ export function Sidebar({ collapsed, onToggle }: Props) {
               key={item.to}
               to={item.to}
               title={item.label}
+              aria-label={item.label}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 rounded-md px-3 h-9 text-sm transition-colors',
-                  collapsed && 'justify-center px-0',
+                  'flex items-center rounded-md h-9 text-sm transition-colors',
+                  collapsed ? 'justify-center' : 'gap-3 px-3',
                   isActive
                     ? 'bg-accent text-accent-bright'
                     : 'text-text-secondary hover:bg-white/[0.04] hover:text-text-primary',
@@ -115,13 +129,15 @@ export function Sidebar({ collapsed, onToggle }: Props) {
         })}
       </nav>
 
-      <div className="border-t border-[var(--border-subtle)] p-3">
+      <div className={cn('border-t border-[var(--border-subtle)]', collapsed ? 'p-2 flex justify-center' : 'p-3')}>
         {member ? (
           <NavLink
             to="/member/info"
+            title={member.nickname ?? '내 정보'}
+            aria-label="내 정보"
             className={cn(
-              'flex items-center gap-3 rounded-md px-2 h-12 hover:bg-white/[0.04]',
-              collapsed && 'justify-center px-0',
+              'flex items-center rounded-md hover:bg-white/[0.04]',
+              collapsed ? 'justify-center w-9 h-9' : 'gap-3 px-2 h-12',
             )}
           >
             <div className="w-8 h-8 rounded-full bg-elevated flex items-center justify-center text-sm font-semibold shrink-0">
@@ -140,14 +156,14 @@ export function Sidebar({ collapsed, onToggle }: Props) {
             )}
           </NavLink>
         ) : (
-          !collapsed && (
-            <NavLink
-              to="/member/login"
-              className="nm-btn nm-btn--outline w-full"
-            >
-              로그인
-            </NavLink>
-          )
+          <NavLink
+            to="/member/login"
+            title="로그인"
+            aria-label="로그인"
+            className={cn('nm-btn nm-btn--outline', collapsed ? 'nm-btn--icon' : 'w-full')}
+          >
+            {collapsed ? <LogIn size={16} /> : '로그인'}
+          </NavLink>
         )}
       </div>
     </aside>
