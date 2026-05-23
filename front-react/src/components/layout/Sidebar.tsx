@@ -9,7 +9,7 @@ import {
   Upload,
   ChevronsUpDown,
 } from 'lucide-react';
-import { NmLogo, NmLogoMark } from '@/components/icons/NmLogoMark';
+import { NmLogo } from '@/components/icons/NmLogoMark';
 import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
@@ -40,27 +40,34 @@ export function Sidebar({ collapsed, onToggle }: Props) {
     openUpload();
   };
 
+  if (collapsed) {
+    return (
+      <aside className="h-screen flex flex-col border-r border-[var(--border-subtle)] bg-surface transition-[width] duration-200 ease-out w-[48px] shrink-0">
+        <div className="flex items-center justify-center h-[60px] shrink-0">
+          <button
+            type="button"
+            onClick={onToggle}
+            className="text-text-secondary hover:text-text-primary p-1.5 rounded-md hover:bg-white/[0.04] transition-colors"
+            aria-label="사이드바 펼치기"
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
   return (
-    <aside
-      className={cn(
-        'h-screen flex flex-col border-r border-[var(--border-subtle)] bg-surface transition-[width] duration-200 ease-out',
-        collapsed ? 'w-[64px]' : 'w-[244px]',
-      )}
-    >
-      <div
-        className={cn(
-          'flex items-center px-3 h-[60px] border-b border-[var(--border-subtle)] shrink-0',
-          collapsed ? 'justify-center' : 'justify-between',
-        )}
-      >
-        {collapsed ? <NmLogoMark /> : <NmLogo />}
+    <aside className="h-screen flex flex-col border-r border-[var(--border-subtle)] bg-surface transition-[width] duration-200 ease-out w-[244px]">
+      <div className="flex items-center justify-between px-3 h-[60px] border-b border-[var(--border-subtle)] shrink-0">
+        <NmLogo />
         <button
           type="button"
           onClick={onToggle}
           className="text-text-secondary hover:text-text-primary p-1.5 rounded-md hover:bg-white/[0.04] transition-colors"
-          aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
+          aria-label="사이드바 접기"
         >
-          {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          <PanelLeftClose size={16} />
         </button>
       </div>
 
@@ -68,14 +75,10 @@ export function Sidebar({ collapsed, onToggle }: Props) {
         <button
           type="button"
           onClick={handleUploadClick}
-          className={cn(
-            'nm-btn nm-btn--primary w-full',
-            collapsed && 'nm-btn--icon',
-          )}
-          title="사진 올리기"
+          className="nm-btn nm-btn--primary w-full"
         >
           <Upload size={16} />
-          {!collapsed && <span>사진 올리기</span>}
+          <span>사진 올리기</span>
         </button>
       </div>
 
@@ -86,22 +89,14 @@ export function Sidebar({ collapsed, onToggle }: Props) {
             return (
               <span
                 key={item.label}
-                title={item.label}
-                className={cn(
-                  'flex items-center gap-3 rounded-md px-3 h-9 text-sm text-text-tertiary cursor-not-allowed',
-                  collapsed && 'justify-center px-0',
-                )}
+                className="flex items-center gap-3 rounded-md px-3 h-9 text-sm text-text-tertiary cursor-not-allowed"
               >
                 <Icon size={18} />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1">{item.label}</span>
-                    {item.badge && (
-                      <span className="text-[11px] font-medium px-1.5 rounded bg-elevated text-text-secondary">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
+                <span className="flex-1">{item.label}</span>
+                {item.badge && (
+                  <span className="text-[11px] font-medium px-1.5 rounded bg-elevated text-text-secondary">
+                    {item.badge}
+                  </span>
                 )}
               </span>
             );
@@ -110,11 +105,9 @@ export function Sidebar({ collapsed, onToggle }: Props) {
             <NavLink
               key={item.to}
               to={item.to}
-              title={item.label}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-3 rounded-md px-3 h-9 text-sm transition-colors',
-                  collapsed && 'justify-center px-0',
                   isActive
                     ? 'bg-accent text-accent-bright'
                     : 'text-text-secondary hover:bg-white/[0.04] hover:text-text-primary',
@@ -122,7 +115,7 @@ export function Sidebar({ collapsed, onToggle }: Props) {
               }
             >
               <Icon size={18} />
-              {!collapsed && <span className="flex-1">{item.label}</span>}
+              <span className="flex-1">{item.label}</span>
             </NavLink>
           );
         })}
@@ -132,35 +125,23 @@ export function Sidebar({ collapsed, onToggle }: Props) {
         {member ? (
           <NavLink
             to="/member/info"
-            className={cn(
-              'flex items-center gap-3 rounded-md px-2 h-12 hover:bg-white/[0.04]',
-              collapsed && 'justify-center px-0',
-            )}
+            className="flex items-center gap-3 rounded-md px-2 h-12 hover:bg-white/[0.04]"
           >
             <div className="w-8 h-8 rounded-full bg-elevated flex items-center justify-center text-sm font-semibold shrink-0">
               {member.nickname?.[0] ?? '?'}
             </div>
-            {!collapsed && (
-              <>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{member.nickname}</div>
-                  <div className="text-[11px] text-text-tertiary truncate font-en">
-                    {member.email}
-                  </div>
-                </div>
-                <ChevronsUpDown size={14} className="text-text-tertiary" />
-              </>
-            )}
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium truncate">{member.nickname}</div>
+              <div className="text-[11px] text-text-tertiary truncate font-en">
+                {member.email}
+              </div>
+            </div>
+            <ChevronsUpDown size={14} className="text-text-tertiary" />
           </NavLink>
         ) : (
-          !collapsed && (
-            <NavLink
-              to="/member/login"
-              className="nm-btn nm-btn--outline w-full"
-            >
-              로그인
-            </NavLink>
-          )
+          <NavLink to="/member/login" className="nm-btn nm-btn--outline w-full">
+            로그인
+          </NavLink>
         )}
       </div>
     </aside>
