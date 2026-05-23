@@ -1,4 +1,5 @@
 import { Heart, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useLikeToggle } from '@/hooks/useLikeToggle';
 import type { ImageItem } from '@/types';
@@ -131,7 +132,11 @@ function BentoTile({ image, span, hero }: TileProps) {
   const liked = image.likeState ?? false;
   const thumbnail = image.url ?? image.thumbnailUrl ?? '';
   return (
-    <div className={cn('cat-card ap-tile', `ap-tile--${span}`)} style={spanGridStyle[span]}>
+    <Link
+      to={`/images/${image.id}`}
+      className={cn('cat-card ap-tile block', `ap-tile--${span}`)}
+      style={spanGridStyle[span]}
+    >
       <img src={thumbnail} alt={image.name ?? ''} loading="lazy" />
       <div className="ap-tile-shade" />
       <div className="cc-overlay-top">
@@ -181,7 +186,7 @@ function BentoTile({ image, span, hero }: TileProps) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
