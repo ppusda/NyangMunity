@@ -25,8 +25,8 @@ logging:
 nyangmunity:
   domain: nyangmunity.bbgk.me
 jwt:
-  access-token-expiration: 1800000 # 30분
-  refresh-token-expiration: 7889280000 # 3달
+  access-token-expiration: 3600000 # 1시간
+  refresh-token-expiration: 2592000000 # 30일
 kakao:
   redirect-uri: "https://nyangmunity.bbgk.me/auth/kakao/callback"
 google:
