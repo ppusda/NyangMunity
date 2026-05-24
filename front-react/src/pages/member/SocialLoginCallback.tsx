@@ -24,9 +24,9 @@ export function SocialLoginCallbackPage() {
 
     authApi
       .exchangeCode(provider as SocialProvider, code)
-      .then((auth) => {
-        setMember(auth.memberInfoResponse);
-        toast.success(`환영합니다, ${auth.memberInfoResponse.nickname}님`);
+      .then((member) => {
+        setMember(member);
+        toast.success(`환영합니다, ${member.nickname}님`);
         navigate('/', { replace: true });
       })
       .catch(() => {
