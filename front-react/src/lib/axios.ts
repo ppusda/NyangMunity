@@ -54,7 +54,7 @@ function clearLocalAuth() {
 
 axiosClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError<{ message?: string }>) => {
+  async (error: AxiosError<{ code?: string; message?: string }>) => {
     const originalRequest = error.config as RetryableRequest | undefined;
 
     if (error.response?.status !== 401) {
@@ -66,6 +66,13 @@ axiosClient.interceptors.response.use(
     }
 
     if (!originalRequest) return Promise.reject(error);
+
+    // TOKEN_EXPIRED 만 재발급 신호. TOKEN_INVALID·그 외 401 (블랙리스트·서명 위조·세션 만료) 은
+    // 재발급해도 같은 코드로 또 거부될 가능성이 높아 즉시 로컬 인증을 정리한다.
+    if (error.response.data?.code !== 'TOKEN_EXPIRED') {
+      clearLocalAuth();
+      return Promise.reject(error);
+    }
 
     if (originalRequest._retry) {
       toast.warning('재로그인 해주세요!');

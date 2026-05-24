@@ -19,9 +19,10 @@ public class ExceptionController {
 	@ExceptionHandler(NyangmunityException.class)
 	public ResponseEntity<ErrorResponse> globalResponseException(NyangmunityException e) {
 		int statusCode = e.getStatusCode();
+		String code = e.getErrorCode() != null ? e.getErrorCode() : String.valueOf(statusCode);
 
 		ErrorResponse body = ErrorResponse.builder()
-			.code(String.valueOf(statusCode))
+			.code(code)
 			.message(e.getMessage())
 			.validation(e.getValidation())
 			.build();
