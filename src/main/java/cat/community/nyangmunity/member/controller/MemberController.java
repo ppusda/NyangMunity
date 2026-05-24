@@ -50,8 +50,13 @@ public class MemberController {
 	}
 
 	@PostMapping("/logout")
-	private void logout(@CookieValue("refreshToken") String refreshToken) {
+	private ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken) {
 		memberFacadeService.logout(refreshToken);
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.SET_COOKIE, cookieProvider.removeAccessTokenCookie().toString())
+			.header(HttpHeaders.SET_COOKIE, cookieProvider.removeRefreshTokenCookie().toString())
+			.build();
 	}
 
 	@PostMapping("/join")

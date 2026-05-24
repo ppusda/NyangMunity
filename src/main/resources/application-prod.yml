@@ -24,6 +24,7 @@ logging:
 # 운영 환경 변수
 nyangmunity:
   domain: nyangmunity.bbgk.me
+  cookie-secure: true
 jwt:
   access-token-expiration: 3600000 # 1시간
   refresh-token-expiration: 2592000000 # 30일

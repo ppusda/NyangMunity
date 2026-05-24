@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { authApi, type SocialProvider } from '@/api/auth';
-import { tokenCookies } from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
 
 export function SocialLoginCallbackPage() {
@@ -26,7 +25,6 @@ export function SocialLoginCallbackPage() {
     authApi
       .exchangeCode(provider as SocialProvider, code)
       .then((auth) => {
-        tokenCookies.save(auth.memberTokens);
         setMember(auth.memberInfoResponse);
         toast.success(`환영합니다, ${auth.memberInfoResponse.nickname}님`);
         navigate('/', { replace: true });
