@@ -2,11 +2,13 @@ package cat.community.nyangmunity.member.service;
 
 import org.springframework.stereotype.Service;
 
+import cat.community.nyangmunity.global.data.JwtValidateStatus;
 import cat.community.nyangmunity.global.exception.global.InternalServerErrorException;
 import cat.community.nyangmunity.global.exception.global.UnauthorizedException;
 import cat.community.nyangmunity.global.exception.member.LoginExpiredException;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
 import cat.community.nyangmunity.member.entity.Token;
+import cat.community.nyangmunity.member.redisRepository.AccessTokenBlacklistRepository;
 import cat.community.nyangmunity.member.response.MemberAuthenticationResponse;
 import cat.community.nyangmunity.member.response.MemberInfoResponse;
 import cat.community.nyangmunity.member.response.MemberTokens;
@@ -18,6 +20,7 @@ public class TokenFacadeService {
 
 	private final TokenQueryService tokenQueryService;
 	private final TokenCommandService tokenCommandService;
+	private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
 
 	private final JwtTokenProvider jwtTokenProvider;
 
@@ -66,6 +69,22 @@ public class TokenFacadeService {
 	public void deleteToken(String refreshToken) {
 		Token token = tokenQueryService.findTokenByRefreshToken(refreshToken);
 		tokenCommandService.delete(token);
+	}
+
+	/**
+	 * 로그아웃 시 access 토큰을 블랙리스트에 등록한다.
+	 * 이미 만료·위조된 토큰은 등록 의미가 없어 무시한다.
+	 */
+	public void blacklistAccessToken(String accessToken) {
+		if (accessToken == null) {
+			return;
+		}
+		if (jwtTokenProvider.validateToken(accessToken) != JwtValidateStatus.ACCEPTED) {
+			return;
+		}
+		String jti = jwtTokenProvider.getJti(accessToken);
+		long remaining = jwtTokenProvider.getRemainingMillis(accessToken);
+		accessTokenBlacklistRepository.blacklist(jti, remaining);
 	}
 
 	private Token validateRefreshToken(String refreshToken) {

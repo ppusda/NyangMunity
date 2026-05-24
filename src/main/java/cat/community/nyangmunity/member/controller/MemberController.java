@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,13 +51,23 @@ public class MemberController {
 	}
 
 	@PostMapping("/logout")
-	private ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken) {
-		memberFacadeService.logout(refreshToken);
+	private ResponseEntity<Void> logout(
+		@CookieValue("refreshToken") String refreshToken,
+		@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String authHeader
+	) {
+		memberFacadeService.logout(refreshToken, extractBearerToken(authHeader));
 
 		return ResponseEntity.ok()
 			.header(HttpHeaders.SET_COOKIE, cookieProvider.removeAccessTokenCookie().toString())
 			.header(HttpHeaders.SET_COOKIE, cookieProvider.removeRefreshTokenCookie().toString())
 			.build();
+	}
+
+	private static String extractBearerToken(String authHeader) {
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			return authHeader.substring(7);
+		}
+		return null;
 	}
 
 	@PostMapping("/join")

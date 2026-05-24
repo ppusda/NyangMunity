@@ -16,6 +16,7 @@ import cat.community.nyangmunity.global.exception.global.InternalServerErrorExce
 import cat.community.nyangmunity.global.exception.member.AccessTokenExpiredException;
 import cat.community.nyangmunity.global.exception.member.AccessTokenInvalidException;
 import cat.community.nyangmunity.global.provider.JwtTokenProvider;
+import cat.community.nyangmunity.member.redisRepository.AccessTokenBlacklistRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,13 +26,16 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
+	private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
 	private final HandlerExceptionResolver resolver;
 
 	public JwtAuthenticationFilter(
 		JwtTokenProvider jwtTokenProvider,
+		AccessTokenBlacklistRepository accessTokenBlacklistRepository,
 		@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver
 	) {
 		this.jwtTokenProvider = jwtTokenProvider;
+		this.accessTokenBlacklistRepository = accessTokenBlacklistRepository;
 		this.resolver = resolver;
 	}
 
@@ -62,6 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		JwtValidateStatus status = jwtTokenProvider.validateToken(accessToken);
 		switch (status) {
 			case ACCEPTED -> {
+				if (accessTokenBlacklistRepository.isBlacklisted(jwtTokenProvider.getJti(accessToken))) {
+					throw new AccessTokenInvalidException();
+				}
 				Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
