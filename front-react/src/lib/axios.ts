@@ -67,9 +67,9 @@ axiosClient.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(error);
 
-    // TOKEN_EXPIRED 만 재발급 신호. TOKEN_INVALID·그 외 401 (블랙리스트·서명 위조·세션 만료) 은
-    // 재발급해도 같은 코드로 또 거부될 가능성이 높아 즉시 로컬 인증을 정리한다.
-    if (error.response.data?.code !== 'TOKEN_EXPIRED') {
+    // 명시적으로 무효 처리된 토큰만 즉시 정리한다. 그 외 401 (만료, 토큰 미첨부, 일반 인증 실패)
+    // 은 일단 재발급을 시도하고 그것마저 실패하면 catch 분기에서 정리한다.
+    if (error.response.data?.code === 'TOKEN_INVALID') {
       clearLocalAuth();
       return Promise.reject(error);
     }
