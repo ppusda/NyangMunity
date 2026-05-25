@@ -7,7 +7,6 @@ import type { MemberAuthenticationResponse } from '@/types';
 type RetryableRequest = InternalAxiosRequestConfig & { _retry?: boolean };
 
 const ACCESS_COOKIE = 'accessToken';
-const REFRESH_COOKIE = 'refreshToken';
 
 export const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -35,6 +34,8 @@ function onRefreshed(token?: string) {
   refreshSubscribers = [];
 }
 
+// Refresh 쿠키는 HttpOnly 라 JS 가 직접 첨부할 수 없지만 withCredentials:true 로 자동 전송된다.
+// 백엔드가 응답 Set-Cookie 로 access·refresh 를 함께 갱신해 내려주므로 프론트는 별도 저장이 필요 없다.
 async function requestReissue(): Promise<MemberAuthenticationResponse> {
   const response = await axios.post<MemberAuthenticationResponse>(
     `${import.meta.env.VITE_API_BASE_URL}/tokens`,
@@ -44,20 +45,16 @@ async function requestReissue(): Promise<MemberAuthenticationResponse> {
   return response.data;
 }
 
-function saveTokens(tokens: { accessToken: string; refreshToken: string }) {
-  Cookies.set(ACCESS_COOKIE, tokens.accessToken);
-  Cookies.set(REFRESH_COOKIE, tokens.refreshToken);
-}
-
-function clearTokensAndLogout() {
+// Access 만 JS-readable 이라 클라이언트가 직접 지울 수 있다. Refresh 는 HttpOnly 이므로
+// 백엔드 logout API 의 응답 Set-Cookie 가 maxAge=0 으로 제거하는 것을 신뢰한다.
+function clearLocalAuth() {
   Cookies.remove(ACCESS_COOKIE);
-  Cookies.remove(REFRESH_COOKIE);
   useAuthStore.getState().clearMember();
 }
 
 axiosClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError<{ message?: string }>) => {
+  async (error: AxiosError<{ code?: string; message?: string }>) => {
     const originalRequest = error.config as RetryableRequest | undefined;
 
     if (error.response?.status !== 401) {
@@ -70,9 +67,16 @@ axiosClient.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(error);
 
+    // 명시적으로 무효 처리된 토큰만 즉시 정리한다. 그 외 401 (만료, 토큰 미첨부, 일반 인증 실패)
+    // 은 일단 재발급을 시도하고 그것마저 실패하면 catch 분기에서 정리한다.
+    if (error.response.data?.code === 'TOKEN_INVALID') {
+      clearLocalAuth();
+      return Promise.reject(error);
+    }
+
     if (originalRequest._retry) {
       toast.warning('재로그인 해주세요!');
-      clearTokensAndLogout();
+      clearLocalAuth();
       return Promise.reject(error);
     }
 
@@ -82,7 +86,6 @@ axiosClient.interceptors.response.use(
 
       try {
         const reissued = await requestReissue();
-        saveTokens(reissued.memberTokens);
         useAuthStore.getState().setMember(reissued.memberInfoResponse);
 
         const newToken = reissued.memberTokens.accessToken;
@@ -93,7 +96,7 @@ axiosClient.interceptors.response.use(
       } catch (reissueError) {
         toast.warning('세션이 만료되었습니다. 다시 로그인해주세요.');
         onRefreshed();
-        clearTokensAndLogout();
+        clearLocalAuth();
         return Promise.reject(reissueError);
       } finally {
         isRefreshing = false;
@@ -114,10 +117,7 @@ axiosClient.interceptors.response.use(
 );
 
 export const tokenCookies = {
-  save: saveTokens,
-  clear: () => {
-    Cookies.remove(ACCESS_COOKIE);
-    Cookies.remove(REFRESH_COOKIE);
-  },
-  hasAny: () => Boolean(Cookies.get(ACCESS_COOKIE) || Cookies.get(REFRESH_COOKIE)),
+  clear: clearLocalAuth,
+  // Refresh 쿠키는 HttpOnly 라 JS 가 못 읽으므로 persisted 인증 상태로 추정한다.
+  hasAny: () => useAuthStore.getState().isLogin || Boolean(Cookies.get(ACCESS_COOKIE)),
 };

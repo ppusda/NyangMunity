@@ -107,11 +107,12 @@ public class MemberFacadeService {
 	}
 
 	/**
-	 * 로그아웃을 위한 메서드 (토큰 제거)
-	 * @param refreshToken 갱신 토큰
+	 * 로그아웃: refresh 토큰을 Redis 화이트리스트에서 제거하고, 살아있는 access 토큰이 함께 전달된 경우
+	 * 블랙리스트에 등록해 만료 전까지 재사용을 차단한다.
 	 */
-	public void logout(String refreshToken) {
+	public void logout(String refreshToken, String accessToken) {
 		tokenFacadeService.deleteToken(refreshToken);
+		tokenFacadeService.blacklistAccessToken(accessToken);
 	}
 
 	/**

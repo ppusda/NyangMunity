@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@RedisHash(value = "token", timeToLive = 60 * 60 * 24 * 7)
+@RedisHash(value = "token", timeToLive = 60 * 60 * 24 * 30)
 public class Token {
 
 	@Id

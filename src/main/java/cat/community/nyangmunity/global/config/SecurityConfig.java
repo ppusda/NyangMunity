@@ -71,8 +71,8 @@ public class SecurityConfig {
 						HttpMethod.GET,
 						"/auth/kakao/url",
 						"/auth/google/url",
-						"/auth/kakaoLogin",
-						"/auth/googleLogin"
+						"/auth/kakao/callback",
+						"/auth/google/callback"
 					).permitAll()
 
 					.anyRequest().authenticated()

@@ -26,9 +26,10 @@ logging:
 # 개발 환경 변수
 nyangmunity:
   domain: localhost
+  cookie-secure: false # localhost(HTTP) 에서도 쿠키가 박히도록 dev 만 false
 jwt:
-  access-token-expiration: 600000 # 10분
-  refresh-token-expiration: 3600000 # 1시간
+  access-token-expiration: 3600000 # 1시간
+  refresh-token-expiration: 2592000000 # 30일
 kakao:
   redirect-uri: "http://localhost:5173/auth/kakao/callback"
 google:

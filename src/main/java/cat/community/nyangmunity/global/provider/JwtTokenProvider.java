@@ -2,6 +2,7 @@ package cat.community.nyangmunity.global.provider;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -36,25 +37,19 @@ public class JwtTokenProvider {
 	}
 
 	/**
-	 * 접근 토큰 생성을 위한 메서드
-	 * @param memberId subject 등록을 위한 회원 아이디
-	 * @return 생성된 접근 토큰
+	 * Access 토큰 생성. jti 를 부여해 로그아웃 시 블랙리스트 키로 사용한다.
 	 */
 	public String createAccessToken(Long memberId) {
 		Date now = new Date();
 		return Jwts.builder()
+			.id(UUID.randomUUID().toString())
 			.subject(memberId.toString())
 			.signWith(secretKey)
-			.expiration(new Date(now.getTime() + accessTokenExpiration)) // 30분
+			.expiration(new Date(now.getTime() + accessTokenExpiration))
 			.issuedAt(now)
 			.compact();
 	}
 
-	/**
-	 * 갱신 토큰 생성을 위한 메서드
-	 * @param memberId subject 등록을 위한 회원 아이디
-	 * @return 생성된 갱신 토큰
-	 */
 	public String createRefreshToken(Long memberId) {
 		Date now = new Date();
 		return Jwts.builder()
@@ -65,11 +60,6 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	/**
-	 * 토큰 내 정보를 확인하기 위한 메서드
-	 * @param token 접근 토큰 혹은 갱신 토큰
-	 * @return 토큰 내 정보
-	 */
 	public Claims getClaims(String token) {
 		return Jwts.parser()
 			.verifyWith(secretKey)
@@ -78,14 +68,6 @@ public class JwtTokenProvider {
 			.getPayload();
 	}
 
-	/**
-	 * 토큰 검증을 위한 메서드
-	 * @param token 접근 토큰 혹은 갱신 토큰
-	 * @return JwtValidateStatus
-	 *  ACCEPTED 검증 완료
-	 *  EXPIRED 만료
-	 *  DENIED 검증 실패
-	 */
 	public JwtValidateStatus validateToken(String token) {
 		try {
 			Jwts.parser()
@@ -100,15 +82,25 @@ public class JwtTokenProvider {
 		}
 	}
 
-	/**
-	 * 인증 정보 설정을 위한 메서드
-	 * @param token 접근 토큰
-	 * @return 인증 정보
-	 */
 	public Authentication getAuthentication(String token) {
 		Claims claims = getClaims(token);
 		User principal = new User(claims.getSubject(), "", Collections.emptyList());
 		return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+	}
+
+	/**
+	 * 블랙리스트 키로 쓰는 jti.
+	 */
+	public String getJti(String token) {
+		return getClaims(token).getId();
+	}
+
+	/**
+	 * 토큰 만료까지 남은 시간(ms). 0 이하면 이미 만료. 블랙리스트 TTL 산정에 쓴다.
+	 */
+	public long getRemainingMillis(String token) {
+		long remaining = getClaims(token).getExpiration().getTime() - System.currentTimeMillis();
+		return Math.max(remaining, 0);
 	}
 
 }
