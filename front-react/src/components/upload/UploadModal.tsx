@@ -11,6 +11,7 @@ interface Props {
   onClose: () => void;
 }
 
+const MAX_NAME = 60;
 const MAX_DESCRIPTION = 500;
 const SUGGESTED_TAGS = ['#아기냥', '#식빵자세', '#골골송', '#창문냥', '#박스고양이', '#하품'];
 
@@ -32,6 +33,7 @@ export function UploadModal({ open, onClose }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -44,6 +46,7 @@ export function UploadModal({ open, onClose }: Props) {
       if (current) URL.revokeObjectURL(current);
       return null;
     });
+    setName('');
     setDescription('');
     setTags([]);
     setTagInput('');
@@ -132,6 +135,7 @@ export function UploadModal({ open, onClose }: Props) {
       await imagesApi.uploadToS3(uploadUrl, file);
       await imagesApi.completeUpload({
         imageId: id,
+        name: name.trim() || undefined,
         description: description.trim() || undefined,
         tags: tags.length > 0 ? tags : undefined,
       });
@@ -249,6 +253,24 @@ export function UploadModal({ open, onClose }: Props) {
             </section>
 
             <section className="up-form nm-scroll">
+              <div className="up-field">
+                <label className="up-label" htmlFor="up-name">
+                  제목 <span className="up-label-opt">선택</span>
+                </label>
+                <input
+                  id="up-name"
+                  type="text"
+                  className="up-input"
+                  maxLength={MAX_NAME}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={file?.name ?? '이 사진을 부를 이름'}
+                />
+                <span className="up-counter">
+                  {MAX_NAME - name.length} / {MAX_NAME}
+                </span>
+              </div>
+
               <div className="up-field">
                 <label className="up-label" htmlFor="up-tags">
                   태그 <span className="up-label-opt">선택 · 최대 10개</span>

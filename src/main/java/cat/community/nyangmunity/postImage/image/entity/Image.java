@@ -173,6 +173,13 @@ public class Image {
 	}
 
 	/**
+	 * 사용자가 입력한 제목으로 갱신합니다. 빈 값이면 기존 파일명을 유지합니다.
+	 */
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	/**
 	 * 업로더(회원)를 설정합니다.
 	 */
 	public void setMember(Member member) {

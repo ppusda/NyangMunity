@@ -14,6 +14,7 @@ import lombok.Setter;
 public class ImageUploadRequest {
 
   private String imageId;
+  private String name;
   private String description;
   private List<String> tags;
 }
