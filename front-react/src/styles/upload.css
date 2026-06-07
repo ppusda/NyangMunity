@@ -244,6 +244,7 @@
     border-style: solid;
   }
 
+  .up-input,
   .up-textarea {
     padding: 10px 12px;
     border-radius: var(--r-2);
@@ -251,15 +252,19 @@
     background: var(--bg-surface);
     font: 400 14px var(--font-kr);
     color: var(--text-primary);
-    resize: vertical;
     outline: none;
     width: 100%;
     line-height: 1.55;
   }
+  .up-textarea {
+    resize: vertical;
+  }
+  .up-input:focus,
   .up-textarea:focus {
     border-color: var(--accent-hover);
     box-shadow: 0 0 0 3px var(--accent-subtle);
   }
+  .up-input::placeholder,
   .up-textarea::placeholder { color: var(--text-tertiary); }
   .up-counter {
     align-self: flex-end;

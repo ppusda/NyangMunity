@@ -66,6 +66,11 @@ public class ImageCommandService {
 		// 업로더 설정
 		image.setMember(member);
 
+		// 제목 업데이트 (비어있으면 createImageInfo 단계에서 박힌 원본 파일명 유지)
+		if (request.getName() != null && !request.getName().trim().isEmpty()) {
+			image.updateName(request.getName().trim());
+		}
+
 		// 설명 업데이트
 		if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
 			image.updateDescription(request.getDescription());

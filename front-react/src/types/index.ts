@@ -86,6 +86,7 @@ export interface UploadUrlResponse {
 
 export interface ImageUploadCompleteRequest {
   imageId: string;
+  name?: string;
   description?: string;
   tags?: string[];
 }
